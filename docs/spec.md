@@ -1,62 +1,105 @@
-# Daily Költségvetéskezelő alkalmazás - Specifikáció
+# Daily költségvetéskezelő alkalmazás – specifikáció
 
-**Készítette:** Szenes Márton (KTZRDZ)
+**Készítette:** Szenes Márton (KTZRDZ)  
 **Dátum:** 2026. február 16.
 
 ---
 
-## 1. Rendszeráttekintés
+## 1. Cél és hatókör
 
-A **Daily** egy elsősorban mobilalapú pénzügyi asszisztens, amelynek célja a napi kiadások és bevételek transzparens követése. Az alkalmazás kiemelt funkciója az automatizáció: mesterséges intelligencia segítségével képes a beérkező banki értesítések (pl. Google Pay) feldolgozására, ezzel minimalizálva a manuális adatbevitel igényét.
+A Daily célja, hogy a felhasználó napi pénzmozgásait (bevétel, kiadás, belső átutalás) rögzítse, visszakereshetően tárolja, és összesítésekkel támogassa a döntéseit.
+
+Az alkalmazás elsődleges platformja mobil, de a rendszer több platformon futtatható.
+
+---
 
 ## 2. Funkcionális követelmények
 
-### 2.1. Hitelesítés és felhasználókezelés
+### 2.1. Hitelesítés és profilkezelés
 
-**Hibrid bejelentkezési modell:**
-* **Lokális profil:** Gyors regisztráció jelszó nélkül (helyi tárolású adatok).
-* **Google SSO integráció:** OAuth 2.0 alapú bejelentkezés a felhőalapú szinkronizációhoz.
+1. A rendszer támogat lokális profilt, amely internet nélkül is használható.
+2. A rendszer támogat Google-alapú bejelentkezést (OAuth 2.0) felhőszinkronhoz.
+3. Lokális profil és Google-fiók összekapcsolásakor a lokális adatok migrálhatók.
+4. Adatütközés esetén determinisztikus szabályt kell alkalmazni (alapértelmezés: last-write-wins).
 
+### 2.2. Számlák (Accounts)
 
-* **Fiók összekapcsolás:** Meglévő lokális adatok migrációja frissen csatolt Google fiókhoz.
-* **Konfliktuskezelés:** Determinisztikus stratégia (pl. *last-write-wins* vagy manuális választás) a lokális és felhőalapú adatok ütközése esetén.
+1. Több számla kezelése támogatott.
+2. Minden számlához kötelező mezők: név, pénznem, kezdőegyenleg.
+3. Opcionális mezők: ikon, szín, megjegyzés.
 
-### 2.2. Pénzügyi entitások kezelése (CRUD)
+### 2.3. Kategóriák (Categories)
 
-* **Számlák (Accounts):** Több deviza kezelése, testreszabható metaadatok (ikon, színkód, egyéni megnevezés). Kezdőegyenleg rögzítése.
-* **Kategóriák (Categories):** Hierarchikus rendszerezés. Törlés esetén az entitások automatikusan egy "Egyéb" gyűjtőkategóriába kerülnek (soft-delete).
-* **Tranzakciók (Transactions):**
-  * **Egyszerű tételek:** Bevétel/Kiadás rögzítése összeggel, időbélyeggel, megjegyzéssel és opcionális bizonylat-fotóval.
-  * **Belső átutalások:** Számlák közötti mozgások kezelése, akár eltérő devizák közötti konverzióval.
+1. A kategóriák hierarchikusak (szülő–gyerek kapcsolat).
+2. Kategória törlésekor a kapcsolódó tételek az „Egyéb” kategóriába kerülnek.
+3. Az „Egyéb” kategória nem törölhető.
 
-### 2.3. Költségvetés és jelentések
+### 2.4. Tranzakciók (Transactions)
 
-* **Export/Import:** Adatok archiválása és hordozhatósága JSON, CSV és (később) Excel (XLSX) formátumokban.
-* **Dinamikus jelentések:** Napi, heti, havi és éves összesítők, kategória-alapú elemzések, valamint egyéni szűrők (pl. időszak, számla, kategória).
-* **Grafikus megjelenítés:** Interaktív diagramok (pl. kördiagram, oszlopdiagram) a kiadások és bevételek vizualizálásához.
+1. A rendszer kezeli a bevétel, kiadás és belső átutalás típusú tételeket.
+2. Kötelező mezők: típus (kiadás / bevétel), összeg, pénznem, időbélyeg, forrásszámla.
+3. Opcionális mezők: kategória, megjegyzés, bizonylatkép.
+4. Belső átutalás esetén kötelező a célszámla; eltérő pénznem esetén árfolyam vagy célösszeg megadása szükséges.
 
-### 2.4. Felhasználói interakciók egymással
+### 2.5. Kimutatások és szűrés
 
-* **Közösségi funkciók:** Ismerősök felvétele, tranzakciók megosztása, közös költségvetés létrehozása (pl. családi vagy lakótársi költségek).
+1. Időalapú összesítések: napi, heti, havi, éves.
+2. Szűrési lehetőségek: időszak, számla, kategória, tranzakciótípus.
+3. Kimenetek: listanézet és diagram (kör- vagy oszlopdiagram).
 
-## 3. AI-alapú Automatizáció
+### 2.6. Import / export
 
-### 3.1. Intelligens értesítés-feldolgozás
+1. Export formátumok: JSON, CSV.
+2. Import formátumok: JSON, CSV.
+3. Az import validálja a kötelező mezőket; hibás rekord nem kerül mentésre.
+4. XLSX támogatás későbbi bővítésként kezelendő.
 
-Az alkalmazás a háttérben figyeli a kijelölt banki applikációk (pl. Google Pay, Revolut) push üzeneteit.
+### 2.7. Közös használat
 
-* **NLP motor:** Az üzenet szövegéből kinyeri a tranzakció típusát, az összeget, a pénznemet és a kereskedő neve alapjá negy megjegyzést ír a tranzakcióhoz.
-* **Kontextus-függő kategorizálás:** A korábbi tranzakciók alapján automatikusan hozzárendeli a legvalószínűbb kategóriát. Ez később tanítható a felhasználói visszajelzések alapján.
-* **Offline reziliencia:** Internetkapcsolat hiányában az üzenetek egy lokális várólistába (**Queue**) kerülnek, majd a kapcsolat helyreálltakor történik meg az AI elemzés.
+1. Több felhasználós funkciók (ismerősök, megosztott költségvetés).
+2. A modul tervezése során biztosítani kell a későbbi bővíthetőséget.
 
-### 3.2. Automatizált transzfer-felismerés
+---
 
-Amennyiben az üzenet belső mozgatásra utal (pl. "Pénz küldése a Revolut számlára"), a rendszer felismeri a célszámlát a felhasználó által korábban definiált nevek és kontextus alapján, így nem kettős kiadásként, hanem transzferként rögzíti.
+## 3. Automatikus értesítés-feldolgozás
+
+### 3.1. Forrás és feldolgozás
+
+1. A rendszer képes kijelölt pénzügyi alkalmazások értesítéseit feldolgozni.
+2. A feldolgozás célja a következő mezők kinyerése: tranzakciótípus, összeg, pénznem, kereskedő/partner név.
+3. A rendszer javasol kategóriát korábbi adatok alapján.
+
+### 3.2. Offline működés
+
+1. Hálózat hiányában az értesítések helyi sorban tárolódnak.
+2. Kapcsolat helyreállásakor a sor feldolgozása automatikusan megtörténik.
+
+### 3.3. Belső átutalás felismerése
+
+1. A rendszer azonosítja a belső számlák közötti pénzmozgásra utaló mintákat.
+2. Sikeres felismerés esetén a tétel átutalásként rögzül, nem kiadásként.
+
+---
 
 ## 4. Nem-funkcionális követelmények (NFR)
 
-* **Felhasználói élmény (UX):** Azonnali visszajelzés (Toast/Snackbar) az automatikus tranzakciórögzítés sikerességéről.
-* **Beállítások:**
-  * Alapértelmezett deviza és főszámla kezelése.
-  * Szabályozás az AI funkciók felett.
-  * Dinamikus nézetek (Napi/Heti/Havi/Éves aggregáció).
+### 4.1. Használhatóság
+
+1. Minden létrehozás, módosítás, törlés művelethez egyértelmű felhasználói visszajelzés tartozik.
+2. Az automatikusan rögzített tételekről külön visszajelzés jelenik meg.
+
+### 4.2. Megbízhatóság
+
+1. Az adatműveletek tranzakcióbiztosan futnak; félbemaradt művelet nem hagyhat inkonzisztens állapotot.
+2. Szinkronizációs hibák esetén a rendszer naplóz és újrapróbálkozási mechanizmust alkalmaz.
+
+---
+
+## 6. Minimális kritériumok (MVP)
+
+1. A felhasználó képes lokális profillal belépni és tranzakciókat rögzíteni.
+2. A felhasználó képes Google-fiókot kapcsolni és adatot szinkronizálni.
+3. A rendszer kezeli a bevétel/kiadás/átutalás típusokat, valamint a kategóriákat és számlákat.
+4. Elérhető legalább JSON és CSV import/export.
+5. Elérhető napi/heti/havi/éves összesítés és alapdiagram.
+6. Értesítésalapú automatikus tranzakció-feldolgozás működik, offline sorral.
