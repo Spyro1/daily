@@ -1,12 +1,6 @@
-# Daily költségvetéskezelő – Professzionális DB séma (v2)
+# Daily költségvetéskezelő – DB séma (v1.1)
 
-Az adatbázis séma a [specifikáció](spec.md)alapján lett elkészítve:
-- offline-first szinkron (`updated_at`, `deleted_at`)
-- moduláris auth modell (`providers` + `external_identities`)
-- rugalmas, de validálható tranzakciós modell (`income` / `expense` / `transfer`)
-- értesítés-parser visszacsatolás (`notification_logs`)
-
-## Egységes ER diagram
+## DB séma
 
 ```mermaid
 erDiagram
@@ -101,7 +95,7 @@ erDiagram
         uuid destination_account_id FK "nullable; transfer esetén kötelező"
         uuid category_id FK "nullable transfernél"
         uuid transfer_group_id "nullable; transfer párosításhoz"
-        string transaction_type "income|expense|transfer|opening"
+        string transaction_type "income|expense|transfer|overwrite"
         decimal amount "decimal(19,4)"
         decimal target_amount "decimal(19,4) nullable"
         datetime occurred_at
@@ -125,40 +119,40 @@ erDiagram
     }
 ```
 
-## Üzleti és technikai szabályok
+## Szabályok
 
-### 1) Offline-first és szinkron
+### Offline-first és szinkron
 - Minden entitásban kötelező: `id`, `created_at`, `updated_at`, `deleted_at`.
 - Konfliktus feloldás: azonos `id` esetén a nagyobb `updated_at` nyer.
 - Soft delete: rekord törlése `deleted_at` beállítással történik.
 
-### 2) Összegkezelés
+### Összegkezelés
 - Minden pénzösszeg `decimal(19,4)` formátumban tárolódik.
 - `amount` mindig a forrásszámla devizájában értendő.
 - `target_amount` csak eltérő devizás átutaláskor kötelező.
 
-### 3) Tranzakciós integritás (CHECK constraint ajánlás)
+### Tranzakciós integritás (CHECK constraint ajánlás)
 - `transaction_type = 'expense'`: `destination_account_id IS NULL`, `category_id IS NOT NULL`.
 - `transaction_type = 'income'`: `destination_account_id IS NULL`, `category_id IS NOT NULL`.
 - `transaction_type = 'transfer'`: `destination_account_id IS NOT NULL`, `category_id IS NULL`.
-- `transaction_type = 'opening'`: automatikusan generált kezdőegyenleg tranzakció.
+- `transaction_type = 'overwrite'`: automatikusan generált kezdőegyenleg tranzakció.
 
-### 4) Számla és kategória szabályok
+### Számla és kategória szabályok
 - `accounts.currency_code` ISO-4217 kód (pl. `HUF`, `EUR`).
 - `accounts.is_archived = true` esetén új tranzakció ne jöhessen létre rá.
 - Kategóriafa: `parent_id` nem mutathat önmagára vagy saját leszármazottra.
 - Törlés előtt a tranzakcióval rendelkező kategória átmozgatandó a rendszer `Other` kategóriába.
 
-### 5) Auth modell
+### Auth modell
 - `external_identities` egyértelmű kapcsolat a lokális profil és provider-fiók között.
 - Javasolt egyediség: `UNIQUE(provider_id, provider_user_id)`.
 
-### 6) Notification parser támogatás
+### Notification parser támogatás
 - Nem biztosan feldolgozható értesítés: `notification_logs.status = 'pending'`.
 - Sikeres feldolgozás esetén kapcsolás: `processed_transaction_id`.
 - Felhasználói javítás/tanítás tárolása: `ai_feedback_json`.
 
-## Javasolt indexek
+## Indexek
 
 - `profiles(updated_at)`
 - `accounts(profile_id, is_archived, deleted_at)`
