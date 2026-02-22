@@ -96,8 +96,8 @@ erDiagram
         uuid category_id FK "nullable transfernél"
         uuid transfer_group_id "nullable; transfer párosításhoz"
         string transaction_type "income|expense|transfer|overwrite"
-        decimal amount "decimal(19,4)"
-        decimal target_amount "decimal(19,4) nullable"
+        decimal amount
+        decimal target_amount "nullable"
         datetime occurred_at
         string note "nullable"
         timestamp created_at
@@ -127,7 +127,7 @@ erDiagram
 - Soft delete: rekord törlése `deleted_at` beállítással történik.
 
 ### Összegkezelés
-- Minden pénzösszeg `decimal(19,4)` formátumban tárolódik.
+- Minden pénzösszeg 2 tizedes pontossággal tárolódik.
 - `amount` mindig a forrásszámla devizájában értendő.
 - `target_amount` csak eltérő devizás átutaláskor kötelező.
 
