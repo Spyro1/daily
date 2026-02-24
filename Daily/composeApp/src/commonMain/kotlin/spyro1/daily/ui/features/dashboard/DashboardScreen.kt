@@ -24,6 +24,7 @@ fun DashboardScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(text = "Daily", style = MaterialTheme.typography.headlineLarge)
+            Text(text = "Daily2", style = MaterialTheme.typography.headlineLarge)
         }
     }
 }
