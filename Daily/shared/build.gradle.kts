@@ -38,7 +38,7 @@ kotlin {
 }
 
 android {
-    namespace = "hu.github.spyro1.daily.shared"
+    namespace = "spyro1.daily.shared"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

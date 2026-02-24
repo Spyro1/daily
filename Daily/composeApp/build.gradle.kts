@@ -67,11 +67,11 @@ kotlin {
 }
 
 android {
-    namespace = "hu.github.spyro1.daily"
+    namespace = "spyro1.daily"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "hu.github.spyro1.daily"
+        applicationId = "spyro1.daily"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -99,11 +99,11 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "hu.github.spyro1.daily.MainKt"
+        mainClass = "spyro1.daily.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "hu.github.spyro1.daily"
+            packageName = "spyro1.daily"
             packageVersion = "1.0.0"
         }
     }

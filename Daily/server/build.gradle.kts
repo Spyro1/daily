@@ -4,10 +4,10 @@ plugins {
     application
 }
 
-group = "hu.github.spyro1.daily"
+group = "spyro1.daily"
 version = "1.0.0"
 application {
-    mainClass.set("hu.github.spyro1.daily.ApplicationKt")
+    mainClass.set("spyro1.daily.ApplicationKt")
     
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
