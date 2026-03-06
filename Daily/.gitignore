@@ -1,19 +1,90 @@
-*.iml
-.kotlin
-.gradle
+# =========================
+# Gradle & Build Artifacts
+# =========================
+.gradle/
+build/
 **/build/
-xcuserdata
-!src/**/build/
+**/bin/
+!gradle/wrapper/gradle-wrapper.jar
+gradle-app.setting
+
+# Local configuration (DO NOT COMMIT!)
+# Contains local SDK paths and potentially signing secrets
 local.properties
-.idea
-.DS_Store
-captures
-.externalNativeBuild
-.cxx
-*.xcodeproj/*
-!*.xcodeproj/project.pbxproj
-!*.xcodeproj/xcshareddata/
-!*.xcodeproj/project.xcworkspace/
-!*.xcworkspace/contents.xcworkspacedata
-**/xcshareddata/WorkspaceSettings.xcsettings
+
+# =========================
+# IntelliJ IDEA / Android Studio
+# =========================
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/libraries
+.idea/caches
+.idea/modules.xml
+.idea/navEditor.xml
+.idea/runConfigurations.xml
+
+# =========================
+# Android Specific
+# =========================
+.cxx/
+captures/
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+# Keystores for signing your apps
+*.keystore
+*.jks
+
+# =========================
+# iOS / Xcode Specific
+# =========================
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+*.xcuserstate
+xcuserdata/
+*.xccheckout
+*.moved-aside
+DerivedData/
+*.hmap
+*.ipa
+*.xcarchive
+
+# CocoaPods (if your KMP project uses them)
+Pods/
+/.symlinks/
+
+# =========================
+# Web / JS / Wasm Specific
+# =========================
 node_modules/
+.npm/
+package-lock.json
+yarn.lock
+
+# =========================
+# Kotlin Native & KMP Specific
+# =========================
+.konan/
+kotlin-js-store/
+
+# =========================
+# OS Specific (Mac / Windows)
+# =========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

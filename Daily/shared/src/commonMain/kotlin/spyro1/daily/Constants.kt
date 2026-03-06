@@ -1,3 +1,3 @@
 package spyro1.daily
 
-const val SERVER_PORT = 8000
+val SERVER_PORT = System.getenv("SERVER_PORT")?.toInt() ?: 8080

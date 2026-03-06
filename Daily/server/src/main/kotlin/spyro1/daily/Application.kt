@@ -3,18 +3,22 @@ package spyro1.daily
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
+import spyro1.daily.database.DatabaseFactory
+import spyro1.daily.plugins.configureHTTP
+import spyro1.daily.plugins.configureMonitoring
+import spyro1.daily.plugins.configureRouting
+import spyro1.daily.plugins.configureSerialization
 
 fun main() {
-    embeddedServer(Netty, port = SERVER_PORT, host = "0.0.0.0", module = Application::module)
+    val port = System.getenv("SERVER_PORT")?.toIntOrNull() ?: 8080
+    embeddedServer(Netty, port = port, host = "0.0.0.0", module = Application::module)
         .start(wait = true)
 }
 
 fun Application.module() {
-    routing {
-        get("/") {
-            call.respondText("Ktor: ${Greeting().greet()}")
-        }
-    }
+    DatabaseFactory.init()
+    configureSerialization()
+    configureHTTP()
+    configureMonitoring()
+    configureRouting()
 }
