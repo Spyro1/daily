@@ -11,6 +11,7 @@ gradle-app.setting
 # Local configuration (DO NOT COMMIT!)
 # Contains local SDK paths and potentially signing secrets
 local.properties
+.env
 
 # =========================
 # IntelliJ IDEA / Android Studio
