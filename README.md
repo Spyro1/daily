@@ -1,5 +1,7 @@
 # Daily
 
+![](./assets/logo/happy-wallet-logo-nobg.png)
+
 Daily is a Kotlin Multiplatform personal finance tracker focused on fast, reliable expense and income management.
 
 ## Scope
