@@ -4,6 +4,20 @@
 
 Daily is a Kotlin Multiplatform personal finance tracker focused on fast, reliable expense and income management.
 
+## Setup
+
+### Backend
+
+Run this command:
+
+```bash
+cd backend
+docker compose up --build
+```
+
+(Make sure the Docker Desktop is running if you are on windwos.)
+
+
 ## Scope
 
 - Track expenses, income, and internal transfers across multiple accounts.
