@@ -4,7 +4,7 @@ services:
     container_name: daily-db
     restart: unless-stopped
     env_file:
-      - ./backend/.env
+      - ./.env
     environment:
       POSTGRES_USER: ${db_username:-postgres}
       POSTGRES_PASSWORD: ${db_password:-password}
@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
     working_dir: /app/backend
     env_file:
-      - ./backend/.env
+      - ./.env
     environment:
       db_host: db
     command:
@@ -74,7 +74,7 @@ services:
     restart: unless-stopped
     working_dir: /app/frontend
     env_file:
-      - ./frontend/.env
+      - ./.env
     command:
       - npm
       - run
