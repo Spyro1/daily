@@ -7,5 +7,5 @@ router = APIRouter()
 router.include_router(
     dashboard.router,
     prefix='/api/v1',
-    tags=['v1','index'])
+    tags=['index', 'v1'])
 
