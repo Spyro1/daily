@@ -12,7 +12,8 @@
     "test": "vitest run",
     "lint": "eslint",
     "format": "prettier --check .",
-    "check": "prettier --write . && eslint --fix"
+    "check": "prettier --write . && eslint --fix",
+    "gen-api": "openapi-generator-cli generate -i http://localhost:8000/openapi.json -g typescript-axios -o src/api/generated"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
