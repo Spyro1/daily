@@ -1,38 +1,128 @@
-# Compiled class file
-*.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
-
-# Kotlin Gradle plugin data, see https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects
-.kotlin/
-
-# Android Studio and IDE
-.idea/
-*.iml
-.gradle/
-local.properties
+# ==========================================
+# Generic / OS Specific
+# ==========================================
+# Mac OS
 .DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDEs / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==========================================
+# React Frontend (.gitignore for React)
+# ==========================================
+# Dependencies
+# It's crucial to ignore node_modules; it will be rebuilt on deploy/install.
+node_modules/
+/frontend/node_modules/
+
+# Production build artifacts
+/build/
+/frontend/build/
+/dist/
+/frontend/dist/
+
+# Local environment variable overrides
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+/frontend/.env.local
+
+# Optional TypeScript search cache
+.tscache/
+
+# Sentry release files
+.sentry-clirc
+
+# Testing coverage reports
+coverage/
+/frontend/coverage/
+
+# ==========================================
+# Python / FastAPI Backend (.gitignore for Python)
+# ==========================================
+# Virtual Environments
+# Always ignore your local venv.
+venv/
+/backend/venv/
+ENV/
+env/
+.env/
+
+# Python build artifacts and cache
+__pycache__/
+/backend/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
 build/
-captures/
-.externalNativeBuild/
-.cxx/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing and Coverage
+.tox/
+.nox/
+.coverage
+.coverage.*
+nosetests.xml
+pylintrc
+.pytest_cache/
+htmlcov/
+/backend/htmlcov/
+
+# Static and Uploads (if applicable)
+# Ignore local upload folders to prevent committing user data.
+/backend/static/uploads/
+/backend/media/
+
+# ==========================================
+# Secrets and Environment Variables
+# ==========================================
+# IMPORTANT: Never commit actual .env files that contain secrets.
+# This rule covers both frontend and backend .env files.
+.env
+/frontend/.env
+/backend/.env
+
+# But DO commit example files like this:
+# !.env.example
+# !/backend/.env.example
+
+# Database (if using local SQLite for development)
+*.db
+*.sqlite3
+/backend/*.db
