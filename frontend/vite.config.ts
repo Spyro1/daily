@@ -1,22 +1,38 @@
-import { defineConfig } from 'vite'
-import { devtools } from '@tanstack/devtools-vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
-
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-
+import { defineConfig } from 'vitest/config'
+import { loadEnv } from 'vite'
 import viteReact from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import { nitro } from 'nitro/vite'
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
+import { resolve, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const config = defineConfig({
-  plugins: [
-    devtools(),
-    nitro({ rollupConfig: { external: [/^@sentry\//] } }),
-    tsconfigPaths({ projects: ['./tsconfig.json'] }),
-    tailwindcss(),
-    tanstackStart(),
-    viteReact(),
-  ],
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const apiTarget = env.VITE_API_BASE_URL || 'http://localhost:8000'
+
+  return {
+    plugins: [TanStackRouterVite({ autoCodeSplitting: true }), viteReact()],
+    define: {
+      'import.meta.env.VITE_API_BASE_URL': JSON.stringify(apiTarget),
+    },
+    server: {
+      proxy: {
+        '/api': {
+          target: apiTarget,
+          changeOrigin: true,
+        },
+      },
+    },
+    test: {
+      globals: true,
+      environment: 'jsdom',
+    },
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, './src'),
+      },
+    },
+  }
 })
-
-export default config
