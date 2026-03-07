@@ -1,5 +1,6 @@
 import logging
-from core.config import app_configs
+import sys
+from app.core.config import app_configs
 from loguru import logger
 
 class InterceptHandler(logging.Handler):
@@ -20,9 +21,19 @@ class InterceptHandler(logging.Handler):
         )
 
 def configure_logging():
-    for name in logging.root.manager.loggerDict:
-        if name in ("uvicorn"):
-            uvicorn_logger = logging.getLogger(name)
-            uvicorn_logger.handlers.clear()
-            uvicorn_logger.setLevel(app_configs.log_level)
-            uvicorn_logger.addHandler(InterceptHandler())
+    logger.remove()
+    logger.add(sys.stdout, level=app_configs.log_level, enqueue=True)
+
+    intercept_handler = InterceptHandler()
+
+    root_logger = logging.getLogger()
+    root_logger.handlers.clear()
+    root_logger.addHandler(intercept_handler)
+    root_logger.setLevel(app_configs.log_level)
+
+    for name in ("uvicorn", "uvicorn.error", "uvicorn.access", "fastapi"):
+        target_logger = logging.getLogger(name)
+        target_logger.handlers.clear()
+        target_logger.addHandler(intercept_handler)
+        target_logger.setLevel(app_configs.log_level)
+        target_logger.propagate = False

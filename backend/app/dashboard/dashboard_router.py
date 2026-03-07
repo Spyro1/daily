@@ -3,5 +3,5 @@ from fastapi import APIRouter
 router = APIRouter()
 
 @router.get('')
-async def get_dashboard():
+async def get_dashboard(): 
     return {"message": "Hello, World!"}

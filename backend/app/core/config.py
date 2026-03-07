@@ -32,16 +32,16 @@ class JWT(Settings):
         env_prefix='jwt_'
     )
     
-class Authsch(Settings):
-    client_id: str
-    client_secret: str
-    redirect_uri: str
-    token_url: str
-    userinfo_url: str
+# class Authsch(Settings):
+#     client_id: str
+#     client_secret: str
+#     redirect_uri: str
+#     token_url: str
+#     userinfo_url: str
     
-    model_config = SettingsConfigDict(
-        env_prefix='authsch_'
-    )
+#     model_config = SettingsConfigDict(
+#         env_prefix='authsch_'
+#     )
     
 class Google(Settings):
     client_id: str
@@ -62,7 +62,7 @@ class Frontend(Settings):
     )
 app_configs = AppConfig()
 database = Database()
-jwt = JWT()
-authsch_config = Authsch()
+jwt_config = JWT()
+# authsch_config = Authsch()
 google_config = Google()
 frontend_config = Frontend()

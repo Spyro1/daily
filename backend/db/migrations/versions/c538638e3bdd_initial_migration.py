@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: c30a18edfa80
+Revision ID: c538638e3bdd
 Revises: 
-Create Date: 2026-03-07 12:51:39.290154
+Create Date: 2026-03-07 18:09:55.304844
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'c30a18edfa80'
+revision: str = 'c538638e3bdd'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -32,7 +32,19 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index('ix_icons_system_deleted', 'icons', ['is_system', 'deleted_at'], unique=False)
-    op.create_table('profiles',
+    op.create_table('providers',
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('name', sa.String(length=255), nullable=False),
+    sa.Column('is_enabled', sa.Boolean(), server_default='true', nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
+    sa.CheckConstraint('length(trim(name)) > 0', name='ck_providers_name_not_empty'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index('ix_providers_deleted_at', 'providers', ['deleted_at'], unique=False)
+    op.create_index('ux_providers_name_active', 'providers', ['name'], unique=True, postgresql_where=sa.text('deleted_at IS NULL'))
+    op.create_table('users',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('email', sa.String(length=255), nullable=True),
     sa.Column('display_name', sa.String(length=255), nullable=False),
@@ -40,29 +52,15 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
-    sa.CheckConstraint('length(trim(display_name)) > 0', name='ck_profiles_display_name_not_empty'),
+    sa.CheckConstraint('length(trim(display_name)) > 0', name='ck_users_display_name_not_empty'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_profiles_deleted_at', 'profiles', ['deleted_at'], unique=False)
-    op.create_index('ix_profiles_updated_at', 'profiles', ['updated_at'], unique=False)
-    op.create_index('ux_profiles_email_active', 'profiles', ['email'], unique=True, postgresql_where=sa.text('email IS NOT NULL AND deleted_at IS NULL'))
-    op.create_table('providers',
-    sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('code', sa.String(length=50), nullable=False),
-    sa.Column('name', sa.String(length=255), nullable=False),
-    sa.Column('is_enabled', sa.Boolean(), server_default='true', nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
-    sa.CheckConstraint("code ~ '^[a-z0-9_\\-]+$'", name='ck_providers_code_slug'),
-    sa.CheckConstraint('length(trim(name)) > 0', name='ck_providers_name_not_empty'),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index('ix_providers_deleted_at', 'providers', ['deleted_at'], unique=False)
-    op.create_index('ux_providers_code_active', 'providers', ['code'], unique=True, postgresql_where=sa.text('deleted_at IS NULL'))
+    op.create_index('ix_users_deleted_at', 'users', ['deleted_at'], unique=False)
+    op.create_index('ix_users_updated_at', 'users', ['updated_at'], unique=False)
+    op.create_index('ux_users_email_active', 'users', ['email'], unique=True, postgresql_where=sa.text('email IS NOT NULL AND deleted_at IS NULL'))
     op.create_table('accounts',
     sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('profile_id', sa.UUID(), nullable=False),
+    sa.Column('user_id', sa.UUID(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('currency_code', sa.String(length=3), nullable=False),
     sa.Column('icon_id', sa.UUID(), nullable=True),
@@ -76,15 +74,15 @@ def upgrade() -> None:
     sa.CheckConstraint("currency_code ~ '^[A-Z]{3}$'", name='ck_accounts_currency_iso4217'),
     sa.CheckConstraint('length(trim(name)) > 0', name='ck_accounts_name_not_empty'),
     sa.ForeignKeyConstraint(['icon_id'], ['icons.id'], ondelete='SET NULL'),
-    sa.ForeignKeyConstraint(['profile_id'], ['profiles.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_accounts_profile_archived_deleted', 'accounts', ['profile_id', 'is_archived', 'deleted_at'], unique=False)
-    op.create_index('ix_accounts_profile_include_total_deleted', 'accounts', ['profile_id', 'include_in_total', 'deleted_at'], unique=False)
-    op.create_index('ux_accounts_profile_name_active', 'accounts', ['profile_id', 'name'], unique=True, postgresql_where=sa.text('deleted_at IS NULL'))
+    op.create_index('ix_accounts_user_archived_deleted', 'accounts', ['user_id', 'is_archived', 'deleted_at'], unique=False)
+    op.create_index('ix_accounts_user_include_total_deleted', 'accounts', ['user_id', 'include_in_total', 'deleted_at'], unique=False)
+    op.create_index('ux_accounts_user_name_active', 'accounts', ['user_id', 'name'], unique=True, postgresql_where=sa.text('deleted_at IS NULL'))
     op.create_table('categories',
     sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('profile_id', sa.UUID(), nullable=False),
+    sa.Column('user_id', sa.UUID(), nullable=False),
     sa.Column('parent_id', sa.UUID(), nullable=True),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('category_type', sa.String(length=20), nullable=False),
@@ -100,31 +98,31 @@ def upgrade() -> None:
     sa.CheckConstraint('parent_id IS NULL OR parent_id <> id', name='ck_categories_parent_not_self'),
     sa.ForeignKeyConstraint(['icon_id'], ['icons.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['parent_id'], ['categories.id'], ondelete='SET NULL'),
-    sa.ForeignKeyConstraint(['profile_id'], ['profiles.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_categories_profile_parent_deleted', 'categories', ['profile_id', 'parent_id', 'deleted_at'], unique=False)
-    op.create_index('ix_categories_profile_type_deleted', 'categories', ['profile_id', 'category_type', 'deleted_at'], unique=False)
-    op.create_index('ux_categories_profile_parent_name_type_active', 'categories', ['profile_id', 'parent_id', 'name', 'category_type'], unique=True, postgresql_where=sa.text('deleted_at IS NULL'))
-    op.create_table('external_identities',
+    op.create_index('ix_categories_user_parent_deleted', 'categories', ['user_id', 'parent_id', 'deleted_at'], unique=False)
+    op.create_index('ix_categories_user_type_deleted', 'categories', ['user_id', 'category_type', 'deleted_at'], unique=False)
+    op.create_index('ux_categories_user_parent_name_type_active', 'categories', ['user_id', 'parent_id', 'name', 'category_type'], unique=True, postgresql_where=sa.text('deleted_at IS NULL'))
+    op.create_table('provided_users',
     sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('profile_id', sa.UUID(), nullable=False),
+    sa.Column('user_id', sa.UUID(), nullable=False),
     sa.Column('provider_id', sa.UUID(), nullable=False),
     sa.Column('provider_user_id', sa.String(length=255), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
-    sa.CheckConstraint('length(trim(provider_user_id)) > 0', name='ck_external_identities_provider_user_not_empty'),
-    sa.ForeignKeyConstraint(['profile_id'], ['profiles.id'], ondelete='CASCADE'),
+    sa.CheckConstraint('length(trim(provider_user_id)) > 0', name='ck_provided_users_provider_user_not_empty'),
     sa.ForeignKeyConstraint(['provider_id'], ['providers.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_external_identities_profile_deleted', 'external_identities', ['profile_id', 'deleted_at'], unique=False)
-    op.create_index('ix_external_identities_provider_deleted', 'external_identities', ['provider_id', 'deleted_at'], unique=False)
-    op.create_index('ux_external_identities_provider_user_active', 'external_identities', ['provider_id', 'provider_user_id'], unique=True, postgresql_where=sa.text('deleted_at IS NULL'))
+    op.create_index('ix_provided_users_provider_deleted', 'provided_users', ['provider_id', 'deleted_at'], unique=False)
+    op.create_index('ix_provided_users_user_deleted', 'provided_users', ['user_id', 'deleted_at'], unique=False)
+    op.create_index('ux_provided_users_provider_user_active', 'provided_users', ['provider_id', 'provider_user_id'], unique=True, postgresql_where=sa.text('deleted_at IS NULL'))
     op.create_table('transactions',
     sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('profile_id', sa.UUID(), nullable=False),
+    sa.Column('user_id', sa.UUID(), nullable=False),
     sa.Column('source_account_id', sa.UUID(), nullable=False),
     sa.Column('destination_account_id', sa.UUID(), nullable=True),
     sa.Column('category_id', sa.UUID(), nullable=True),
@@ -142,19 +140,19 @@ def upgrade() -> None:
     sa.CheckConstraint('target_amount IS NULL OR target_amount > 0', name='ck_transactions_target_amount_positive'),
     sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['destination_account_id'], ['accounts.id'], ondelete='SET NULL'),
-    sa.ForeignKeyConstraint(['profile_id'], ['profiles.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['source_account_id'], ['accounts.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index('ix_transactions_destination_occurred', 'transactions', ['destination_account_id', 'occurred_at'], unique=False)
-    op.create_index('ix_transactions_profile_category_occurred', 'transactions', ['profile_id', 'category_id', 'occurred_at'], unique=False)
-    op.create_index('ix_transactions_profile_occurred_deleted', 'transactions', ['profile_id', 'occurred_at', 'deleted_at'], unique=False)
-    op.create_index('ix_transactions_profile_type_occurred_deleted', 'transactions', ['profile_id', 'transaction_type', 'occurred_at', 'deleted_at'], unique=False)
-    op.create_index('ix_transactions_profile_updated_at', 'transactions', ['profile_id', 'updated_at'], unique=False)
     op.create_index('ix_transactions_source_occurred', 'transactions', ['source_account_id', 'occurred_at'], unique=False)
+    op.create_index('ix_transactions_user_category_occurred', 'transactions', ['user_id', 'category_id', 'occurred_at'], unique=False)
+    op.create_index('ix_transactions_user_occurred_deleted', 'transactions', ['user_id', 'occurred_at', 'deleted_at'], unique=False)
+    op.create_index('ix_transactions_user_type_occurred_deleted', 'transactions', ['user_id', 'transaction_type', 'occurred_at', 'deleted_at'], unique=False)
+    op.create_index('ix_transactions_user_updated_at', 'transactions', ['user_id', 'updated_at'], unique=False)
     op.create_table('notification_logs',
     sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('profile_id', sa.UUID(), nullable=False),
+    sa.Column('user_id', sa.UUID(), nullable=False),
     sa.Column('processed_transaction_id', sa.UUID(), nullable=True),
     sa.Column('raw_text', sa.Text(), nullable=False),
     sa.Column('source_app_package', sa.String(length=255), nullable=True),
@@ -166,50 +164,50 @@ def upgrade() -> None:
     sa.CheckConstraint("status IN ('pending', 'processed', 'failed')", name='ck_notification_logs_status'),
     sa.CheckConstraint('length(trim(raw_text)) > 0', name='ck_notification_logs_raw_text_not_empty'),
     sa.ForeignKeyConstraint(['processed_transaction_id'], ['transactions.id'], ondelete='SET NULL'),
-    sa.ForeignKeyConstraint(['profile_id'], ['profiles.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index('ix_notification_logs_ai_feedback_json_gin', 'notification_logs', ['ai_feedback_json'], unique=False, postgresql_using='gin')
     op.create_index('ix_notification_logs_processed_transaction', 'notification_logs', ['processed_transaction_id'], unique=False)
-    op.create_index('ix_notification_logs_profile_created', 'notification_logs', ['profile_id', 'created_at'], unique=False)
-    op.create_index('ix_notification_logs_profile_status_created', 'notification_logs', ['profile_id', 'status', 'created_at'], unique=False)
+    op.create_index('ix_notification_logs_user_created', 'notification_logs', ['user_id', 'created_at'], unique=False)
+    op.create_index('ix_notification_logs_user_status_created', 'notification_logs', ['user_id', 'status', 'created_at'], unique=False)
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_index('ix_notification_logs_profile_status_created', table_name='notification_logs')
-    op.drop_index('ix_notification_logs_profile_created', table_name='notification_logs')
+    op.drop_index('ix_notification_logs_user_status_created', table_name='notification_logs')
+    op.drop_index('ix_notification_logs_user_created', table_name='notification_logs')
     op.drop_index('ix_notification_logs_processed_transaction', table_name='notification_logs')
     op.drop_index('ix_notification_logs_ai_feedback_json_gin', table_name='notification_logs', postgresql_using='gin')
     op.drop_table('notification_logs')
+    op.drop_index('ix_transactions_user_updated_at', table_name='transactions')
+    op.drop_index('ix_transactions_user_type_occurred_deleted', table_name='transactions')
+    op.drop_index('ix_transactions_user_occurred_deleted', table_name='transactions')
+    op.drop_index('ix_transactions_user_category_occurred', table_name='transactions')
     op.drop_index('ix_transactions_source_occurred', table_name='transactions')
-    op.drop_index('ix_transactions_profile_updated_at', table_name='transactions')
-    op.drop_index('ix_transactions_profile_type_occurred_deleted', table_name='transactions')
-    op.drop_index('ix_transactions_profile_occurred_deleted', table_name='transactions')
-    op.drop_index('ix_transactions_profile_category_occurred', table_name='transactions')
     op.drop_index('ix_transactions_destination_occurred', table_name='transactions')
     op.drop_table('transactions')
-    op.drop_index('ux_external_identities_provider_user_active', table_name='external_identities', postgresql_where=sa.text('deleted_at IS NULL'))
-    op.drop_index('ix_external_identities_provider_deleted', table_name='external_identities')
-    op.drop_index('ix_external_identities_profile_deleted', table_name='external_identities')
-    op.drop_table('external_identities')
-    op.drop_index('ux_categories_profile_parent_name_type_active', table_name='categories', postgresql_where=sa.text('deleted_at IS NULL'))
-    op.drop_index('ix_categories_profile_type_deleted', table_name='categories')
-    op.drop_index('ix_categories_profile_parent_deleted', table_name='categories')
+    op.drop_index('ux_provided_users_provider_user_active', table_name='provided_users', postgresql_where=sa.text('deleted_at IS NULL'))
+    op.drop_index('ix_provided_users_user_deleted', table_name='provided_users')
+    op.drop_index('ix_provided_users_provider_deleted', table_name='provided_users')
+    op.drop_table('provided_users')
+    op.drop_index('ux_categories_user_parent_name_type_active', table_name='categories', postgresql_where=sa.text('deleted_at IS NULL'))
+    op.drop_index('ix_categories_user_type_deleted', table_name='categories')
+    op.drop_index('ix_categories_user_parent_deleted', table_name='categories')
     op.drop_table('categories')
-    op.drop_index('ux_accounts_profile_name_active', table_name='accounts', postgresql_where=sa.text('deleted_at IS NULL'))
-    op.drop_index('ix_accounts_profile_include_total_deleted', table_name='accounts')
-    op.drop_index('ix_accounts_profile_archived_deleted', table_name='accounts')
+    op.drop_index('ux_accounts_user_name_active', table_name='accounts', postgresql_where=sa.text('deleted_at IS NULL'))
+    op.drop_index('ix_accounts_user_include_total_deleted', table_name='accounts')
+    op.drop_index('ix_accounts_user_archived_deleted', table_name='accounts')
     op.drop_table('accounts')
-    op.drop_index('ux_providers_code_active', table_name='providers', postgresql_where=sa.text('deleted_at IS NULL'))
+    op.drop_index('ux_users_email_active', table_name='users', postgresql_where=sa.text('email IS NOT NULL AND deleted_at IS NULL'))
+    op.drop_index('ix_users_updated_at', table_name='users')
+    op.drop_index('ix_users_deleted_at', table_name='users')
+    op.drop_table('users')
+    op.drop_index('ux_providers_name_active', table_name='providers', postgresql_where=sa.text('deleted_at IS NULL'))
     op.drop_index('ix_providers_deleted_at', table_name='providers')
     op.drop_table('providers')
-    op.drop_index('ux_profiles_email_active', table_name='profiles', postgresql_where=sa.text('email IS NOT NULL AND deleted_at IS NULL'))
-    op.drop_index('ix_profiles_updated_at', table_name='profiles')
-    op.drop_index('ix_profiles_deleted_at', table_name='profiles')
-    op.drop_table('profiles')
     op.drop_index('ix_icons_system_deleted', table_name='icons')
     op.drop_table('icons')
     # ### end Alembic commands ###

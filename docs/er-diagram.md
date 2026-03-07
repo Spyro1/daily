@@ -1,10 +1,10 @@
 ```mermaid
 erDiagram
-    profiles ||--o{ accounts : "owns"
-    profiles ||--o{ categories : "defines"
-    profiles ||--o{ transactions : "records"
-    profiles ||--o{ external_identities : "has"
-    profiles ||--o{ notification_logs : "receives"
+    users ||--o{ accounts : "owns"
+    users ||--o{ categories : "defines"
+    users ||--o{ transactions : "records"
+    users ||--o{ external_identities : "has"
+    users ||--o{ notification_logs : "receives"
 
     providers ||--o{ external_identities : "auth_provider"
 
@@ -18,7 +18,7 @@ erDiagram
     accounts ||--o{ transactions : "destination_transfer"
     transactions ||--o{ notification_logs : "created_from"
 
-    profiles {
+    users {
         uuid id PK
         string email "nullable"
         string display_name
@@ -38,7 +38,7 @@ erDiagram
 
     external_identities {
         uuid id PK
-        uuid profile_id FK
+        uuid user_id FK
         uuid provider_id FK
         string provider_user_id
         timestamp created_at
@@ -58,7 +58,7 @@ erDiagram
 
     accounts {
         uuid id PK
-        uuid profile_id FK
+        uuid user_id FK
         string name
         string currency_code "ISO-4217"
         uuid icon_id FK "nullable"
@@ -72,7 +72,7 @@ erDiagram
 
     categories {
         uuid id PK
-        uuid profile_id FK
+        uuid user_id FK
         uuid parent_id FK "self nullable"
         string name
         string category_type "expense|income"
@@ -86,7 +86,7 @@ erDiagram
 
     transactions {
         uuid id PK
-        uuid profile_id FK
+        uuid user_id FK
         uuid source_account_id FK
         uuid destination_account_id FK "nullable; transfer esetén kötelező"
         uuid category_id FK "nullable transfernél"
@@ -103,7 +103,7 @@ erDiagram
 
     notification_logs {
         uuid id PK
-        uuid profile_id FK
+        uuid user_id FK
         uuid processed_transaction_id FK "nullable"
         string raw_text
         string source_app_package "nullable"
