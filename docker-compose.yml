@@ -1,0 +1,112 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: daily-db
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      POSTGRES_USER: ${db_username:-postgres}
+      POSTGRES_PASSWORD: ${db_password:-password}
+      POSTGRES_DB: ${db_name:-daily}
+    ports:
+      - "${db_port:-5432}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${db_username:-postgres} -d ${db_name:-daily} -h localhost -p 5432"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: daily-backend
+    restart: unless-stopped
+    working_dir: /app/backend
+    env_file:
+      - ./backend/.env
+    environment:
+      db_host: db
+    command:
+      - uvicorn
+      - app.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --reload
+      - --reload-dir
+      - /app/backend/app
+      - --reload-dir
+      - /app/backend/db
+    ports:
+      - "${backend_port:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/app
+          target: /app/backend/app
+          ignore:
+            - __pycache__/
+        - action: sync
+          path: ./backend/db
+          target: /app/backend/db
+          ignore:
+            - __pycache__/
+        - action: sync+restart
+          path: ./backend/alembic.ini
+          target: /app/backend/alembic.ini
+        - action: rebuild
+          path: ./backend/requirements.txt
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: daily-frontend
+    restart: unless-stopped
+    working_dir: /app/frontend
+    env_file:
+      - ./frontend/.env
+    command:
+      - npm
+      - run
+      - start
+      - --
+      - --host
+      - 0.0.0.0
+      - --port
+      - "3000"
+    ports:
+      - "${frontend_port:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_started
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/frontend/src
+        - action: sync
+          path: ./frontend/public
+          target: /app/frontend/public
+        - action: sync
+          path: ./frontend/index.html
+          target: /app/frontend/index.html
+        - action: sync+restart
+          path: ./frontend/vite.config.ts
+          target: /app/frontend/vite.config.ts
+        - action: rebuild
+          path: ./frontend/package.json
+        - action: rebuild
+          path: ./frontend/package-lock.json
+
+volumes:
+  pg_data:

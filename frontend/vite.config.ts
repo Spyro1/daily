@@ -18,6 +18,8 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_API_BASE_URL': JSON.stringify(apiTarget),
     },
     server: {
+      host: true,
+      allowedHosts: true,
       proxy: {
         '/api': {
           target: apiTarget,

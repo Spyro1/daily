@@ -9,13 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 # from fastapi.openapi.utils import get_openapi
 
+from app.core.config import frontend_config
 from app.core.logging import configure_logging
 from app.routers import router
 
-# TODO make it env var
-origins = [
-    'http://localhost:3000'
-]
+origins = frontend_config.allowed_origins
 
 async def run_migrations():
     alembic_cfg = Config("alembic.ini")
@@ -43,13 +41,13 @@ async def request_logging_middleware(request: Request, call_next):
     except Exception:
         duration_ms = (perf_counter() - start_time) * 1000
         logger.exception(
-            f"[http]: {request.method} {request.url.path} -> 500 ({duration_ms:.2f} ms)"
+            f"[http]: {request.client.host}:{request.client.port} {request.method} {request.url.path} -> 500 ({duration_ms:.2f} ms)"
         )
         raise
 
     duration_ms = (perf_counter() - start_time) * 1000
     logger.info(
-        f"[http]: {request.method} {request.url.path} -> {response.status_code} ({duration_ms:.2f} ms)"
+        f"[http]: {request.client.host}:{request.client.port} {request.method} {request.url.path} -> {response.status_code} ({duration_ms:.2f} ms)"
     )
     return response
 

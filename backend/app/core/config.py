@@ -56,10 +56,21 @@ class Google(Settings):
 
 class Frontend(Settings):
     auth_callback: str
+    cors_origins: str = ''
     
     model_config = SettingsConfigDict(
         env_prefix='frontend_'
     )
+
+    @property
+    def allowed_origins(self) -> list[str]:
+        origins: list[str] = []
+
+        for origin in self.cors_origins.split(','):
+            origins.append(origin.strip())
+
+        return origins
+
 app_configs = AppConfig()
 database = Database()
 jwt_config = JWT()
