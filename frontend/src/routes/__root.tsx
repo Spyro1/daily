@@ -1,7 +1,7 @@
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { CssBaseline, ThemeProvider } from '@mui/material'
 
-import { NotFoundPage } from '@/components/NotFoundPage'
+import { NotFoundPage } from '#/shared/layout/NotFoundPage'
 import { getThemeByName } from '@/theme/theme'
 import { ThemeModeProvider, useThemeMode } from '@/theme/themeMode'
 

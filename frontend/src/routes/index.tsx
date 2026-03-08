@@ -1,118 +1,99 @@
-import type { FormEvent } from 'react'
-
-import { Link, createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import {
-  Button,
-  Checkbox,
-  Divider,
-  FormControlLabel,
-  Stack,
-  TextField,
-  Typography,
-  Alert,
-  Box,
-} from '@mui/material'
-
-import { healthApi } from '@/api/clients'
-import { queryKeys } from '@/api/queryKeys'
-import { AuthShell } from '@/components/AuthShell'
+import { createFileRoute } from '@tanstack/react-router'
+import { alpha } from '@mui/material/styles'
+import GoogleIcon from '@mui/icons-material/Google'
+import { Box, Button, Stack, Typography } from '@mui/material'
+import { API_BASE } from '@/constants'
+import { HealthIcon } from '@/shared/layout/HealthIcon'
+import { ThemeModeToggle } from '@/shared/ThemeModeToggle'
 
 export const Route = createFileRoute('/')({ component: App })
 
+const logoSrc = '/brand/happy-wallet-logo-nobg.png'
+
 function App() {
-  const { data: healthStatus } = useQuery({
-    queryKey: queryKeys.health,
-    queryFn: async () => {
-      const response = await healthApi.healthHealthGet()
-      return response.data
-    },
-    retry: 1,
-  })
-
-  const onLocalLogin = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-  }
-
   const onGoogleLogin = () => {
-    window.location.assign('/api/v1/google/login')
+    location.assign(`${API_BASE}/api/v1/google/login`)
   }
 
   return (
-    <AuthShell
-      eyebrow="Daily workspace"
-      title="Welcome back"
-      description="Sign in to continue with your daily dashboard, quick actions, and synchronized workspace settings."
-      footer={
-        <Typography variant="body2" textAlign="center" color="text.secondary">
-          Don&apos;t have an account?{' '}
-          <Link to="/register">Create one now</Link>
-        </Typography>
-      }
+    <Box
+      sx={{
+        minHeight: '100dvh',
+        display: 'grid',
+        placeItems: 'center',
+      }}
     >
-      <Stack spacing={2.5}>
-        <Stack spacing={0.75}>
-          <Typography variant="h4">Sign in</Typography>
-          <Typography color="text.secondary">
-            Use your account credentials or continue with Google.
-          </Typography>
-        </Stack>
+      <Box sx={{ position: 'fixed', top: 5, left: 5, zIndex: 1 }}>
+        <HealthIcon />
+      </Box>
 
-        {healthStatus != null ? (
-          <Alert severity="success">Backend connection is available.</Alert>
-        ) : (
-          <Alert severity="info">Backend status will appear here when reachable.</Alert>
-        )}
+      <Box sx={{ position: 'fixed', top: 5, right: 5 }}>
+        <ThemeModeToggle />
+      </Box>
 
-        <Box component="form" onSubmit={onLocalLogin}>
-          <Stack spacing={2}>
-            <TextField
-              id="email"
-              name="email"
-              label="Email"
-              type="email"
-              placeholder="Enter your email"
-              autoComplete="email"
-              required
-              fullWidth
-            />
-
-            <TextField
-              id="password"
-              name="password"
-              label="Password"
-              type="password"
-              placeholder="Enter password"
-              autoComplete="current-password"
-              required
-              fullWidth
-            />
-
-            <FormControlLabel
-              control={<Checkbox id="rememberMe" name="rememberMe" color="primary" />}
-              label="Remember Me"
-            />
-
-            <Button type="submit" variant="contained" size="large" fullWidth>
-              Sign in
-            </Button>
+      <Stack
+        spacing={3}
+        alignItems="center"
+        sx={{
+          width: '100%',
+          maxWidth: 520,
+          px: { xs: 3, sm: 5 },
+          py: { xs: 4, sm: 5 },
+          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <Stack spacing={2} alignItems="center" sx={{ position: 'relative' }}>
+          <Box
+            component="img"
+            src={logoSrc}
+            alt="Daily logo"
+            sx={{
+              width: { xs: 120, sm: 148 },
+              height: { xs: 120, sm: 148 },
+              objectFit: 'contain',
+              filter: `drop-shadow(0 10px 32px ${alpha('#c9841b', 0.28)})`,
+            }}
+          />
+          <Stack spacing={1}>
+            <Typography
+              variant="h1"
+              sx={{
+                fontSize: { xs: '3rem', sm: '4rem' },
+                lineHeight: 0.95,
+              }}
+            >
+              Daily
+            </Typography>
+            <Typography variant="h4">Welcome back</Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 360 }}>
+              Sign in with Google to continue to your Daily dashboard.
+            </Typography>
           </Stack>
-        </Box>
-
-        <Divider sx={{ my: 2 }}>Or</Divider>
-
-        <Stack spacing={1.5}>
-          <Button
-            type="button"
-            variant="outlined"
-            size="large"
-            fullWidth
-            onClick={onGoogleLogin}
-          >
-            Continue with Google
-          </Button>
         </Stack>
+
+        <Button
+          variant="contained"
+          size="large"
+          onClick={onGoogleLogin}
+          startIcon={<GoogleIcon />}
+          sx={{
+            py: 1.6,
+            px: 3,
+            bgcolor: 'primary.main',
+            '&:hover': {
+              bgcolor: 'primary.dark',
+            },
+          }}
+        >
+          Login via Google
+        </Button>
+
+        <Typography variant="body2" color="text.secondary" sx={{ position: 'relative' }}>
+          Secure OAuth login. You will be redirected back here after authentication.
+        </Typography>
       </Stack>
-    </AuthShell>
+    </Box>
   )
 }

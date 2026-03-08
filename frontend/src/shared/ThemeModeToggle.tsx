@@ -9,7 +9,7 @@ export function ThemeModeToggle() {
   const nextLabel = mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
 
   return (
-    <Tooltip title={nextLabel}>
+    <Tooltip title={nextLabel} sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
       <IconButton aria-label={nextLabel} color="inherit" onClick={toggleTheme}>
         {mode === 'dark' ? <LightModeRounded /> : <DarkModeRounded />}
       </IconButton>

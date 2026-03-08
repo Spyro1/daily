@@ -11,37 +11,59 @@ const buildTheme = (mode: ThemeMode): Theme => {
     palette: {
       mode,
       primary: {
-        main: isLight ? '#2563eb' : '#60a5fa',
-        light: isLight ? '#3b82f6' : '#93c5fd',
-        dark: isLight ? '#1d4ed8' : '#2563eb',
-        contrastText: '#ffffff',
+        main: isLight ? '#14633d' : '#7ddf93',
+        light: isLight ? '#2c8f5c' : '#b7f2bf',
+        dark: isLight ? '#0d4c2f' : '#52b36b',
+        contrastText: isLight ? '#f7f3e8' : '#0e1110',
       },
       secondary: {
-        main: isLight ? '#f59e0b' : '#fbbf24',
-        contrastText: '#111827',
+        main: isLight ? '#c9841b' : '#f2b84e',
+        contrastText: '#1e1405',
       },
       background: {
-        default: isLight ? '#edf4ff' : '#08111f',
-        paper: isLight ? '#ffffff' : '#0f1b31',
+        default: isLight ? '#f6f3ec' : '#101718',
+        paper: isLight ? '#fffcf4' : '#172020',
       },
       text: {
-        primary: isLight ? '#0f172a' : '#f8fafc',
-        secondary: isLight ? '#475569' : '#94a3b8',
+        primary: isLight ? '#1f251d' : '#f6f1df',
+        secondary: isLight ? '#5c6657' : '#b0b8a1',
       },
-      divider: isLight ? alpha('#1e293b', 0.1) : alpha('#cbd5e1', 0.12),
+      divider: isLight ? alpha('#3d4f36', 0.12) : alpha('#f0e5bb', 0.12),
     },
     shape: {
       borderRadius: 20,
     },
     typography: {
-      fontFamily: 'Roboto, sans-serif',
+      fontFamily: 'Manrope, sans-serif',
+      h1: {
+        fontFamily: 'Space Grotesk, sans-serif',
+        fontWeight: 700,
+        letterSpacing: '-0.05em',
+      },
       h2: {
+        fontFamily: 'Space Grotesk, sans-serif',
+        fontWeight: 700,
+        letterSpacing: '-0.04em',
+      },
+      h3: {
+        fontFamily: 'Space Grotesk, sans-serif',
         fontWeight: 700,
         letterSpacing: '-0.04em',
       },
       h4: {
+        fontFamily: 'Space Grotesk, sans-serif',
         fontWeight: 700,
         letterSpacing: '-0.03em',
+      },
+      h5: {
+        fontFamily: 'Space Grotesk, sans-serif',
+        fontWeight: 700,
+        letterSpacing: '-0.02em',
+      },
+      h6: {
+        fontFamily: 'Space Grotesk, sans-serif',
+        fontWeight: 700,
+        letterSpacing: '-0.02em',
       },
       button: {
         fontWeight: 700,
@@ -56,14 +78,14 @@ const buildTheme = (mode: ThemeMode): Theme => {
             background: (
               isLight
                 ? [
-                    'radial-gradient(circle at top left, rgba(37,99,235,0.18), transparent 28%)',
-                    'radial-gradient(circle at bottom right, rgba(245,158,11,0.16), transparent 26%)',
-                    '#edf4ff',
+                    'radial-gradient(circle at top left, rgba(20,99,61,0.18), transparent 28%)',
+                    'radial-gradient(circle at bottom right, rgba(201,132,27,0.16), transparent 26%)',
+                    '#f6f3ec',
                   ].join(',')
                 : [
-                    'radial-gradient(circle at top left, rgba(59,130,246,0.22), transparent 24%)',
-                    'radial-gradient(circle at bottom right, rgba(14,165,233,0.18), transparent 20%)',
-                    '#08111f',
+                    'radial-gradient(circle at top left, rgba(125,223,147,0.18), transparent 24%)',
+                    'radial-gradient(circle at bottom right, rgba(242,184,78,0.16), transparent 20%)',
+                    '#101718',
                   ].join(',')
             ),
             backgroundAttachment: 'fixed',
@@ -101,6 +123,7 @@ const buildTheme = (mode: ThemeMode): Theme => {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
+            border: `1px solid ${isLight ? alpha('#406241', 0.08) : alpha('#f0e5bb', 0.08)}`,
           },
         },
       },

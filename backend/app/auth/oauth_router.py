@@ -53,7 +53,7 @@ async def login_for_access_token(
     try:
         data = decode_token(refresh_token)
         logger.debug(f"[{request_id}][oauth/token]: Refresh token decoded for sub={data.get('sub')}")
-        logger.verbose(f"[{request_id}][oauth/token]: Refresh token payload: {data}")
+        logger.debug(f"[{request_id}][oauth/token]: Refresh token payload: {data}")
     except Exception:
         logger.exception(f"[{request_id}][oauth/token]: Failed to decode refresh token")
         raise HTTPException(
@@ -133,7 +133,7 @@ async def oauth_callback(
 
         token_json = token_response.json()
         logger.debug(f"[{request_id}][oauth/callback]: Token response keys={list(token_json.keys())}")
-        logger.verbose(f"[{request_id}][oauth/callback]: Token response payload: {token_json}")
+        logger.debug(f"[{request_id}][oauth/callback]: Token response payload: {token_json}")
 
         if "error" in token_json:
             logger.error(f"[{request_id}][oauth/callback]: OAuth token error payload={token_json}")
