@@ -3,8 +3,7 @@ import { alpha } from '@mui/material/styles'
 import GoogleIcon from '@mui/icons-material/Google'
 import { Box, Button, Stack, Typography } from '@mui/material'
 import { API_BASE } from '@/constants'
-import { HealthIcon } from '@/shared/layout/HealthIcon'
-import { ThemeModeToggle } from '@/shared/ThemeModeToggle'
+import { PageLayout } from '@/shared/layout/PageLayout'
 
 export const Route = createFileRoute('/')({ component: App })
 
@@ -16,20 +15,7 @@ function App() {
   }
 
   return (
-    <Box
-      sx={{
-        minHeight: '100dvh',
-        display: 'grid',
-        placeItems: 'center',
-      }}
-    >
-      <Box sx={{ position: 'fixed', top: 5, left: 5, zIndex: 1 }}>
-        <HealthIcon />
-      </Box>
-
-      <Box sx={{ position: 'fixed', top: 5, right: 5 }}>
-        <ThemeModeToggle />
-      </Box>
+    <PageLayout>
 
       <Stack
         spacing={3}
@@ -62,6 +48,7 @@ function App() {
               sx={{
                 fontSize: { xs: '3rem', sm: '4rem' },
                 lineHeight: 0.95,
+                color: 'gold',
               }}
             >
               Daily
@@ -94,6 +81,6 @@ function App() {
           Secure OAuth login. You will be redirected back here after authentication.
         </Typography>
       </Stack>
-    </Box>
+    </PageLayout>
   )
 }

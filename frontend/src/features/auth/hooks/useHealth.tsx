@@ -10,7 +10,8 @@ export function useHealth() {
             const response = await healthApi.healthHealthGet()
             return response.data
         },
-        retry: 1,
+        // retry: 1,
+        retryDelay: 5000,
     })
     
     return healthStatus

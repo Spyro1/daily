@@ -4,6 +4,8 @@ import { useNavigate, createFileRoute } from '@tanstack/react-router'
 import { Alert, Box, CircularProgress, Paper, Stack, Typography } from '@mui/material'
 
 import { oauthApi } from '@/api/clients'
+import { PageLayout } from '#/shared/layout/PageLayout'
+import { ErrorRounded } from '@mui/icons-material'
 
 export const Route = createFileRoute('/callback')({ component: CallbackPage })
 
@@ -36,17 +38,15 @@ function CallbackPage() {
   }, [navigate])
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'grid', placeItems: 'center', px: 2 }}>
-      <Paper elevation={0} sx={{ width: '100%', maxWidth: 460, p: 4, borderRadius: 8 }}>
+    <PageLayout>
         <Stack spacing={2.5} alignItems="center" textAlign="center">
-          <CircularProgress color="primary" />
-          <Typography variant="h4">Finishing sign in</Typography>
+          {errorMessage ? <ErrorRounded /> : <CircularProgress color="primary" />}
+          <Typography variant="h4">Signing in...</Typography>
           <Typography color="text.secondary">
             Daily is validating your session and redirecting you to the dashboard.
           </Typography>
           {errorMessage ? <Alert severity="error" sx={{ width: '100%' }}>{errorMessage}</Alert> : null}
         </Stack>
-      </Paper>
-    </Box>
+    </PageLayout>
   )
 }
