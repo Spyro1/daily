@@ -38,31 +38,37 @@ const buildTheme = (mode: ThemeMode): Theme => {
       h1: {
         fontFamily: 'Space Grotesk, sans-serif',
         fontWeight: 700,
+        fontSize: '3.5rem',
         letterSpacing: '-0.05em',
       },
       h2: {
         fontFamily: 'Space Grotesk, sans-serif',
         fontWeight: 700,
+        fontSize: '2.5rem',
         letterSpacing: '-0.04em',
       },
       h3: {
         fontFamily: 'Space Grotesk, sans-serif',
         fontWeight: 700,
+        fontSize: '1.875rem',
         letterSpacing: '-0.04em',
       },
       h4: {
         fontFamily: 'Space Grotesk, sans-serif',
         fontWeight: 700,
+        fontSize: '1.5rem',
         letterSpacing: '-0.03em',
       },
       h5: {
         fontFamily: 'Space Grotesk, sans-serif',
         fontWeight: 700,
+        fontSize: '1.25rem',
         letterSpacing: '-0.02em',
       },
       h6: {
         fontFamily: 'Space Grotesk, sans-serif',
         fontWeight: 700,
+        fontSize: '1.125rem',
         letterSpacing: '-0.02em',
       },
       button: {
@@ -74,7 +80,7 @@ const buildTheme = (mode: ThemeMode): Theme => {
       MuiCssBaseline: {
         styleOverrides: {
           body: {
-            minHeight: '100vh',
+            minHeight: '100dvh',
             background: (
               isLight
                 ? [
@@ -91,7 +97,7 @@ const buildTheme = (mode: ThemeMode): Theme => {
             backgroundAttachment: 'fixed',
           },
           '#app': {
-            minHeight: '100vh',
+            minHeight: '100dvh',
           },
         },
       },

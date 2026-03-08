@@ -1,4 +1,4 @@
-import { Box} from "@mui/material";
+import { Box } from "@mui/material";
 
 export interface PageLayoutProps {
     verticalAlign?: 'flex-start' | 'center' | 'flex-end'
