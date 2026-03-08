@@ -8,8 +8,8 @@ export const Route = createFileRoute('/dashboard')({ component: DashboardPage })
 function DashboardPage() {
   return (
     <PageLayout verticalAlign="flex-start">
-      <DemoPage />
-      {/* <CreateAccountPage /> */}
+      {/* <DemoPage /> */}
+      <CreateAccountPage />
       {/* <Box sx={{}}>
         <Typography variant="overline" sx={{ color: 'primary.main', letterSpacing: '0.22em', fontWeight: 700 }}>
           Daily Dashboard
