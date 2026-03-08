@@ -36,19 +36,18 @@ app = FastAPI(
 @app.middleware("http")
 async def request_logging_middleware(request: Request, call_next):
     start_time = perf_counter()
-    try:
-        response = await call_next(request)
-    except Exception:
-        duration_ms = (perf_counter() - start_time) * 1000
-        logger.exception(
-            f"[http]: {request.client.host}:{request.client.port} {request.method} {request.url.path} -> 500 ({duration_ms:.2f} ms)"
-        )
-        raise
+    response = await call_next(request)
+    # try:
+    #     response = await call_next(request)
+    # except Exception:
+    #     duration_ms = (perf_counter() - start_time) * 1000
+    #     logger.exception(
+    #         f"[http]: {request.client.host}:{request.client.port} {request.method} {request.url.path} -> 500 ({duration_ms:.2f} ms)"
+    #     )
+    #     raise
 
     duration_ms = (perf_counter() - start_time) * 1000
-    logger.info(
-        f"[http]: {request.client.host}:{request.client.port} {request.method} {request.url.path} -> {response.status_code} ({duration_ms:.2f} ms)"
-    )
+    logger.info(f"[http]: {request.client.host}:{request.client.port} {request.method} {request.url.path} -> {response.status_code} ({duration_ms:.2f} ms)")
     return response
 
 app.include_router(router)

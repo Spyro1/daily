@@ -26,11 +26,21 @@ PROVIDER_CONFIGS: Dict[str, Any] = {
 }
 
 
+def _cookie_options() -> dict[str, Any]:
+    return {
+        "httponly": True,
+        "secure": False, # Set to True if your app is served over HTTPS in production
+        "samesite": "lax",
+        "path": "/",
+    }
+
+
 @router.post("/logout", status_code=204)
 async def logout(response: Response):
     logger.info("[oauth/logout]: Clearing auth cookies")
-    response.delete_cookie(key="access_token", httponly=True, samesite="lax")
-    response.delete_cookie(key="refresh_token", httponly=True, samesite="lax")
+    cookie_options = _cookie_options()
+    response.delete_cookie(key="access_token", **cookie_options)
+    response.delete_cookie(key="refresh_token", **cookie_options)
 
 
 @router.post("/token")
@@ -71,14 +81,13 @@ async def login_for_access_token(
         )
 
     new_access = create_access_token(payload={"sub": data["sub"], "email": data["email"]})
+    cookie_options = _cookie_options()
 
     response.set_cookie(
         key="access_token",
         value=new_access,
-        httponly=True,
-        secure=True,  # TODO set true in production
-        samesite="lax",
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        **cookie_options,
     )
     logger.info(f"[{request_id}][oauth/token]: Access token refreshed successfully")
     return {"token_type": "bearer"}
@@ -204,27 +213,26 @@ async def oauth_callback(
     access_token = create_access_token(payload=dict(data))
     refresh_token = create_refresh_token(payload=dict(data))
 
+    logger.info(f"[{request_id}][oauth/callback]: Tokens created successfully: access_token: {access_token}, refresh_token: {refresh_token}")
+
     redirect_route = frontend_config.auth_callback
     if not redirect_route:
         logger.error(f"[{request_id}][oauth/callback]: frontend_auth_callback is empty")
         raise HTTPException(status_code=500, detail="Redirect route incorrect! Contact the site administrator.")
 
     redirect_response = RedirectResponse(url=redirect_route, status_code=302)
+    cookie_options = _cookie_options()
     redirect_response.set_cookie(
         key="access_token",
         value=access_token,
-        httponly=True,
-        secure=True,  # TODO set true in production
-        samesite="lax",
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        **cookie_options,
     )
     redirect_response.set_cookie(
         key="refresh_token",
         value=refresh_token,
-        httponly=True,
-        secure=True,  # TODO set true in production
-        samesite="lax",
         max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+        **cookie_options,
     )
 
     logger.debug(f"[{request_id}][oauth/callback]: Redirecting to frontend callback: {redirect_route}")
