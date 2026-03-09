@@ -3,6 +3,10 @@ from fastapi import APIRouter
 import app.auth.oauth_router as oauth
 import app.auth.google.google_router as google
 import app.dashboard.dashboard_router as dashboard
+import app.transactions.transactions_router as transactions
+import app.accounts.accounts_router as accounts
+import app.icons.icons_router as icons
+import app.categories.categories_router as categories
 
 router = APIRouter()
 
@@ -25,3 +29,22 @@ router.include_router(
     prefix='/api/v1',
     tags=['v1', 'dashboard'])
 
+router.include_router(
+    accounts.router,
+    prefix='/api/v1',
+    tags=['v1', 'accounts'])
+
+router.include_router(
+    categories.router,
+    prefix='/api/v1',
+    tags=['v1', 'categories'])
+
+router.include_router(
+    icons.router,
+    prefix='/api/v1',
+    tags=['v1', 'icons'])
+
+router.include_router(
+    transactions.router,
+    prefix='/api/v1',
+    tags=['v1', 'transactions'])
