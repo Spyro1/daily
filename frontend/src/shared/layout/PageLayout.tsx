@@ -23,11 +23,11 @@ export function PageLayout({ children, verticalAlign = 'center', horizontalAlign
             <Box
                 sx={{
                     display: 'flex',
-                    flex: 1,
-                    flexDirection: 'column',
-                    width: '100%',
-                    maxWidth: { xs: '100%', sm: '720px', md: '960px' },
-                    minHeight: 0,
+                    // flex: 1,
+                    // flexDirection: 'column',
+                    // width: '100%',
+                    // maxWidth: { xs: '100%', sm: '720px', md: '960px' },
+                    // minHeight: 0,
                 }}
             >
                 {children}

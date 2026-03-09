@@ -1,10 +1,13 @@
-import AccountBalanceRounded from '@mui/icons-material/AccountBalanceRounded'
-import CreditCardRounded from '@mui/icons-material/CreditCardRounded'
-import PaymentsRounded from '@mui/icons-material/PaymentsRounded'
-import SavingsRounded from '@mui/icons-material/SavingsRounded'
-import WalletRounded from '@mui/icons-material/WalletRounded'
-import WorkspacesRounded from '@mui/icons-material/WorkspacesRounded'
+import {
+    AccountBalanceRounded,
+    CreditCardRounded,
+    PaymentsRounded,
+    SavingsRounded,
+    WalletRounded,
+    WorkspacesRounded,
+} from '@mui/icons-material'
 import { alpha } from '@mui/material/styles'
+import { MuiColorInput } from 'mui-color-input'
 import {
     Box,
     Button,
@@ -59,24 +62,18 @@ export function CreateAccountPage() {
             }}
         >
             <Box
-                // elevation={0}
                 sx={{
                     display: 'flex',
                     flex: 1,
                     flexDirection: 'column',
-                    gap: { xs: 3, sm: 4 },
-                    // p: { xs: 2.5, sm: 3.5, md: 4 },
-                    // borderRadius: { xs: 4, sm: 5 },
+                    gap: 2,
                 }}
             >
-                <Stack spacing={1}>
+                <Stack>
                     <Typography variant="overline" sx={{ color: 'primary.main', letterSpacing: '0.18em', fontWeight: 800 }}>
                         Accounts
                     </Typography>
                     <Typography variant="h3">Create Account</Typography>
-                    <Typography color="text.secondary">
-                        Add the account basics now and fine-tune the details later.
-                    </Typography>
                 </Stack>
 
                 <Stack spacing={2.5} id="create-account-input-fields">
@@ -177,13 +174,13 @@ export function CreateAccountPage() {
                         <Typography variant="subtitle2">Account color</Typography>
                         <Box
                             sx={{
-                                display: 'grid',
-                                gridTemplateColumns: '56px minmax(0, 1fr)',
+                                display: 'flex',
+                                // gridTemplateColumns: '56px minmax(0, 1fr)',
                                 gap: 1.5,
                                 alignItems: 'center',
                             }}
                         >
-                            <Box
+                            {/* <Box
                                 sx={{
                                     height: 56,
                                     borderRadius: 3,
@@ -192,14 +189,22 @@ export function CreateAccountPage() {
                                     borderColor: 'divider',
                                     boxShadow: `inset 0 0 0 1px ${alpha('#ffffff', 0.35)}`,
                                 }}
+                            /> */}
+                            <MuiColorInput
+                                fullWidth
+                                isAlphaHidden
+                                format="hex"
+                                value={color}
+                                variant="outlined"
+                                onChange={(value) => setColor(value)}
                             />
-                            <TextField
+                            {/* <TextField
                                 label="Color"
                                 type="color"
                                 value={color}
                                 onChange={(event) => setColor(event.target.value)}
                                 fullWidth
-                            />
+                            /> */}
                         </Box>
                     </Stack>
 
