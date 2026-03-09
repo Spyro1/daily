@@ -26,25 +26,25 @@ router.include_router(
 # Data routes
 router.include_router(
     dashboard.router,
-    prefix='/api/v1',
+    prefix='/api/v1/dashboard',
     tags=['v1', 'dashboard'])
 
 router.include_router(
     accounts.router,
-    prefix='/api/v1',
+    prefix='/api/v1/accounts',
     tags=['v1', 'accounts'])
 
 router.include_router(
     categories.router,
-    prefix='/api/v1',
+    prefix='/api/v1/categories',
     tags=['v1', 'categories'])
 
 router.include_router(
     icons.router,
-    prefix='/api/v1',
+    prefix='/api/v1/icons',
     tags=['v1', 'icons'])
 
 router.include_router(
     transactions.router,
-    prefix='/api/v1',
+    prefix='/api/v1/transactions',
     tags=['v1', 'transactions'])
