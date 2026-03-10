@@ -18,7 +18,7 @@ function CallbackPage() {
 
     const completeLogin = async () => {
       try {
-        await oauthApi.loginForAccessTokenApiV1OauthTokenPost()
+        await oauthApi.validateAccessTokenApiV1OauthValidatePost()
 
         if (!cancelled) {
           void navigate({ to: '/dashboard', replace: true })
