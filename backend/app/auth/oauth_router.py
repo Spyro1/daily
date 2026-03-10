@@ -9,11 +9,12 @@ from fastapi.responses import RedirectResponse
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.jwt_utils import create_access_token, create_refresh_token, decode_token
-from app.auth.models import TokenData
+from app.auth.jwt_utils import create_access_token, create_refresh_token, decode_token, get_current_user
+from app.auth.models import TokenData, TokenType
 from app.core.config import frontend_config, google_config, jwt_config
 from app.users.models import UserCreate, ProviderCreate, ProvidedUserCreate
 from app.users.services import get_or_create_provided_user, get_provided_user_by_sub
+from db.models import Users
 from db.core import get_db
 
 router = APIRouter()
@@ -39,12 +40,44 @@ def _cookie_options() -> dict[str, Any]:
 async def logout(response: Response):
     logger.info("[oauth/logout]: Clearing auth cookies")
     cookie_options = _cookie_options()
-    response.delete_cookie(key="access_token", **cookie_options)
-    response.delete_cookie(key="refresh_token", **cookie_options)
+    response.delete_cookie(key=TokenType.ACCESS_TOKEN.value, **cookie_options)
+    response.delete_cookie(key=TokenType.REFRESH_TOKEN.value, **cookie_options)
 
 
-@router.post("/token")
-async def login_for_access_token(
+@router.post("/validate")
+async def validate_access_token(
+    response: Response,
+    access_token: Optional[str] = Cookie(None),
+    db: AsyncSession = Depends(get_db)
+):
+    request_id = str(uuid.uuid4())[:8]
+
+    logger.info(f"[{request_id}][oauth/validate]: Validating access token")
+
+    if not access_token:
+        logger.warning(f"[{request_id}][oauth/validate]: Missing access token cookie")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token not found")
+    
+    try:
+        data = decode_token(access_token)
+        logger.debug(f"[{request_id}][oauth/validate]: Access token decoded for sub={data.get('sub')}")
+        logger.debug(f"[{request_id}][oauth/validate]: Access token payload: {data}")
+    except Exception:
+        logger.exception(f"[{request_id}][oauth/validate]: Failed to decode access token")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired access token")
+    
+    provided_user = await get_provided_user_by_sub(db, data["sub"])
+    
+    if not provided_user:
+        logger.warning(f"[{request_id}][oauth/validate]: No provided user found for sub={data.get('sub')}")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    logger.info(f"[{request_id}][oauth/validate]: Access token is valid for user sub={data.get('sub')}")
+    return {"valid": True}
+
+
+@router.post("/refresh")
+async def refresh_access_token(
     response: Response,
     refresh_token: Optional[str] = Cookie(None),
     db: AsyncSession = Depends(get_db),
@@ -80,18 +113,36 @@ async def login_for_access_token(
             detail="User not found",
         )
 
-    new_access = create_access_token(payload={"sub": data["sub"], "email": data["email"]})
+    payload = TokenData(
+        sub= data["sub"], 
+        email= data["email"]
+    )
+
+    new_access = create_access_token(dict(payload))
     cookie_options = _cookie_options()
 
     response.set_cookie(
-        key="access_token",
+        key=TokenType.ACCESS_TOKEN.value,
         value=new_access,
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         **cookie_options,
     )
     logger.info(f"[{request_id}][oauth/token]: Access token refreshed successfully")
-    return {"token_type": "bearer"}
+    return {"refreshed": "success"}
 
+
+@router.get("/token", response_model=str)
+async def get_access_token_string(
+    current_user: Users = Depends(get_current_user)
+) -> str:
+    data = TokenData(
+        email=current_user.email,
+        sub=current_user.accounts[0].provider_user_id
+    )
+    
+    access_token = create_access_token(payload=dict(data))
+
+    return access_token
 
 @router.get("/callback")
 async def oauth_callback(
@@ -149,7 +200,7 @@ async def oauth_callback(
             error_msg = token_json.get("error_description", token_json.get("error", "Unknown OAuth error"))
             raise HTTPException(status_code=400, detail=f"OAuth token exchange failed: {error_msg}")
 
-        access_token = token_json["access_token"]
+        access_token = token_json[TokenType.ACCESS_TOKEN.value]
         logger.debug(f"[{request_id}][oauth/callback]: Access token acquired")
 
         userinfo_headers = {
@@ -223,13 +274,13 @@ async def oauth_callback(
     redirect_response = RedirectResponse(url=redirect_route, status_code=302)
     cookie_options = _cookie_options()
     redirect_response.set_cookie(
-        key="access_token",
+        key=TokenType.ACCESS_TOKEN.value,
         value=access_token,
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         **cookie_options,
     )
     redirect_response.set_cookie(
-        key="refresh_token",
+        key=TokenType.REFRESH_TOKEN.value,
         value=refresh_token,
         max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
         **cookie_options,

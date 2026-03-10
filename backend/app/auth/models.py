@@ -7,8 +7,8 @@ from enum import Enum
 
 # JWT token schemas
 class TokenType(str, Enum):
-    ACCESS = "access"
-    REFRESH = "refresh"
+    ACCESS_TOKEN = "access_token"
+    REFRESH_TOKEN = "refresh_token"
 
 class TokenData(BaseModel):
     sub: str

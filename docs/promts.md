@@ -7,6 +7,7 @@
 - Review and finalize the Profiles to Users refactor in the backend/ directory, ensuring end-to-end consistency across FastAPI models, SQLAlchemy async relationships, and PostgreSQL schema. Scan for residual naming in imports, type hints, and function arguments—excluding the OAuth 'profile' scope—and verify that Alembic migrations align with the new table names. Additionally, validate that the recent logging middleware correctly captures all API requests and that the Google OAuth callback fully utilizes the updated user services. Provide a report of file-specific fixes and any remaining runtime risks.
 - for the backend instead of running the main.py, run uvicorn: command: ['uvicorn', 'app.main:app', '--host', '0.0.0.0', '--port' , '8000', '--workers', '2'] and read the ports from env var for the frontend too
 - add watch and fast reload to backend and frontend so if a file changes then it syncs and rebuilds just that container
+- I input the given access token copyed from the cookies of the frontend site then paste it to swagger and it does not validate it. Why?
 
 ## Building the frontend
 
