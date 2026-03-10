@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **string** |  | [default to undefined]
 **name** | **string** |  | [default to undefined]
+**balance** | **string** |  | [optional] [default to undefined]
 **currency_code** | **string** |  | [default to undefined]
 **icon_svg_content** | **string** |  | [default to undefined]
 **color** | **string** |  | [default to undefined]
@@ -21,6 +22,7 @@ import { AccountIndex } from './api';
 const instance: AccountIndex = {
     id,
     name,
+    balance,
     currency_code,
     icon_svg_content,
     color,

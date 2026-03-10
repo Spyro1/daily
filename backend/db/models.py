@@ -5,13 +5,15 @@ import uuid
 from decimal import Decimal
 from typing import Any, Optional
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, Numeric, String, Text, func, text
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, Numeric, String, Text, case, func, text, select
 from sqlalchemy.dialects.postgresql import JSONB, UUID
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, column_property, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
-    pass
+    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class Users(Base):
@@ -28,19 +30,18 @@ class Users(Base):
         CheckConstraint("length(trim(display_name)) > 0", name="ck_users_display_name_not_empty"),
     )
 
+    # Fields
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     display_name: Mapped[str] = mapped_column(String(255), nullable=False)
     avatar_url: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
-    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-
+    
+    # Connections
     accounts: Mapped[list[Accounts]] = relationship(back_populates="user")
     categories: Mapped[list[Categories]] = relationship(back_populates="user")
     provided_users: Mapped[list[ProvidedUsers]] = relationship(back_populates="user")
     transactions: Mapped[list[Transactions]] = relationship(back_populates="user")
-    notification_logs: Mapped[list[NotificationLogs]] = relationship(back_populates="user")
+    # notification_logs: Mapped[list[NotificationLogs]] = relationship(back_populates="user")
 
 # Static table of the connected SSO login providers
 class Providers(Base):
@@ -56,13 +57,12 @@ class Providers(Base):
         CheckConstraint("length(trim(name)) > 0", name="ck_providers_name_not_empty"),
     )
 
+    # Fields
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     is_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
-    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
+    # Connection
     provided_users: Mapped[list[ProvidedUsers]] = relationship(back_populates="provider")
 
 
@@ -81,76 +81,33 @@ class ProvidedUsers(Base):
         CheckConstraint("length(trim(provider_user_id)) > 0", name="ck_provided_users_provider_user_not_empty"),
     )
 
+    # Fields
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     provider_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("providers.id", ondelete="RESTRICT"), nullable=False)
     provider_user_id: Mapped[str] = mapped_column(String(255), nullable=False)
-    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-
+    
+    # Connections
     user: Mapped[Users] = relationship(back_populates="provided_users")
     provider: Mapped[Providers] = relationship(back_populates="provided_users")
 
 
-class Icons(Base):
-    __tablename__ = "icons"
-    __table_args__ = (
-        Index("ix_icons_system_deleted", "is_system", "deleted_at"),
-    )
+# class Icons(Base):
+#     __tablename__ = "icons"
+#     __table_args__ = (
+#         Index("ix_icons_system_deleted", "is_system", "deleted_at"),
+#     )
 
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    svg_content: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    is_system: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
-    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+#     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+#     name: Mapped[str] = mapped_column(String(255), nullable=False)
+#     svg_content: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+#     is_system: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
+#     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+#     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+#     deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    accounts: Mapped[list[Accounts]] = relationship(back_populates="icon")
-    categories: Mapped[list[Categories]] = relationship(back_populates="icon")
-
-
-class Accounts(Base):
-    __tablename__ = "accounts"
-    __table_args__ = (
-        Index("ix_accounts_user_archived_deleted", "user_id", "is_archived", "deleted_at"),
-        Index("ix_accounts_user_include_total_deleted", "user_id", "include_in_total", "deleted_at"),
-        Index(
-            "ux_accounts_user_name_active",
-            "user_id",
-            "name",
-            unique=True,
-            postgresql_where=text("deleted_at IS NULL"),
-        ),
-        CheckConstraint("currency_code ~ '^[A-Z]{3}$'", name="ck_accounts_currency_iso4217"),
-        CheckConstraint("color IS NULL OR color ~ '^#[0-9A-Fa-f]{6}$'", name="ck_accounts_color_hex"),
-        CheckConstraint("length(trim(name)) > 0", name="ck_accounts_name_not_empty"),
-    )
-
-    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
-    currency_code: Mapped[str] = mapped_column(String(3), nullable=False)
-    icon_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("icons.id", ondelete="SET NULL"), nullable=True)
-    color: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)
-    include_in_total: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
-    is_archived: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
-    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-
-    user: Mapped[Users] = relationship(back_populates="accounts")
-    icon: Mapped[Optional[Icons]] = relationship(back_populates="accounts")
-    source_transactions: Mapped[list[Transactions]] = relationship(
-        back_populates="source_account",
-        foreign_keys="Transactions.source_account_id",
-    )
-    destination_transactions: Mapped[list[Transactions]] = relationship(
-        back_populates="destination_account",
-        foreign_keys="Transactions.destination_account_id",
-    )
-
+#     accounts: Mapped[list[Accounts]] = relationship(back_populates="icon")
+#     categories: Mapped[list[Categories]] = relationship(back_populates="icon")
 
 class Categories(Base):
     __tablename__ = "categories"
@@ -172,20 +129,19 @@ class Categories(Base):
         CheckConstraint("length(trim(name)) > 0", name="ck_categories_name_not_empty"),
     )
 
+    # Fields
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     parent_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     category_type: Mapped[str] = mapped_column(String(20), nullable=False)
     is_system_category: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
-    icon_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("icons.id", ondelete="SET NULL"), nullable=True)
+    icon_name: Mapped[str] = mapped_column(String(100), server_default="Savings", nullable=False)
     color: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)
-    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-
+    
+    # Connections
     user: Mapped[Users] = relationship(back_populates="categories")
-    icon: Mapped[Optional[Icons]] = relationship(back_populates="categories")
+    # icon: Mapped[Optional[Icons]] = relationship(back_populates="categories")
     parent: Mapped[Optional[Categories]] = relationship(remote_side=[id], back_populates="children")
     children: Mapped[list[Categories]] = relationship(back_populates="parent")
     transactions: Mapped[list[Transactions]] = relationship(back_populates="category")
@@ -198,64 +154,140 @@ class Transactions(Base):
         Index("ix_transactions_source_occurred", "source_account_id", "occurred_at"),
         Index("ix_transactions_destination_occurred", "destination_account_id", "occurred_at"),
         Index("ix_transactions_user_type_occurred_deleted", "user_id", "transaction_type", "occurred_at", "deleted_at"),
-        Index("ix_transactions_user_category_occurred", "user_id", "category_id", "occurred_at"),
-        Index("ix_transactions_user_updated_at", "user_id", "updated_at"),
+        
         CheckConstraint("transaction_type IN ('income', 'expense', 'transfer', 'overwrite')", name="ck_transactions_type"),
         CheckConstraint("amount > 0", name="ck_transactions_amount_positive"),
-        CheckConstraint("target_amount IS NULL OR target_amount > 0", name="ck_transactions_target_amount_positive"),
+        
+        # Új, szigorított integritási szabályok
         CheckConstraint(
-            "(transaction_type = 'transfer' AND destination_account_id IS NOT NULL AND category_id IS NULL "
-            "AND destination_account_id <> source_account_id AND target_amount IS NOT NULL) OR "
-            "(transaction_type IN ('income', 'expense') AND destination_account_id IS NULL AND category_id IS NOT NULL "
-            "AND target_amount IS NULL) OR "
-            "(transaction_type = 'overwrite' AND destination_account_id IS NULL AND category_id IS NULL "
-            "AND target_amount IS NULL)",
+            # 1. INCOME: Csak cél számla van, kategória kötelező
+            "(transaction_type = 'income' AND destination_account_id IS NOT NULL AND source_account_id IS NULL AND category_id IS NOT NULL) OR "
+            
+            # 2. EXPENSE: Csak forrás számla van, kategória kötelező
+            "(transaction_type = 'expense' AND source_account_id IS NOT NULL AND destination_account_id IS NULL AND category_id IS NOT NULL) OR "
+            
+            # 3. TRANSFER: Mindkét számla megadva, kategória tilos, cél összeg kötelező (deviza miatt)
+            "(transaction_type = 'transfer' AND source_account_id IS NOT NULL AND destination_account_id IS NOT NULL "
+            "AND source_account_id <> destination_account_id AND category_id IS NULL AND target_amount IS NOT NULL)",
+            
+            # 4. OVERWRITE: Csak forrás számla (vagy cél, de maradjunk a forrásnál), kategória tilos, összeg lehet negatív is? 
+            # (Az overwrite-nál az 'amount' a különbözet lesz: pl. -200 vagy +500)
+            # "(transaction_type = 'overwrite' AND source_account_id IS NOT NULL AND destination_account_id IS NULL AND category_id IS NULL)",
+            
             name="ck_transactions_type_integrity",
         ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    source_account_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("accounts.id", ondelete="RESTRICT"), nullable=False)
+    source_account_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("accounts.id", ondelete="RESTRICT"), nullable=True)
     destination_account_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("accounts.id", ondelete="SET NULL"), nullable=True)
     category_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
     transaction_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    
+    # Az 'amount' mindig a forrás szempontjából vett levonás, vagy a bevétel értéke
     amount: Mapped[Decimal] = mapped_column(Numeric(18, 4), nullable=False)
+    # Csak devizás átutalásnál lehet eltérő a cél összeg, ekkor a 'amount' a forrás számla terhelése, a 'target_amount' pedig a cél számla jóváírása lesz
     target_amount: Mapped[Optional[Decimal]] = mapped_column(Numeric(18, 4), nullable=True)
+    
     occurred_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-
+    
+    # Connections
     user: Mapped[Users] = relationship(back_populates="transactions")
     source_account: Mapped[Accounts] = relationship(back_populates="source_transactions", foreign_keys=[source_account_id])
     destination_account: Mapped[Optional[Accounts]] = relationship(back_populates="destination_transactions", foreign_keys=[destination_account_id])
     category: Mapped[Optional[Categories]] = relationship(back_populates="transactions")
-    notification_logs: Mapped[list[NotificationLogs]] = relationship(back_populates="processed_transaction")
+    # notification_logs: Mapped[list[NotificationLogs]] = relationship(back_populates="processed_transaction")
 
 
-class NotificationLogs(Base):
-    __tablename__ = "notification_logs"
+class Accounts(Base):
+    __tablename__ = "accounts"
     __table_args__ = (
-        Index("ix_notification_logs_user_status_created", "user_id", "status", "created_at"),
-        Index("ix_notification_logs_user_created", "user_id", "created_at"),
-        Index("ix_notification_logs_processed_transaction", "processed_transaction_id"),
-        Index("ix_notification_logs_ai_feedback_json_gin", "ai_feedback_json", postgresql_using="gin"),
-        CheckConstraint("status IN ('pending', 'processed', 'failed')", name="ck_notification_logs_status"),
-        CheckConstraint("length(trim(raw_text)) > 0", name="ck_notification_logs_raw_text_not_empty"),
+        Index("ix_accounts_user_archived_deleted", "user_id", "is_archived", "deleted_at"),
+        Index("ix_accounts_user_include_total_deleted", "user_id", "include_in_total", "deleted_at"),
+        Index(
+            "ux_accounts_user_name_active",
+            "user_id",
+            "name",
+            unique=True,
+            postgresql_where=text("deleted_at IS NULL"),
+        ),
+        CheckConstraint("currency_code ~ '^[A-Z]{3}$'", name="ck_accounts_currency_iso4217"),
+        CheckConstraint("color IS NULL OR color ~ '^#[0-9A-Fa-f]{6}$'", name="ck_accounts_color_hex"),
+        CheckConstraint("length(trim(name)) > 0", name="ck_accounts_name_not_empty"),
     )
 
+    # Fields
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    processed_transaction_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("transactions.id", ondelete="SET NULL"), nullable=True)
-    raw_text: Mapped[str] = mapped_column(Text, nullable=False)
-    source_app_package: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    status: Mapped[str] = mapped_column(String(20), nullable=False, server_default="pending")
-    ai_feedback_json: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
-    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-    deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    currency_code: Mapped[str] = mapped_column(String(3), nullable=False)
+    icon_name: Mapped[str] = mapped_column(String(100), server_default="Savings", nullable=False)
+    color: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)
+    include_in_total: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
+    is_archived: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
+    
+    # Connections
+    user: Mapped[Users] = relationship(back_populates="accounts")
+    # icon: Mapped[Optional[Icons]] = relationship(back_populates="accounts")
+    source_transactions: Mapped[list[Transactions]] = relationship(
+        back_populates="source_account",
+        foreign_keys="Transactions.source_account_id",
+    )
+    destination_transactions: Mapped[list[Transactions]] = relationship(
+        back_populates="destination_account",
+        foreign_keys="Transactions.destination_account_id",
+    )
 
-    user: Mapped[Users] = relationship(back_populates="notification_logs")
-    processed_transaction: Mapped[Optional[Transactions]] = relationship(back_populates="notification_logs")
+    # A balance property definiálása
+    balance: Mapped[Decimal] = column_property(
+        select(
+            func.coalesce(
+                func.sum(
+                    case(
+                        # Bevétel vagy Bejövő utalás
+                        (Transactions.destination_account_id == id, Transactions.target_amount),
+                        # Kiadás vagy Kimenő utalás vagy Overwrite korrekció
+                        (Transactions.source_account_id == id, -Transactions.amount),
+                        else_=0
+                    )
+                ),
+                0
+            )
+        )
+        .where(
+            ((Transactions.source_account_id == id) | (Transactions.destination_account_id == id)),
+            Transactions.deleted_at.is_(None)
+        )
+        .correlate_except(Transactions)
+        .scalar_subquery()
+    )
+
+
+
+
+# Future feature
+# class NotificationLogs(Base):
+#     __tablename__ = "notification_logs"
+#     __table_args__ = (
+#         Index("ix_notification_logs_user_status_created", "user_id", "status", "created_at"),
+#         Index("ix_notification_logs_user_created", "user_id", "created_at"),
+#         Index("ix_notification_logs_processed_transaction", "processed_transaction_id"),
+#         Index("ix_notification_logs_ai_feedback_json_gin", "ai_feedback_json", postgresql_using="gin"),
+#         CheckConstraint("status IN ('pending', 'processed', 'failed')", name="ck_notification_logs_status"),
+#         CheckConstraint("length(trim(raw_text)) > 0", name="ck_notification_logs_raw_text_not_empty"),
+#     )
+
+#     # Fields
+#     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+#     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+#     processed_transaction_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("transactions.id", ondelete="SET NULL"), nullable=True)
+#     raw_text: Mapped[str] = mapped_column(Text, nullable=False)
+#     source_app_package: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+#     status: Mapped[str] = mapped_column(String(20), nullable=False, server_default="pending")
+#     ai_feedback_json: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
+    
+#     # Connections
+#     user: Mapped[Users] = relationship(back_populates="notification_logs")
+#     processed_transaction: Mapped[Optional[Transactions]] = relationship(back_populates="notification_logs")

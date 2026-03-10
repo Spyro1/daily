@@ -16,15 +16,20 @@ from app.routers import router
 origins = frontend_config.allowed_origins
 
 async def run_migrations():
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
+    try:
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
+    except Exception as e:
+        logger.error(f"Error running migrations: {e}")
 
 
 @asynccontextmanager
 async def _lifespan(_app: FastAPI):
     configure_logging()
     await run_migrations()
+    logger.info("Application startup complete.")
     yield
+    logger.info("Shutting down application...")
 
 app = FastAPI(
     debug = False,

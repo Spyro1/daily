@@ -12,15 +12,15 @@ router = APIRouter()
 
 # Auth routes
 router.include_router(
-    oauth.router,
-    prefix='/api/v1/oauth',
-    tags=['v1', 'oauth'])
-
-router.include_router(
     google.router,
     prefix='/api/v1/google',
     tags=['v1', 'oauth']
 )
+router.include_router(
+    oauth.router,
+    prefix='/api/v1/oauth',
+    tags=['v1', 'oauth'])
+
 
 
 # Data routes

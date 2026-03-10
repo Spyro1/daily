@@ -26,6 +26,7 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 export interface AccountIndex {
     'id': string;
     'name': string;
+    'balance'?: string | null;
     'currency_code': string;
     'icon_svg_content': string;
     'color': string;
