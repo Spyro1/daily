@@ -6,6 +6,7 @@ from urllib.parse import urlencode
 
 from fastapi import APIRouter
 from fastapi.responses import RedirectResponse
+from loguru import logger
 
 from app.auth.jwt_utils import create_token
 from app.core.config import google_config, jwt_config
@@ -17,6 +18,7 @@ router = APIRouter()
 
 @router.get("/login")
 async def google_login():
+    logger.info("[google/login]: Starting Google OAuth login redirect")
     state = create_token({"provider": "google"}, expires_delta=timedelta(minutes=jwt_config.login_token_expire_minutes))
     query = urlencode(
         {
@@ -29,4 +31,5 @@ async def google_login():
             "prompt": "consent",
         }
     )
+    logger.debug("[google/login]: Redirect URL prepared for Google OAuth")
     return RedirectResponse(url=f"https://accounts.google.com/o/oauth2/v2/auth?{query}", status_code=302)

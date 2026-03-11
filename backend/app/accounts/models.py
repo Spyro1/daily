@@ -6,10 +6,10 @@ from pydantic import BaseModel
 class AccountBrief(BaseModel):
     id: uuid.UUID
     name: str
+    balance: Decimal
     currency_code: str
 
 class AccountIndex(AccountBrief):
-    balance: Optional[Decimal] = None
     icon_name: str
     color: str
     include_in_total: bool

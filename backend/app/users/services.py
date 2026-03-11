@@ -14,23 +14,39 @@ def _get_user_eager_load_options():
 # JWT functions
 
 async def get_provided_user_by_sub(db: AsyncSession, sub: str):
-    return (
-        await db.scalars(
-            select(ProvidedUsers).where(
-                ProvidedUsers.provider_user_id == sub,
-                ProvidedUsers.deleted_at.is_(None),
+    logger.debug(f"[users/get_provided_user_by_sub]: start sub={sub}")
+    try:
+        provided_user = (
+            await db.scalars(
+                select(ProvidedUsers).where(
+                    ProvidedUsers.provider_user_id == sub,
+                    ProvidedUsers.deleted_at.is_(None),
+                )
             )
-        )
-    ).first()
+        ).first()
+    except Exception as exc:
+        logger.exception(f"[users/get_provided_user_by_sub]: error sub={sub}: {exc}")
+        raise
+
+    logger.debug(f"[users/get_provided_user_by_sub]: found={provided_user is not None} sub={sub}")
+    return provided_user
 
 async def get_user_by_email(db: AsyncSession, email: str) -> Users | None:
-    return (
-        await db.scalars(
-            select(Users)
-            .where(Users.email == email, Users.deleted_at.is_(None))
-            .options(*_get_user_eager_load_options())
-        )
-    ).first()
+    logger.debug(f"[users/get_user_by_email]: start email={email}")
+    try:
+        db_user = (
+            await db.scalars(
+                select(Users)
+                .where(Users.email == email, Users.deleted_at.is_(None))
+                .options(*_get_user_eager_load_options())
+            )
+        ).first()
+    except Exception as exc:
+        logger.exception(f"[users/get_user_by_email]: error email={email}: {exc}")
+        raise
+
+    logger.debug(f"[users/get_user_by_email]: found={db_user is not None} email={email}")
+    return db_user
 
 
 async def get_or_create_user(db: AsyncSession, user: UserCreate, avatar_url: str | None = None) -> Users:
@@ -64,18 +80,34 @@ async def get_or_create_user(db: AsyncSession, user: UserCreate, avatar_url: str
 # == provider functions ==
 
 async def get_providers(db: AsyncSession) -> list[Providers]:
-    return (await db.scalars(select(Providers).where(Providers.deleted_at.is_(None)))).all()
+    logger.debug("[users/get_providers]: start")
+    try:
+        providers = (await db.scalars(select(Providers).where(Providers.deleted_at.is_(None)))).all()
+    except Exception as exc:
+        logger.exception(f"[users/get_providers]: error: {exc}")
+        raise
+
+    logger.debug(f"[users/get_providers]: returning {len(providers)} providers")
+    return providers
 
 
 async def get_provider_by_name(db: AsyncSession, name: str) -> Providers | None:
-    return (
-        await db.scalars(
-            select(Providers).where(
-                Providers.name == name,
-                Providers.deleted_at.is_(None),
+    logger.debug(f"[users/get_provider_by_name]: start name={name}")
+    try:
+        provider = (
+            await db.scalars(
+                select(Providers).where(
+                    Providers.name == name,
+                    Providers.deleted_at.is_(None),
+                )
             )
-        )
-    ).first()
+        ).first()
+    except Exception as exc:
+        logger.exception(f"[users/get_provider_by_name]: error name={name}: {exc}")
+        raise
+
+    logger.debug(f"[users/get_provider_by_name]: found={provider is not None} name={name}")
+    return provider
 
 
 async def get_or_create_provider(
@@ -135,28 +167,55 @@ async def get_or_create_provided_user(
 # == ProvidedUsers functions ==
 
 async def get_provided_user_by_ids(db: AsyncSession, user_id: uuid.UUID, provider_id: uuid.UUID):
-    return (
-        await db.scalars(
-            select(ProvidedUsers).where(
-                ProvidedUsers.user_id == user_id,
-                ProvidedUsers.provider_id == provider_id,
-                ProvidedUsers.deleted_at.is_(None),
+    logger.debug(f"[users/get_provided_user_by_ids]: start user_id={user_id} provider_id={provider_id}")
+    try:
+        provided_user = (
+            await db.scalars(
+                select(ProvidedUsers).where(
+                    ProvidedUsers.user_id == user_id,
+                    ProvidedUsers.provider_id == provider_id,
+                    ProvidedUsers.deleted_at.is_(None),
+                )
             )
-        )
-    ).first()
+        ).first()
+    except Exception as exc:
+        logger.exception(f"[users/get_provided_user_by_ids]: error user_id={user_id} provider_id={provider_id}: {exc}")
+        raise
+
+    logger.debug(
+        f"[users/get_provided_user_by_ids]: found={provided_user is not None} user_id={user_id} provider_id={provider_id}"
+    )
+    return provided_user
 
 
 # == user functions ==
 
 async def get_users(db: AsyncSession):
-    return (await db.scalars(select(Users).where(Users.deleted_at.is_(None)))).all()
+    logger.debug("[users/get_users]: start")
+    try:
+        users = (await db.scalars(select(Users).where(Users.deleted_at.is_(None)))).all()
+    except Exception as exc:
+        logger.exception(f"[users/get_users]: error: {exc}")
+        raise
+
+    logger.debug(f"[users/get_users]: returning {len(users)} users")
+    return users
 
 
 async def get_user_by_id(db: AsyncSession, id: uuid.UUID, eager_load = False):
-    if eager_load:
-        return (
-            await db.scalars(
-                select(Users).where(Users.id == id, Users.deleted_at.is_(None)).options(*_get_user_eager_load_options())
-            )
-        ).first()
-    return (await db.scalars(select(Users).where(Users.id == id, Users.deleted_at.is_(None)))).first()
+    logger.debug(f"[users/get_user_by_id]: start id={id} eager_load={eager_load}")
+    try:
+        if eager_load:
+            user = (
+                await db.scalars(
+                    select(Users).where(Users.id == id, Users.deleted_at.is_(None)).options(*_get_user_eager_load_options())
+                )
+            ).first()
+        else:
+            user = (await db.scalars(select(Users).where(Users.id == id, Users.deleted_at.is_(None)))).first()
+    except Exception as exc:
+        logger.exception(f"[users/get_user_by_id]: error id={id} eager_load={eager_load}: {exc}")
+        raise
+
+    logger.debug(f"[users/get_user_by_id]: found={user is not None} id={id} eager_load={eager_load}")
+    return user

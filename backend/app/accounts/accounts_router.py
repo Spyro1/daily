@@ -19,19 +19,33 @@ from app.accounts.models import AccountIndex, CreateAccount, UpdateAccount
 
 router = APIRouter()
 
+
+def _payload_for_log(data: CreateAccount | UpdateAccount) -> dict:
+    if hasattr(data, "model_dump"):
+        return data.model_dump(exclude_none=True)
+    return data.dict(exclude_none=True)
+
+
+def _log_context(current_user: Users, action: str) -> str:
+    return f"[{current_user.display_name}][accounts/{action}]"
+
 @router.get("", response_model=list[AccountIndex])
 async def get_my_accounts(
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
 ) -> list[AccountIndex]:
-    logger.info("[accounts/get_my_accounts]: Fetching user accounts")
+    log_context = _log_context(current_user, "get_my_accounts")
+    logger.info(f"{log_context}: Fetching user accounts")
+    # TODO: Add pagination and filtering (e.g. include_archived) in the future when we have more accounts per user
     try:
         db_accounts = await get_accounts_for_user(db, current_user.id, eager=True)
     except Exception as e:
-        logger.error(f"[accounts/get_my_accounts]: Error fetching user accounts: {e}")
+        logger.exception(f"{log_context}: Error fetching user accounts: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error fetching user accounts")
 
-    return [fill_account_index(acc) for acc in db_accounts]
+    accounts = [fill_account_index(acc) for acc in db_accounts]
+    logger.info(f"{log_context}: Returning {len(accounts)} accounts")
+    return accounts
 
 
 @router.get("/{account_id}", response_model=AccountIndex)
@@ -40,16 +54,20 @@ async def get_my_account(
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
 ) -> AccountIndex:
-    logger.info(f"[{current_user.display_name}][accounts/get_my_account]: Fetching user account")
+    log_context = _log_context(current_user, "get_my_account")
+    logger.info(f"{log_context}: Fetching user account id={account_id}")
+    # TODO: Add option to include_archived in the future when we have archived accounts
     try:
         db_account = await get_account_for_user_by_id(db, current_user.id, account_id, eager=True)
     except Exception as e:
-        logger.error(f"[accounts/get_my_account]: Error fetching user account: {e}")
+        logger.exception(f"{log_context}: Error fetching user account id={account_id}: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error fetching user account")
 
     if not db_account:
+        logger.warning(f"{log_context}: Account not found id={account_id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
 
+    logger.info(f"{log_context}: Found account id={db_account.id} name={db_account.name}")
     return fill_account_index(db_account)
 
 
@@ -59,7 +77,9 @@ async def create_my_new_account(
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
 )-> AccountIndex:
-    logger.info(f"[{current_user.display_name}][accounts/create_my_new_account]: Creating new user account")
+    log_context = _log_context(current_user, "create_my_new_account")
+    logger.info(f"{log_context}: Creating new user account")
+    logger.debug(f"{log_context}: Payload={_payload_for_log(data)} user_id={current_user.id}")
 
     new_account = Accounts(
         user_id=current_user.id,
@@ -69,16 +89,21 @@ async def create_my_new_account(
         color=data.color,
         include_in_total=data.include_in_total,
     )
+    logger.debug(
+        f"{log_context}: Prepared ORM account name={new_account.name} currency_code={new_account.currency_code} "
+        f"icon_name={new_account.icon_name} include_in_total={new_account.include_in_total}"
+    )
     try:
         created_account = await create_account(db, new_account)
-    except IntegrityError:
+    except IntegrityError as exc:
+        logger.exception(f"{log_context}: Integrity error while creating account: {exc}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database integrity error (possibly duplicate account name)")
     except Exception as e:
-        logger.error(f"[accounts/create_my_new_account]: Error creating user account: {e}")
+        logger.exception(f"{log_context}: Unexpected error while creating user account: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error creating user account")
 
     # TODO: Create starting balance transaction if balance is provided (need to add 'amount' to CreateAccount model and handle it in the service layer)
-
+    logger.info(f"{log_context}: Created account id={created_account.id} name={created_account.name}")
     return fill_account_index(created_account)
 
     
@@ -89,10 +114,18 @@ async def update_my_account(
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
 ) -> AccountIndex:
-    logger.info(f"[{current_user.display_name}][accounts/update_my_account]: Updating user account")
-    db_account = await get_account_for_user_by_id(db, current_user.id, account_id, eager=True)
+    log_context = _log_context(current_user, "update_my_account")
+    logger.info(f"{log_context}: Updating user account id={account_id}")
+    logger.debug(f"{log_context}: Payload={_payload_for_log(data)} user_id={current_user.id}")
+
+    try:
+        db_account = await get_account_for_user_by_id(db, current_user.id, account_id, eager=True)
+    except Exception as e:
+        logger.exception(f"{log_context}: Error fetching user account id={account_id}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error fetching user account")
 
     if not db_account:
+        logger.warning(f"{log_context}: Account not found id={account_id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
 
     if data.name is not None: db_account.name = data.name
@@ -102,18 +135,25 @@ async def update_my_account(
     if data.include_in_total is not None: db_account.include_in_total = data.include_in_total
     if data.is_archived is not None: db_account.is_archived = data.is_archived
 
+    logger.debug(
+        f"{log_context}: Prepared updated account id={db_account.id} name={db_account.name} "
+        f"currency_code={db_account.currency_code} include_in_total={db_account.include_in_total} "
+        f"is_archived={db_account.is_archived}"
+    )
+
     try:
         updated = await update_account(db, db_account)
-    except IntegrityError:
+    except IntegrityError as exc:
+        logger.exception(f"{log_context}: Integrity error while updating account id={account_id}: {exc}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database integrity error (possibly duplicate account name)")
     except Exception as e:
-        logger.error(f"[accounts/update_my_account]: Error updating user account: {e}")
+        logger.exception(f"{log_context}: Unexpected error while updating user account id={account_id}: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error updating user account")
 
     if data.balance is not None:
         # TODO: Create a transaction to adjust the balance to the new value (need to calculate the difference and create a transaction with that amount, maybe with a special category or flag to indicate it's a balance adjustment)
         pass
-
+    logger.info(f"{log_context}: Updated account id={updated.id} name={updated.name}")
     return fill_account_index(updated)
 
 
@@ -123,10 +163,23 @@ async def delete_my_account(
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
 ):
-    logger.info(f"[{current_user.display_name}][accounts/delete_my_account]: Deleting user account")
-    db_account = await get_account_for_user_by_id(db, current_user.id, account_id, eager=False)
+    log_context = _log_context(current_user, "delete_my_account")
+    logger.info(f"{log_context}: Deleting user account id={account_id}")
+
+    try:
+        db_account = await get_account_for_user_by_id(db, current_user.id, account_id, eager=False)
+    except Exception as e:
+        logger.exception(f"{log_context}: Error fetching user account id={account_id}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error fetching user account")
 
     if not db_account:
+        logger.warning(f"{log_context}: Account not found id={account_id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
 
-    await delete_account(db, db_account)
+    try:
+        await delete_account(db, db_account)
+    except Exception as e:
+        logger.exception(f"{log_context}: Error deleting user account id={account_id}: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error deleting user account")
+
+    logger.info(f"{log_context}: Deleted account id={account_id}")

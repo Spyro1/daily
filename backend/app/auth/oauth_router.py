@@ -10,7 +10,7 @@ from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.jwt_utils import create_access_token, create_refresh_token, decode_token, get_current_user
-from app.auth.models import TokenData, TokenType
+from app.auth.models import ResponseMessage, TokenData, TokenType
 from app.core.config import frontend_config, google_config, jwt_config
 from app.users.models import UserCreate, ProviderCreate, ProvidedUserCreate
 from app.users.services import get_or_create_provided_user, get_provided_user_by_sub
@@ -44,7 +44,7 @@ async def logout(response: Response):
     response.delete_cookie(key=TokenType.REFRESH_TOKEN.value, **cookie_options)
 
 
-@router.post("/validate")
+@router.post("/validate", response_model=ResponseMessage)
 async def validate_access_token(
     response: Response,
     access_token: Optional[str] = Cookie(None),
@@ -73,10 +73,10 @@ async def validate_access_token(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     
     logger.info(f"[{request_id}][oauth/validate]: Access token is valid for user sub={data.get('sub')}")
-    return {"valid": True}
+    return ResponseMessage(message="Access token is valid")
 
 
-@router.post("/refresh")
+@router.post("/refresh", response_model=ResponseMessage)
 async def refresh_access_token(
     response: Response,
     refresh_token: Optional[str] = Cookie(None),
@@ -128,7 +128,7 @@ async def refresh_access_token(
         **cookie_options,
     )
     logger.info(f"[{request_id}][oauth/token]: Access token refreshed successfully")
-    return {"refreshed": "success"}
+    return ResponseMessage(message="Access token refreshed successfully")
 
 
 @router.get("/token", response_model=str)

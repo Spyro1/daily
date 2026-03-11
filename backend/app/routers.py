@@ -30,6 +30,11 @@ router.include_router(
     tags=['v1', 'dashboard'])
 
 router.include_router(
+    transactions.router,
+    prefix='/api/v1/transactions',
+    tags=['v1', 'transactions'])
+
+router.include_router(
     accounts.router,
     prefix='/api/v1/accounts',
     tags=['v1', 'accounts'])
@@ -39,12 +44,8 @@ router.include_router(
     prefix='/api/v1/categories',
     tags=['v1', 'categories'])
 
-router.include_router(
-    icons.router,
-    prefix='/api/v1/icons',
-    tags=['v1', 'icons'])
+# router.include_router(
+#     icons.router,
+#     prefix='/api/v1/icons',
+#     tags=['v1', 'icons'])
 
-router.include_router(
-    transactions.router,
-    prefix='/api/v1/transactions',
-    tags=['v1', 'transactions'])

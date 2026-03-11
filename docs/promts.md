@@ -8,6 +8,7 @@
 - for the backend instead of running the main.py, run uvicorn: command: ['uvicorn', 'app.main:app', '--host', '0.0.0.0', '--port' , '8000', '--workers', '2'] and read the ports from env var for the frontend too
 - add watch and fast reload to backend and frontend so if a file changes then it syncs and rebuilds just that container
 - I input the given access token copyed from the cookies of the frontend site then paste it to swagger and it does not validate it. Why?
+- create verbose logging for every endpoint for better debugging
 
 ## Building the frontend
 
