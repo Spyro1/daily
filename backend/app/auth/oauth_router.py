@@ -259,7 +259,7 @@ async def oauth_callback(
         logger.info(f"[{request_id}][oauth/callback]: OAuth user persisted successfully")
     except Exception as exc:
         logger.exception(f"[{request_id}][oauth/callback]: Failed to persist oauth user: {exc}")
-        raise HTTPException(status_code=500, detail="Failed to save oauth user user")
+        raise HTTPException(status_code=500, detail="Failed to save oauth user to the database")
 
     access_token = create_access_token(payload=dict(data))
     refresh_token = create_refresh_token(payload=dict(data))
