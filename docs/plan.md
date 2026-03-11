@@ -1,5 +1,11 @@
 # Daily költségvetéskezelő alkalmazás – Terv
 
+## Edited
+
+- 2026-03-11: A DB dokumentáció frissítve lett a refaktorált backend séma alapján.
+- 2026-03-11: A `external_identities` helyett `provided_users`, az `icon_id` helyett `icon_name`, valamint a jelenleg nem aktív `icons` és `notification_logs` táblák dokumentációja kivezetésre került az aktuális sémaleírásból.
+- 2026-03-11: A tranzakciós integritási szabályok, indexek és provider mezők a jelenlegi `backend/db/models.py` implementációhoz lettek igazítva.
+
 ## Technikai Architektúra & Minták
 
 ### 1. Rétegek (Layering)

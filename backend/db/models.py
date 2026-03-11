@@ -134,7 +134,7 @@ class Categories(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     parent_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    category_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    category_type: Mapped[str] = mapped_column(String(20), nullable=False) # "expense" vagy "income"
     is_system_category: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
     icon_name: Mapped[str] = mapped_column(String(100), server_default="Savings", nullable=False)
     color: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)
