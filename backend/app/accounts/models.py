@@ -3,11 +3,13 @@ from typing import Optional
 from decimal import Decimal
 from pydantic import BaseModel
 
-class AccountIndex(BaseModel):
+class AccountBrief(BaseModel):
     id: uuid.UUID
     name: str
-    balance: Optional[Decimal] = None
     currency_code: str
+
+class AccountIndex(AccountBrief):
+    balance: Optional[Decimal] = None
     icon_name: str
     color: str
     include_in_total: bool

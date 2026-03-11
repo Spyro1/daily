@@ -30,8 +30,8 @@ async def get_accounts_for_user(db: AsyncSession, user_id: uuid.UUID, eager: boo
 async def get_account_for_user_by_id(db: AsyncSession, user_id: uuid.UUID, account_id: uuid.UUID, eager: bool = False) -> Accounts | None:
     logger.debug(f"[get_account_for_user_by_id]: Fetching account {account_id} for user {user_id} with eager={eager}")
     statement = select(Accounts).where(
-        Accounts.user_id == user_id,
         Accounts.id == account_id,
+        Accounts.user_id == user_id,
         Accounts.deleted_at.is_(None),
     )
 

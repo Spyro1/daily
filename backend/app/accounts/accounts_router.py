@@ -3,10 +3,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
-
-from db.models import Accounts, Users
 from db.core import get_db
 from app.auth.jwt_utils import get_current_user
+from db.models import Accounts, Users
+
 from app.accounts.services import (
     create_account,
     update_account,
@@ -61,9 +61,6 @@ async def create_my_new_account(
 )-> AccountIndex:
     logger.info(f"[{current_user.display_name}][accounts/create_my_new_account]: Creating new user account")
 
-    # if not db_icon:
-    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Icon not found")
-
     new_account = Accounts(
         user_id=current_user.id,
         name=data.name,
@@ -75,7 +72,7 @@ async def create_my_new_account(
     try:
         created_account = await create_account(db, new_account)
     except IntegrityError:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account with this name already exists")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database integrity error (possibly duplicate account name)")
     except Exception as e:
         logger.error(f"[accounts/create_my_new_account]: Error creating user account: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error creating user account")
@@ -108,7 +105,10 @@ async def update_my_account(
     try:
         updated = await update_account(db, db_account)
     except IntegrityError:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account with this name already exists")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database integrity error (possibly duplicate account name)")
+    except Exception as e:
+        logger.error(f"[accounts/update_my_account]: Error updating user account: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error updating user account")
 
     if data.balance is not None:
         # TODO: Create a transaction to adjust the balance to the new value (need to calculate the difference and create a transaction with that amount, maybe with a special category or flag to indicate it's a balance adjustment)
