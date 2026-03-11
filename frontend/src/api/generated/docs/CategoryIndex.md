@@ -1,4 +1,4 @@
-# AccountIndex
+# CategoryIndex
 
 
 ## Properties
@@ -7,27 +7,23 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **string** |  | [default to undefined]
 **name** | **string** |  | [default to undefined]
-**balance** | **string** |  | [default to undefined]
-**currency_code** | **string** |  | [default to undefined]
+**parent_id** | **string** |  | [optional] [default to undefined]
 **icon_name** | **string** |  | [default to undefined]
-**color** | **string** |  | [default to undefined]
-**include_in_total** | **boolean** |  | [default to undefined]
-**is_archived** | **boolean** |  | [default to undefined]
+**color** | **string** |  | [optional] [default to undefined]
+**type** | [**CategoryType**](CategoryType.md) |  | [default to undefined]
 
 ## Example
 
 ```typescript
-import { AccountIndex } from './api';
+import { CategoryIndex } from './api';
 
-const instance: AccountIndex = {
+const instance: CategoryIndex = {
     id,
     name,
-    balance,
-    currency_code,
+    parent_id,
     icon_name,
     color,
-    include_in_total,
-    is_archived,
+    type,
 };
 ```
 

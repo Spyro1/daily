@@ -1,4 +1,4 @@
-# AccountIndex
+# AccountBrief
 
 
 ## Properties
@@ -9,25 +9,17 @@ Name | Type | Description | Notes
 **name** | **string** |  | [default to undefined]
 **balance** | **string** |  | [default to undefined]
 **currency_code** | **string** |  | [default to undefined]
-**icon_name** | **string** |  | [default to undefined]
-**color** | **string** |  | [default to undefined]
-**include_in_total** | **boolean** |  | [default to undefined]
-**is_archived** | **boolean** |  | [default to undefined]
 
 ## Example
 
 ```typescript
-import { AccountIndex } from './api';
+import { AccountBrief } from './api';
 
-const instance: AccountIndex = {
+const instance: AccountBrief = {
     id,
     name,
     balance,
     currency_code,
-    icon_name,
-    color,
-    include_in_total,
-    is_archived,
 };
 ```
 

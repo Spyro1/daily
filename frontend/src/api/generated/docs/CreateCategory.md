@@ -1,4 +1,4 @@
-# CreateAccount
+# CreateCategory
 
 
 ## Properties
@@ -6,24 +6,22 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **string** |  | [default to undefined]
-**balance** | [**Balance**](Balance.md) |  | [optional] [default to undefined]
-**currency_code** | **string** |  | [default to undefined]
+**parent_id** | **string** |  | [optional] [default to undefined]
 **icon_name** | **string** |  | [default to undefined]
-**color** | **string** |  | [default to undefined]
-**include_in_total** | **boolean** |  | [default to undefined]
+**color** | **string** |  | [optional] [default to undefined]
+**type** | [**CategoryType**](CategoryType.md) |  | [default to undefined]
 
 ## Example
 
 ```typescript
-import { CreateAccount } from './api';
+import { CreateCategory } from './api';
 
-const instance: CreateAccount = {
+const instance: CreateCategory = {
     name,
-    balance,
-    currency_code,
+    parent_id,
     icon_name,
     color,
-    include_in_total,
+    type,
 };
 ```
 

@@ -1,4 +1,4 @@
-# UpdateAccount
+# UpdateCategory
 
 
 ## Properties
@@ -6,26 +6,22 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **string** |  | [optional] [default to undefined]
-**balance** | [**Balance**](Balance.md) |  | [optional] [default to undefined]
-**currency_code** | **string** |  | [optional] [default to undefined]
+**parent_id** | **string** |  | [optional] [default to undefined]
 **icon_name** | **string** |  | [optional] [default to undefined]
 **color** | **string** |  | [optional] [default to undefined]
-**include_in_total** | **boolean** |  | [optional] [default to undefined]
-**is_archived** | **boolean** |  | [optional] [default to undefined]
+**type** | [**CategoryType**](CategoryType.md) |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { UpdateAccount } from './api';
+import { UpdateCategory } from './api';
 
-const instance: UpdateAccount = {
+const instance: UpdateCategory = {
     name,
-    balance,
-    currency_code,
+    parent_id,
     icon_name,
     color,
-    include_in_total,
-    is_archived,
+    type,
 };
 ```
 

@@ -5,7 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**accounts** | [**Array&lt;AccountIndex&gt;**](AccountIndex.md) |  | [default to undefined]
+**accounts** | [**Array&lt;AccountBrief&gt;**](AccountBrief.md) |  | [default to undefined]
+**transactions** | [**Array&lt;TransactionBrief&gt;**](TransactionBrief.md) |  | [default to undefined]
 
 ## Example
 
@@ -14,6 +15,7 @@ import { DashboardIndex } from './api';
 
 const instance: DashboardIndex = {
     accounts,
+    transactions,
 };
 ```
 

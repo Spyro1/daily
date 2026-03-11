@@ -1,36 +1,36 @@
-# AccountsApi
+# CategoriesApi
 
 All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**createMyNewAccountApiV1AccountsPost**](#createmynewaccountapiv1accountspost) | **POST** /api/v1/accounts | Create My New Account|
-|[**deleteMyAccountApiV1AccountsAccountIdDelete**](#deletemyaccountapiv1accountsaccountiddelete) | **DELETE** /api/v1/accounts/{account_id} | Delete My Account|
-|[**getMyAccountApiV1AccountsAccountIdGet**](#getmyaccountapiv1accountsaccountidget) | **GET** /api/v1/accounts/{account_id} | Get My Account|
-|[**getMyAccountsApiV1AccountsGet**](#getmyaccountsapiv1accountsget) | **GET** /api/v1/accounts | Get My Accounts|
-|[**updateMyAccountApiV1AccountsAccountIdPatch**](#updatemyaccountapiv1accountsaccountidpatch) | **PATCH** /api/v1/accounts/{account_id} | Update My Account|
+|[**createMyNewCategoryApiV1CategoriesPost**](#createmynewcategoryapiv1categoriespost) | **POST** /api/v1/categories | Create My New Category|
+|[**deleteMyCategoryApiV1CategoriesCategoryIdDelete**](#deletemycategoryapiv1categoriescategoryiddelete) | **DELETE** /api/v1/categories/{category_id} | Delete My Category|
+|[**getMyCategoriesApiV1CategoriesGet**](#getmycategoriesapiv1categoriesget) | **GET** /api/v1/categories | Get My Categories|
+|[**getMyCategoryApiV1CategoriesCategoryIdGet**](#getmycategoryapiv1categoriescategoryidget) | **GET** /api/v1/categories/{category_id} | Get My Category|
+|[**updateMyCategoryApiV1CategoriesCategoryIdPatch**](#updatemycategoryapiv1categoriescategoryidpatch) | **PATCH** /api/v1/categories/{category_id} | Update My Category|
 
-# **createMyNewAccountApiV1AccountsPost**
-> AccountIndex createMyNewAccountApiV1AccountsPost(createAccount)
+# **createMyNewCategoryApiV1CategoriesPost**
+> any createMyNewCategoryApiV1CategoriesPost(createCategory)
 
 
 ### Example
 
 ```typescript
 import {
-    AccountsApi,
+    CategoriesApi,
     Configuration,
-    CreateAccount
+    CreateCategory
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AccountsApi(configuration);
+const apiInstance = new CategoriesApi(configuration);
 
-let createAccount: CreateAccount; //
+let createCategory: CreateCategory; //
 let accessToken: string; // (optional) (default to undefined)
 
-const { status, data } = await apiInstance.createMyNewAccountApiV1AccountsPost(
-    createAccount,
+const { status, data } = await apiInstance.createMyNewCategoryApiV1CategoriesPost(
+    createCategory,
     accessToken
 );
 ```
@@ -39,13 +39,13 @@ const { status, data } = await apiInstance.createMyNewAccountApiV1AccountsPost(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **createAccount** | **CreateAccount**|  | |
+| **createCategory** | **CreateCategory**|  | |
 | **accessToken** | [**string**] |  | (optional) defaults to undefined|
 
 
 ### Return type
 
-**AccountIndex**
+**any**
 
 ### Authorization
 
@@ -65,26 +65,26 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **deleteMyAccountApiV1AccountsAccountIdDelete**
-> deleteMyAccountApiV1AccountsAccountIdDelete()
+# **deleteMyCategoryApiV1CategoriesCategoryIdDelete**
+> deleteMyCategoryApiV1CategoriesCategoryIdDelete()
 
 
 ### Example
 
 ```typescript
 import {
-    AccountsApi,
+    CategoriesApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AccountsApi(configuration);
+const apiInstance = new CategoriesApi(configuration);
 
-let accountId: string; // (default to undefined)
+let categoryId: string; // (default to undefined)
 let accessToken: string; // (optional) (default to undefined)
 
-const { status, data } = await apiInstance.deleteMyAccountApiV1AccountsAccountIdDelete(
-    accountId,
+const { status, data } = await apiInstance.deleteMyCategoryApiV1CategoriesCategoryIdDelete(
+    categoryId,
     accessToken
 );
 ```
@@ -93,7 +93,7 @@ const { status, data } = await apiInstance.deleteMyAccountApiV1AccountsAccountId
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **accountId** | [**string**] |  | defaults to undefined|
+| **categoryId** | [**string**] |  | defaults to undefined|
 | **accessToken** | [**string**] |  | (optional) defaults to undefined|
 
 
@@ -119,26 +119,24 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getMyAccountApiV1AccountsAccountIdGet**
-> AccountIndex getMyAccountApiV1AccountsAccountIdGet()
+# **getMyCategoriesApiV1CategoriesGet**
+> Array<CategoryIndex> getMyCategoriesApiV1CategoriesGet()
 
 
 ### Example
 
 ```typescript
 import {
-    AccountsApi,
+    CategoriesApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AccountsApi(configuration);
+const apiInstance = new CategoriesApi(configuration);
 
-let accountId: string; // (default to undefined)
 let accessToken: string; // (optional) (default to undefined)
 
-const { status, data } = await apiInstance.getMyAccountApiV1AccountsAccountIdGet(
-    accountId,
+const { status, data } = await apiInstance.getMyCategoriesApiV1CategoriesGet(
     accessToken
 );
 ```
@@ -147,13 +145,12 @@ const { status, data } = await apiInstance.getMyAccountApiV1AccountsAccountIdGet
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **accountId** | [**string**] |  | defaults to undefined|
 | **accessToken** | [**string**] |  | (optional) defaults to undefined|
 
 
 ### Return type
 
-**AccountIndex**
+**Array<CategoryIndex>**
 
 ### Authorization
 
@@ -173,24 +170,26 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getMyAccountsApiV1AccountsGet**
-> Array<AccountIndex> getMyAccountsApiV1AccountsGet()
+# **getMyCategoryApiV1CategoriesCategoryIdGet**
+> CategoryIndex getMyCategoryApiV1CategoriesCategoryIdGet()
 
 
 ### Example
 
 ```typescript
 import {
-    AccountsApi,
+    CategoriesApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AccountsApi(configuration);
+const apiInstance = new CategoriesApi(configuration);
 
+let categoryId: string; // (default to undefined)
 let accessToken: string; // (optional) (default to undefined)
 
-const { status, data } = await apiInstance.getMyAccountsApiV1AccountsGet(
+const { status, data } = await apiInstance.getMyCategoryApiV1CategoriesCategoryIdGet(
+    categoryId,
     accessToken
 );
 ```
@@ -199,12 +198,13 @@ const { status, data } = await apiInstance.getMyAccountsApiV1AccountsGet(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
+| **categoryId** | [**string**] |  | defaults to undefined|
 | **accessToken** | [**string**] |  | (optional) defaults to undefined|
 
 
 ### Return type
 
-**Array<AccountIndex>**
+**CategoryIndex**
 
 ### Authorization
 
@@ -224,29 +224,29 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **updateMyAccountApiV1AccountsAccountIdPatch**
-> AccountIndex updateMyAccountApiV1AccountsAccountIdPatch(updateAccount)
+# **updateMyCategoryApiV1CategoriesCategoryIdPatch**
+> CategoryIndex updateMyCategoryApiV1CategoriesCategoryIdPatch(updateCategory)
 
 
 ### Example
 
 ```typescript
 import {
-    AccountsApi,
+    CategoriesApi,
     Configuration,
-    UpdateAccount
+    UpdateCategory
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AccountsApi(configuration);
+const apiInstance = new CategoriesApi(configuration);
 
-let accountId: string; // (default to undefined)
-let updateAccount: UpdateAccount; //
+let categoryId: string; // (default to undefined)
+let updateCategory: UpdateCategory; //
 let accessToken: string; // (optional) (default to undefined)
 
-const { status, data } = await apiInstance.updateMyAccountApiV1AccountsAccountIdPatch(
-    accountId,
-    updateAccount,
+const { status, data } = await apiInstance.updateMyCategoryApiV1CategoriesCategoryIdPatch(
+    categoryId,
+    updateCategory,
     accessToken
 );
 ```
@@ -255,14 +255,14 @@ const { status, data } = await apiInstance.updateMyAccountApiV1AccountsAccountId
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **updateAccount** | **UpdateAccount**|  | |
-| **accountId** | [**string**] |  | defaults to undefined|
+| **updateCategory** | **UpdateCategory**|  | |
+| **categoryId** | [**string**] |  | defaults to undefined|
 | **accessToken** | [**string**] |  | (optional) defaults to undefined|
 
 
 ### Return type
 
-**AccountIndex**
+**CategoryIndex**
 
 ### Authorization
 

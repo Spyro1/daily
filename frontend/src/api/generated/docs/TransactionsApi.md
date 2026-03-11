@@ -1,36 +1,36 @@
-# AccountsApi
+# TransactionsApi
 
 All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**createMyNewAccountApiV1AccountsPost**](#createmynewaccountapiv1accountspost) | **POST** /api/v1/accounts | Create My New Account|
-|[**deleteMyAccountApiV1AccountsAccountIdDelete**](#deletemyaccountapiv1accountsaccountiddelete) | **DELETE** /api/v1/accounts/{account_id} | Delete My Account|
-|[**getMyAccountApiV1AccountsAccountIdGet**](#getmyaccountapiv1accountsaccountidget) | **GET** /api/v1/accounts/{account_id} | Get My Account|
-|[**getMyAccountsApiV1AccountsGet**](#getmyaccountsapiv1accountsget) | **GET** /api/v1/accounts | Get My Accounts|
-|[**updateMyAccountApiV1AccountsAccountIdPatch**](#updatemyaccountapiv1accountsaccountidpatch) | **PATCH** /api/v1/accounts/{account_id} | Update My Account|
+|[**createMyNewTransactionApiV1TransactionsPost**](#createmynewtransactionapiv1transactionspost) | **POST** /api/v1/transactions | Create My New Transaction|
+|[**deleteMyTransactionApiV1TransactionsTransactionIdDelete**](#deletemytransactionapiv1transactionstransactioniddelete) | **DELETE** /api/v1/transactions/{transaction_id} | Delete My Transaction|
+|[**getMyTransactionApiV1TransactionsTransactionIdGet**](#getmytransactionapiv1transactionstransactionidget) | **GET** /api/v1/transactions/{transaction_id} | Get My Transaction|
+|[**getMyTransactionsApiV1TransactionsGet**](#getmytransactionsapiv1transactionsget) | **GET** /api/v1/transactions | Get My Transactions|
+|[**updateMyTransactionApiV1TransactionsTransactionIdPatch**](#updatemytransactionapiv1transactionstransactionidpatch) | **PATCH** /api/v1/transactions/{transaction_id} | Update My Transaction|
 
-# **createMyNewAccountApiV1AccountsPost**
-> AccountIndex createMyNewAccountApiV1AccountsPost(createAccount)
+# **createMyNewTransactionApiV1TransactionsPost**
+> any createMyNewTransactionApiV1TransactionsPost(createTransaction)
 
 
 ### Example
 
 ```typescript
 import {
-    AccountsApi,
+    TransactionsApi,
     Configuration,
-    CreateAccount
+    CreateTransaction
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AccountsApi(configuration);
+const apiInstance = new TransactionsApi(configuration);
 
-let createAccount: CreateAccount; //
+let createTransaction: CreateTransaction; //
 let accessToken: string; // (optional) (default to undefined)
 
-const { status, data } = await apiInstance.createMyNewAccountApiV1AccountsPost(
-    createAccount,
+const { status, data } = await apiInstance.createMyNewTransactionApiV1TransactionsPost(
+    createTransaction,
     accessToken
 );
 ```
@@ -39,13 +39,13 @@ const { status, data } = await apiInstance.createMyNewAccountApiV1AccountsPost(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **createAccount** | **CreateAccount**|  | |
+| **createTransaction** | **CreateTransaction**|  | |
 | **accessToken** | [**string**] |  | (optional) defaults to undefined|
 
 
 ### Return type
 
-**AccountIndex**
+**any**
 
 ### Authorization
 
@@ -65,26 +65,26 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **deleteMyAccountApiV1AccountsAccountIdDelete**
-> deleteMyAccountApiV1AccountsAccountIdDelete()
+# **deleteMyTransactionApiV1TransactionsTransactionIdDelete**
+> deleteMyTransactionApiV1TransactionsTransactionIdDelete()
 
 
 ### Example
 
 ```typescript
 import {
-    AccountsApi,
+    TransactionsApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AccountsApi(configuration);
+const apiInstance = new TransactionsApi(configuration);
 
-let accountId: string; // (default to undefined)
+let transactionId: string; // (default to undefined)
 let accessToken: string; // (optional) (default to undefined)
 
-const { status, data } = await apiInstance.deleteMyAccountApiV1AccountsAccountIdDelete(
-    accountId,
+const { status, data } = await apiInstance.deleteMyTransactionApiV1TransactionsTransactionIdDelete(
+    transactionId,
     accessToken
 );
 ```
@@ -93,7 +93,7 @@ const { status, data } = await apiInstance.deleteMyAccountApiV1AccountsAccountId
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **accountId** | [**string**] |  | defaults to undefined|
+| **transactionId** | [**string**] |  | defaults to undefined|
 | **accessToken** | [**string**] |  | (optional) defaults to undefined|
 
 
@@ -119,26 +119,26 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getMyAccountApiV1AccountsAccountIdGet**
-> AccountIndex getMyAccountApiV1AccountsAccountIdGet()
+# **getMyTransactionApiV1TransactionsTransactionIdGet**
+> TransactionIndex getMyTransactionApiV1TransactionsTransactionIdGet()
 
 
 ### Example
 
 ```typescript
 import {
-    AccountsApi,
+    TransactionsApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AccountsApi(configuration);
+const apiInstance = new TransactionsApi(configuration);
 
-let accountId: string; // (default to undefined)
+let transactionId: string; // (default to undefined)
 let accessToken: string; // (optional) (default to undefined)
 
-const { status, data } = await apiInstance.getMyAccountApiV1AccountsAccountIdGet(
-    accountId,
+const { status, data } = await apiInstance.getMyTransactionApiV1TransactionsTransactionIdGet(
+    transactionId,
     accessToken
 );
 ```
@@ -147,13 +147,13 @@ const { status, data } = await apiInstance.getMyAccountApiV1AccountsAccountIdGet
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **accountId** | [**string**] |  | defaults to undefined|
+| **transactionId** | [**string**] |  | defaults to undefined|
 | **accessToken** | [**string**] |  | (optional) defaults to undefined|
 
 
 ### Return type
 
-**AccountIndex**
+**TransactionIndex**
 
 ### Authorization
 
@@ -173,24 +173,24 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **getMyAccountsApiV1AccountsGet**
-> Array<AccountIndex> getMyAccountsApiV1AccountsGet()
+# **getMyTransactionsApiV1TransactionsGet**
+> Array<TransactionIndex> getMyTransactionsApiV1TransactionsGet()
 
 
 ### Example
 
 ```typescript
 import {
-    AccountsApi,
+    TransactionsApi,
     Configuration
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AccountsApi(configuration);
+const apiInstance = new TransactionsApi(configuration);
 
 let accessToken: string; // (optional) (default to undefined)
 
-const { status, data } = await apiInstance.getMyAccountsApiV1AccountsGet(
+const { status, data } = await apiInstance.getMyTransactionsApiV1TransactionsGet(
     accessToken
 );
 ```
@@ -204,7 +204,7 @@ const { status, data } = await apiInstance.getMyAccountsApiV1AccountsGet(
 
 ### Return type
 
-**Array<AccountIndex>**
+**Array<TransactionIndex>**
 
 ### Authorization
 
@@ -224,29 +224,29 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **updateMyAccountApiV1AccountsAccountIdPatch**
-> AccountIndex updateMyAccountApiV1AccountsAccountIdPatch(updateAccount)
+# **updateMyTransactionApiV1TransactionsTransactionIdPatch**
+> TransactionIndex updateMyTransactionApiV1TransactionsTransactionIdPatch(updateTransaction)
 
 
 ### Example
 
 ```typescript
 import {
-    AccountsApi,
+    TransactionsApi,
     Configuration,
-    UpdateAccount
+    UpdateTransaction
 } from './api';
 
 const configuration = new Configuration();
-const apiInstance = new AccountsApi(configuration);
+const apiInstance = new TransactionsApi(configuration);
 
-let accountId: string; // (default to undefined)
-let updateAccount: UpdateAccount; //
+let transactionId: string; // (default to undefined)
+let updateTransaction: UpdateTransaction; //
 let accessToken: string; // (optional) (default to undefined)
 
-const { status, data } = await apiInstance.updateMyAccountApiV1AccountsAccountIdPatch(
-    accountId,
-    updateAccount,
+const { status, data } = await apiInstance.updateMyTransactionApiV1TransactionsTransactionIdPatch(
+    transactionId,
+    updateTransaction,
     accessToken
 );
 ```
@@ -255,14 +255,14 @@ const { status, data } = await apiInstance.updateMyAccountApiV1AccountsAccountId
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **updateAccount** | **UpdateAccount**|  | |
-| **accountId** | [**string**] |  | defaults to undefined|
+| **updateTransaction** | **UpdateTransaction**|  | |
+| **transactionId** | [**string**] |  | defaults to undefined|
 | **accessToken** | [**string**] |  | (optional) defaults to undefined|
 
 
 ### Return type
 
-**AccountIndex**
+**TransactionIndex**
 
 ### Authorization
 

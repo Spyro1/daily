@@ -203,7 +203,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **refreshAccessTokenApiV1OauthRefreshPost**
-> any refreshAccessTokenApiV1OauthRefreshPost()
+> ResponseMessage refreshAccessTokenApiV1OauthRefreshPost()
 
 
 ### Example
@@ -233,7 +233,7 @@ const { status, data } = await apiInstance.refreshAccessTokenApiV1OauthRefreshPo
 
 ### Return type
 
-**any**
+**ResponseMessage**
 
 ### Authorization
 
@@ -254,7 +254,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **validateAccessTokenApiV1OauthValidatePost**
-> any validateAccessTokenApiV1OauthValidatePost()
+> ResponseMessage validateAccessTokenApiV1OauthValidatePost()
 
 
 ### Example
@@ -284,7 +284,7 @@ const { status, data } = await apiInstance.validateAccessTokenApiV1OauthValidate
 
 ### Return type
 
-**any**
+**ResponseMessage**
 
 ### Authorization
 
