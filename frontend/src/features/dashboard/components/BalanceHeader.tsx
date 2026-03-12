@@ -20,7 +20,7 @@ export function BalanceHeader({ accounts, isLoading }: Props) {
   const currency = accounts[0]?.currency_code ?? 'USD'
 
   return (
-    <Box sx={{ textAlign: 'center', pt: 4, pb: 2 }}>
+    <Box sx={{ textAlign: 'center', pt: 0, pb: 0 }}>
       <Typography variant="body2" color="text.secondary" gutterBottom>
         Total Balance
       </Typography>

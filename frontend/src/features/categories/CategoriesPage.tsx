@@ -4,21 +4,28 @@ import { CategoryType } from '@/api/generated'
 import { useCategories } from './hooks/useCategories'
 import { PageLayout } from '#/shared/layout/PageLayout'
 import { CategoryGroup } from './components/CategoryGroup'
+import { useNavigate } from '@tanstack/react-router'
 
 export function CategoriesPage() {
   const { data: categories, isPending } = useCategories()
+  const navigate = useNavigate()
 
   const expenses = categories?.filter((c) => c.type === CategoryType.Expense) ?? []
   const income = categories?.filter((c) => c.type === CategoryType.Income) ?? []
 
   const fab = (
-    <Fab color="primary" size="small" aria-label="add category">
+    <Fab
+      color="primary"
+      size="small"
+      aria-label="add category"
+      onClick={() => void navigate({ to: '/categories/new' })}
+    >
       <AddRounded />
     </Fab>
   )
 
   return (
-    <PageLayout overline="Organize" title="Categories" action={fab}>
+    <PageLayout title="Categories" action={fab}>
       {isPending ? (
         <Stack spacing={1.5}>
           {[1, 2, 3, 4].map((i) => (

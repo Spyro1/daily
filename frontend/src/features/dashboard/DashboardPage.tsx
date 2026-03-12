@@ -33,7 +33,7 @@ export function DashboardPage() {
   }
 
   return (
-    <PageLayout overline="Overview" title="Dashboard">
+    <PageLayout overline="Dashboard">
       <BalanceHeader accounts={accounts} isLoading={isPending} />
 
       <BalanceTrendChart

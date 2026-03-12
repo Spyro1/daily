@@ -22,7 +22,7 @@ export function AccountsPage() {
   )
 
   return (
-    <PageLayout overline="Finance" title="Accounts" action={addAccountFab}>
+    <PageLayout title="Accounts" action={addAccountFab}>
       {isPending ? (
         <Stack spacing={1.5}>
           {[1, 2, 3].map((i) => (

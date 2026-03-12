@@ -78,8 +78,8 @@ export function NewTransactionPage() {
 
   return (
     <Box component="form" onSubmit={onSubmit} sx={{ display: 'contents' }}>
-      <PageLayout overline="Transactions" title="New Transaction">
-        <Paper elevation={2} sx={{ p: 2.5, borderRadius: 3 }}>
+      <PageLayout title="New Transaction">
+        <Paper elevation={2} sx={{ p: 2.5, borderRadius: 1.5 }}>
           <Stack spacing={2.5}>
             <ToggleButtonGroup
               exclusive

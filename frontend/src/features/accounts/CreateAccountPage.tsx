@@ -51,8 +51,8 @@ export function CreateAccountPage() {
 
     return (
         <Box component="form" onSubmit={onSubmit} sx={{ display: 'contents' }}>
-            <PageLayout overline="Accounts" title="Create Account">
-                <Paper elevation={2} sx={{ p: 2.5, borderRadius: 3 }}>
+            <PageLayout title="Create Account">
+                <Paper elevation={2} sx={{ p: 2.5, borderRadius: 1.5 }}>
                     <Stack spacing={2.5} id="create-account-input-fields">
                     <TextField
                         label="Account name"

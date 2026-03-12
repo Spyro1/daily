@@ -21,7 +21,7 @@ export function SettingsPage() {
   const { mode } = useThemeMode()
 
   return (
-    <PageLayout overline="Preferences" title="Settings">
+    <PageLayout title="Settings">
       <Paper elevation={2} sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <List disablePadding>
           <ListItem secondaryAction={<ThemeModeToggle />} sx={{ py: 1.5 }}>
