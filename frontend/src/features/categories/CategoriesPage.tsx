@@ -3,7 +3,7 @@ import { Box, Fab, Paper, Skeleton, Stack } from '@mui/material'
 import { CategoryType } from '@/api/generated'
 import { useCategories } from './hooks/useCategories'
 import { PageLayout } from '#/shared/layout/PageLayout'
-import { CategoryGroup } from './components/Categorygroup'
+import { CategoryGroup } from './components/CategoryGroup'
 
 export function CategoriesPage() {
   const { data: categories, isPending } = useCategories()
