@@ -8,6 +8,7 @@ import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -20,14 +21,16 @@ import {
 } from '@mui/material'
 import { useNavigate } from '@tanstack/react-router'
 import { TransactionType } from '@/api/generated'
-import type { TransactionType as TxType } from '@/api/generated'
+import type { CreateTransaction, TransactionType as TxType } from '@/api/generated'
+import { useNotify } from '#/shared/providers/SnackbarProvider'
+import { buildCategoryTreeOptions } from '../categories/categoryTree'
 import { useAccounts } from '../accounts/hooks/useAccounts'
 import { useCategories } from '../categories/hooks/useCategories'
 import { useCreateTransaction } from './hooks/useTransactions'
 import { PageLayout } from '#/shared/layout/PageLayout'
 
 const TYPE_CONFIG = [
-  { value: TransactionType.Expanse, label: 'Expense', Icon: ArrowDownwardRounded },
+  { value: TransactionType.Expense, label: 'Expense', Icon: ArrowDownwardRounded },
   { value: TransactionType.Income, label: 'Income', Icon: ArrowUpwardRounded },
   { value: TransactionType.Transfer, label: 'Transfer', Icon: SwapHorizRounded },
 ]
@@ -36,9 +39,14 @@ function today(): string {
   return new Date().toISOString().split('T')[0]!
 }
 
+function toApiAmount(value: string): CreateTransaction['amount'] {
+  return value as CreateTransaction['amount']
+}
+
 export function NewTransactionPage() {
   const navigate = useNavigate()
-  const [txType, setTxType] = useState<TxType>(TransactionType.Expanse)
+  const notify = useNotify()
+  const [txType, setTxType] = useState<TxType>(TransactionType.Expense)
   const [amount, setAmount] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [sourceAccountId, setSourceAccountId] = useState('')
@@ -49,30 +57,52 @@ export function NewTransactionPage() {
   const { data: accounts } = useAccounts()
   const { data: categories } = useCategories()
   const { mutate: createTransaction, isPending } = useCreateTransaction()
+  const isExpense = txType === TransactionType.Expense
+  const isIncome = txType === TransactionType.Income
+  const isTransfer = txType === TransactionType.Transfer
 
   const filteredCategories =
     categories?.filter((c) =>
-      txType === TransactionType.Expanse
+      isExpense
         ? c.type === 'expense'
-        : txType === TransactionType.Income
+        : isIncome
           ? c.type === 'income'
           : true,
     ) ?? []
+  const categoryOptions = buildCategoryTreeOptions(filteredCategories)
+  const sourceAccountRequired = !isIncome
+  const destinationAccountRequired = !isExpense
+  const hasRequiredAccounts =
+    (!sourceAccountRequired || !!sourceAccountId) &&
+    (!destinationAccountRequired || !!destinationAccountId)
+  const hasValidTransferAccounts = !isTransfer || sourceAccountId !== destinationAccountId
+  const canSubmit = !!amount.trim() && !!categoryId && hasRequiredAccounts && hasValidTransferAccounts
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!categoryId || !amount) return
+
+    const trimmedAmount = amount.trim()
+
+    if (!trimmedAmount || !categoryId || !hasRequiredAccounts || !hasValidTransferAccounts) {
+      return
+    }
+
     createTransaction(
       {
-        amount: amount as unknown as object,
+        amount: toApiAmount(trimmedAmount),
         transaction_type: txType,
         category_id: categoryId,
-        date,
-        source_account_id: sourceAccountId || null,
-        destination_account_id: destinationAccountId || null,
-        note: note || null,
+        occurred_at: date,
+        source_account_id: sourceAccountRequired ? sourceAccountId : null,
+        destination_account_id: destinationAccountRequired ? destinationAccountId : null,
+        note: note.trim() || null,
       },
-      { onSuccess: () => void navigate({ to: '/dashboard' }) },
+      {
+        onSuccess: () => {
+          notify('Transaction created.', 'success')
+          void navigate({ to: '/transactions' })
+        },
+      },
     )
   }
 
@@ -85,8 +115,19 @@ export function NewTransactionPage() {
               exclusive
               fullWidth
               value={txType}
-              onChange={(_, v) => { if (v) { setTxType(v); setCategoryId('') } }}
+              onChange={(_, v) => {
+                if (!v) return
+                setTxType(v)
+                setCategoryId('')
+                if (v === TransactionType.Expense) {
+                  setDestinationAccountId('')
+                }
+                if (v === TransactionType.Income) {
+                  setSourceAccountId('')
+                }
+              }}
               size="small"
+              disabled={isPending}
             >
               {TYPE_CONFIG.map(({ value, label, Icon }) => (
                 <ToggleButton key={value} value={value} sx={{ gap: 0.75 }}>
@@ -103,6 +144,7 @@ export function NewTransactionPage() {
               onChange={(e) => setAmount(e.target.value)}
               inputProps={{ min: 0, step: '0.01' }}
               InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
+              disabled={isPending}
               fullWidth
               required
               autoComplete="off"
@@ -114,23 +156,30 @@ export function NewTransactionPage() {
                 labelId="tx-category-label"
                 value={categoryId}
                 label="Category"
+                disabled={isPending}
                 onChange={(e) => setCategoryId(e.target.value)}
               >
-                {filteredCategories.map((cat) => (
-                  <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
+                {categoryOptions.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>{option.pathLabel}</MenuItem>
                 ))}
               </Select>
+              <FormHelperText>
+                {categoryOptions.length === 0
+                  ? 'Create a category first before saving this transaction.'
+                  : 'Nested categories are shown with their full path.'}
+              </FormHelperText>
             </FormControl>
 
-            {txType !== TransactionType.Income && (
-              <FormControl fullWidth>
+            {!isIncome && (
+              <FormControl fullWidth required={sourceAccountRequired}>
                 <InputLabel id="tx-source-label">
-                  {txType === TransactionType.Transfer ? 'From account' : 'Account'}
+                  {isTransfer ? 'From account' : 'Account'}
                 </InputLabel>
                 <Select
                   labelId="tx-source-label"
                   value={sourceAccountId}
-                  label={txType === TransactionType.Transfer ? 'From account' : 'Account'}
+                  label={isTransfer ? 'From account' : 'Account'}
+                  disabled={isPending}
                   onChange={(e) => setSourceAccountId(e.target.value)}
                 >
                   <MenuItem value=""><em>None</em></MenuItem>
@@ -138,18 +187,22 @@ export function NewTransactionPage() {
                     <MenuItem key={acc.id} value={acc.id}>{acc.name}</MenuItem>
                   ))}
                 </Select>
+                <FormHelperText>
+                  {isTransfer ? 'Money leaves this account.' : 'Choose the account affected by this transaction.'}
+                </FormHelperText>
               </FormControl>
             )}
 
-            {txType !== TransactionType.Expanse && (
-              <FormControl fullWidth>
+            {!isExpense && (
+              <FormControl fullWidth required={destinationAccountRequired} error={isTransfer && !!sourceAccountId && sourceAccountId === destinationAccountId}>
                 <InputLabel id="tx-dest-label">
-                  {txType === TransactionType.Transfer ? 'To account' : 'Account'}
+                  {isTransfer ? 'To account' : 'Account'}
                 </InputLabel>
                 <Select
                   labelId="tx-dest-label"
                   value={destinationAccountId}
-                  label={txType === TransactionType.Transfer ? 'To account' : 'Account'}
+                  label={isTransfer ? 'To account' : 'Account'}
+                  disabled={isPending}
                   onChange={(e) => setDestinationAccountId(e.target.value)}
                 >
                   <MenuItem value=""><em>None</em></MenuItem>
@@ -157,6 +210,13 @@ export function NewTransactionPage() {
                     <MenuItem key={acc.id} value={acc.id}>{acc.name}</MenuItem>
                   ))}
                 </Select>
+                <FormHelperText>
+                  {isTransfer && !!sourceAccountId && sourceAccountId === destinationAccountId
+                    ? 'Choose a different destination account for transfers.'
+                    : isTransfer
+                      ? 'Money arrives in this account.'
+                      : 'Choose the account receiving this income.'}
+                </FormHelperText>
               </FormControl>
             )}
 
@@ -165,6 +225,7 @@ export function NewTransactionPage() {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              disabled={isPending}
               fullWidth
               required
               InputLabelProps={{ shrink: true }}
@@ -174,6 +235,7 @@ export function NewTransactionPage() {
               label="Note"
               value={note}
               onChange={(e) => setNote(e.target.value)}
+              disabled={isPending}
               fullWidth
               multiline
               rows={2}
@@ -186,13 +248,13 @@ export function NewTransactionPage() {
           <Button
             variant="outlined"
             fullWidth
-            onClick={() => void navigate({ to: '/dashboard' })}
+            onClick={() => void navigate({ to: '/transactions' })}
             disabled={isPending}
           >
             Cancel
           </Button>
-          <Button type="submit" variant="contained" fullWidth disabled={isPending}>
-            {isPending ? 'Saving…' : 'Save'}
+          <Button type="submit" variant="contained" fullWidth disabled={isPending || !canSubmit}>
+            {isPending ? 'Saving...' : 'Save'}
           </Button>
         </Stack>
       </PageLayout>

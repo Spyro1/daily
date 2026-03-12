@@ -22,7 +22,7 @@ export function SettingsPage() {
 
   return (
     <PageLayout title="Settings">
-      <Paper elevation={2} sx={{ borderRadius: 3, overflow: 'hidden' }}>
+      <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
         <List disablePadding>
           <ListItem secondaryAction={<ThemeModeToggle />} sx={{ py: 1.5 }}>
             <ListItemIcon sx={{ minWidth: 40 }}>

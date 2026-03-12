@@ -7,8 +7,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **amount** | [**Amount1**](Amount1.md) |  | [optional] [default to undefined]
 **transaction_type** | [**TransactionType**](TransactionType.md) |  | [optional] [default to undefined]
+**occurred_at** | **string** |  | [optional] [default to undefined]
 **category_id** | **string** |  | [optional] [default to undefined]
-**date** | **string** |  | [optional] [default to undefined]
 **source_account_id** | **string** |  | [optional] [default to undefined]
 **destination_account_id** | **string** |  | [optional] [default to undefined]
 **target_amount** | [**TargetAmount**](TargetAmount.md) |  | [optional] [default to undefined]
@@ -22,8 +22,8 @@ import { UpdateTransaction } from './api';
 const instance: UpdateTransaction = {
     amount,
     transaction_type,
+    occurred_at,
     category_id,
-    date,
     source_account_id,
     destination_account_id,
     target_amount,

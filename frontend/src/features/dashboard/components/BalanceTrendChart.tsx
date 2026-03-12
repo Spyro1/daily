@@ -64,7 +64,7 @@ export function BalanceTrendChart({
   }
 
   return (
-    <Paper elevation={2} sx={{ p: 2.5, borderRadius: 3 }}>
+    <Paper elevation={2} sx={{ p: 2.5, borderRadius: 2 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
         <Typography variant="h6">Cash Flow</Typography>
         {/* Legend */}

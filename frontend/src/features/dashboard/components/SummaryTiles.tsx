@@ -1,4 +1,4 @@
-import { Grid, Paper, Skeleton, Typography } from '@mui/material'
+import { Grid, Paper, Skeleton, Stack, Typography } from '@mui/material'
 import TrendingDownIcon from '@mui/icons-material/TrendingDown'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import type { TransactionBrief } from '@/api/generated'
@@ -30,16 +30,18 @@ export function SummaryTiles({ transactions, interval, customRange, isLoading }:
           elevation={2}
           sx={{
             p: 2,
-            borderRadius: 3,
+            borderRadius: 2,
             bgcolor: 'primary.main',
             color: 'primary.contrastText',
             height: '100%',
           }}
         >
-          <TrendingUpIcon sx={{ mb: 0.5, opacity: 0.85 }} />
-          <Typography variant="body2" sx={{ opacity: 0.85, mb: 0.5 }}>
-            Income
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
+            <TrendingUpIcon sx={{ mb: 0.5, opacity: 0.85 }} />
+            <Typography variant="body2" sx={{ opacity: 0.85, mb: 0.5 }}>
+              Income
+            </Typography>
+          </Stack>
           {isLoading ? (
             <Skeleton
               variant="text"
@@ -60,16 +62,18 @@ export function SummaryTiles({ transactions, interval, customRange, isLoading }:
           elevation={2}
           sx={{
             p: 2,
-            borderRadius: 3,
+            borderRadius: 2,
             bgcolor: 'error.main',
             color: 'error.contrastText',
             height: '100%',
           }}
         >
-          <TrendingDownIcon sx={{ mb: 0.5, opacity: 0.85 }} />
-          <Typography variant="body2" sx={{ opacity: 0.85, mb: 0.5 }}>
-            Expenses
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mb: 0.5 }}>
+            <TrendingDownIcon sx={{ mb: 0.5, opacity: 0.85 }} />
+            <Typography variant="body2" sx={{ opacity: 0.85, mb: 0.5 }}>
+              Expenses
+            </Typography>
+          </Stack>
           {isLoading ? (
             <Skeleton
               variant="text"

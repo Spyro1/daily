@@ -31,7 +31,7 @@ function formatDate(dateStr: string): string {
 }
 
 function formatAmount(tx: TransactionBrief): string {
-  const sign = tx.transaction_type === 'expanse' ? '-' : '+'
+  const sign = tx.transaction_type === 'expense' ? '-' : '+'
   return `${sign}$${parseFloat(tx.amount).toFixed(2)}`
 }
 
@@ -39,7 +39,7 @@ export function RecentTransactions({ transactions, isLoading }: Props) {
   const recent = transactions.slice(0, RECENT_LIMIT)
 
   return (
-    <Paper elevation={2} sx={{ borderRadius: 3, overflow: 'hidden' }}>
+    <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
       <Box sx={{ px: 2.5, pt: 2.5, pb: 1 }}>
         <Typography variant="h6">Recent Transactions</Typography>
       </Box>
@@ -67,7 +67,7 @@ export function RecentTransactions({ transactions, isLoading }: Props) {
           <List disablePadding>
             {recent.map((tx, idx) => {
               const cfg = TYPE_CONFIG[tx.transaction_type] ?? { label: tx.transaction_type, color: 'info' as const }
-              const isExpense = tx.transaction_type === 'expanse'
+              const isExpense = tx.transaction_type === 'expense'
               return (
                 <Box key={tx.id}>
                   <ListItem
@@ -88,7 +88,7 @@ export function RecentTransactions({ transactions, isLoading }: Props) {
                           {tx.category.name}
                         </Typography>
                       }
-                      secondary={formatDate(tx.date)}
+                      secondary={formatDate(tx.occurred_at)}
                       sx={{ mr: 1 }}
                     />
                     <Chip label={cfg.label} color={cfg.color} size="small" sx={{ mr: 1 }} />

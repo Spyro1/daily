@@ -3,7 +3,7 @@
 
 ## Enum
 
-* `Expanse` (value: `'expanse'`)
+* `Expense` (value: `'expense'`)
 
 * `Income` (value: `'income'`)
 

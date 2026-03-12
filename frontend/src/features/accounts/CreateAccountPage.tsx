@@ -23,8 +23,12 @@ import {
     TextField,
     Typography,
 } from '@mui/material'
+import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
+import type { CreateAccount } from '@/api/generated'
 import { PageLayout } from '#/shared/layout/PageLayout'
+import { useNotify } from '#/shared/providers/SnackbarProvider'
+import { useCreateAccount } from './hooks/useAccounts'
 
 const ACCOUNT_ICONS = [
     { value: 'wallet', label: 'Wallet', Icon: WalletRounded },
@@ -37,16 +41,47 @@ const ACCOUNT_ICONS = [
 
 const CURRENCIES = ['HUF', 'USD', 'EUR'] as const
 
+function toApiBalance(value: string): CreateAccount['balance'] {
+    return value as CreateAccount['balance']
+}
+
 export function CreateAccountPage() {
+    const navigate = useNavigate()
+    const notify = useNotify()
     const [accountName, setAccountName] = useState('')
     const [balance, setBalance] = useState('0')
     const [currency, setCurrency] = useState<(typeof CURRENCIES)[number]>('USD')
     const [icon, setIcon] = useState<(typeof ACCOUNT_ICONS)[number]['value']>('wallet')
     const [color, setColor] = useState('#14633d')
     const [includeInTotal, setIncludeInTotal] = useState(true)
+    const { mutate: createAccount, isPending } = useCreateAccount()
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
+
+        const trimmedName = accountName.trim()
+        const trimmedBalance = balance.trim()
+
+        if (!trimmedName) {
+            return
+        }
+
+        createAccount(
+            {
+                name: trimmedName,
+                balance: trimmedBalance ? toApiBalance(trimmedBalance) : null,
+                currency_code: currency,
+                icon_name: icon,
+                color,
+                include_in_total: includeInTotal,
+            },
+            {
+                onSuccess: () => {
+                    notify('Account created.', 'success')
+                    void navigate({ to: '/accounts' })
+                },
+            },
+        )
     }
 
     return (
@@ -60,6 +95,7 @@ export function CreateAccountPage() {
                         onChange={(event) => setAccountName(event.target.value)}
                         placeholder="Main wallet"
                         autoComplete="off"
+                        disabled={isPending}
                         fullWidth
                         required
                     />
@@ -80,6 +116,7 @@ export function CreateAccountPage() {
                             value={balance}
                             onChange={(event) => setBalance(event.target.value)}
                             inputProps={{ min: 0, step: '0.01' }}
+                            disabled={isPending}
                             fullWidth
                         />
 
@@ -90,6 +127,7 @@ export function CreateAccountPage() {
                                 id="account-currency"
                                 value={currency}
                                 label="Currency"
+                                disabled={isPending}
                                 onChange={(event) => setCurrency(event.target.value as (typeof CURRENCIES)[number])}
                             >
                                 {CURRENCIES.map((currencyOption) => (
@@ -118,6 +156,7 @@ export function CreateAccountPage() {
                                         key={value}
                                         type="button"
                                         onClick={() => setIcon(value)}
+                                        disabled={isPending}
                                         sx={{ width: '100%', borderRadius: 3, textAlign: 'center' }}
                                     >
                                         <Box
@@ -173,6 +212,7 @@ export function CreateAccountPage() {
                                 format="hex"
                                 value={color}
                                 variant="outlined"
+                                disabled={isPending}
                                 onChange={(value) => setColor(value)}
                             />
                             {/* <TextField
@@ -210,6 +250,7 @@ export function CreateAccountPage() {
                             control={
                                 <Switch
                                     checked={includeInTotal}
+                                    disabled={isPending}
                                     onChange={(event) => setIncludeInTotal(event.target.checked)}
                                 />
                             }
@@ -219,9 +260,29 @@ export function CreateAccountPage() {
                 </Stack>
             </Paper>
 
-            <Button type="submit" variant="contained" color="primary" size="large" fullWidth>
-                    Create account
+            <Stack direction="row" spacing={1.5}>
+                <Button
+                    type="button"
+                    variant="outlined"
+                    color="primary"
+                    size="large"
+                    fullWidth
+                    disabled={isPending}
+                    onClick={() => void navigate({ to: '/accounts' })}
+                >
+                    Cancel
                 </Button>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    fullWidth
+                    loading={isPending}
+                >
+                    {isPending ? 'Creating...' : 'Create account'}
+                </Button>
+            </Stack>
             </PageLayout>
         </Box>
     )

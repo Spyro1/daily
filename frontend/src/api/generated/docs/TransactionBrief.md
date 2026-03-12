@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **amount** | **string** |  | [default to undefined]
 **transaction_type** | [**TransactionType**](TransactionType.md) |  | [default to undefined]
 **category** | [**CategoryBrief**](CategoryBrief.md) |  | [default to undefined]
-**date** | **string** |  | [default to undefined]
+**occurred_at** | **string** |  | [default to undefined]
 
 ## Example
 
@@ -21,7 +21,7 @@ const instance: TransactionBrief = {
     amount,
     transaction_type,
     category,
-    date,
+    occurred_at,
 };
 ```
 

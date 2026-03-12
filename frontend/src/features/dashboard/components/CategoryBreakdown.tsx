@@ -23,7 +23,7 @@ function deriveCategories(
 
   for (const tx of transactions) {
     // Only count expense-type transactions
-    if (tx.transaction_type !== 'expanse') continue
+    if (tx.transaction_type !== 'expense') continue
     const amount = parseFloat(tx.amount)
     total += amount
     const existing = map.get(tx.category.id) ?? { name: tx.category.name, total: 0 }
@@ -48,7 +48,7 @@ export function CategoryBreakdown({ transactions, isLoading }: Props) {
   const { items } = deriveCategories(transactions)
 
   return (
-    <Paper elevation={2} sx={{ p: 2.5, borderRadius: 3 }}>
+    <Paper elevation={2} sx={{ p: 2.5, borderRadius: 2 }}>
       <Typography variant="h6" gutterBottom>
         Top Spending Categories
       </Typography>

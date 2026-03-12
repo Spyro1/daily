@@ -22,3 +22,4 @@
 Use the endpoints /validate and /refresh if the access_token is expired or want to check if valid. If the refresh_token is expired too then redirect to the home page "/" for login.
 - Create an response handeler for the queries and the mutation which is calledu pon error or success to display the response message and alert if was prohibited to call the endpoint. Give feedback based on status codes and the message in the request.
 - Make a snackbar component provider for the toast message notifications.
+- wire up the create transactions, the create accounts and the create category pages as well to the backend hooks and create the category creator page as well with a ui/ux frinedly parent selector for categories cause they can be ordered in a tree structure

@@ -11,7 +11,7 @@ All URIs are relative to *http://localhost*
 |[**updateMyTransactionApiV1TransactionsTransactionIdPatch**](#updatemytransactionapiv1transactionstransactionidpatch) | **PATCH** /api/v1/transactions/{transaction_id} | Update My Transaction|
 
 # **createMyNewTransactionApiV1TransactionsPost**
-> any createMyNewTransactionApiV1TransactionsPost(createTransaction)
+> TransactionIndex createMyNewTransactionApiV1TransactionsPost(createTransaction)
 
 
 ### Example
@@ -45,7 +45,7 @@ const { status, data } = await apiInstance.createMyNewTransactionApiV1Transactio
 
 ### Return type
 
-**any**
+**TransactionIndex**
 
 ### Authorization
 

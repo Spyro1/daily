@@ -1,5 +1,6 @@
 import { AddRounded } from '@mui/icons-material'
-import { Box, Fab, Paper, Skeleton, Stack } from '@mui/material'
+import { Box, Fab, Paper, Skeleton, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { useState } from 'react'
 import { CategoryType } from '@/api/generated'
 import { useCategories } from './hooks/useCategories'
 import { PageLayout } from '#/shared/layout/PageLayout'
@@ -9,6 +10,7 @@ import { useNavigate } from '@tanstack/react-router'
 export function CategoriesPage() {
   const { data: categories, isPending } = useCategories()
   const navigate = useNavigate()
+  const [selectedType, setSelectedType] = useState<CategoryType>(CategoryType.Expense)
 
   const expenses = categories?.filter((c) => c.type === CategoryType.Expense) ?? []
   const income = categories?.filter((c) => c.type === CategoryType.Income) ?? []
@@ -20,12 +22,27 @@ export function CategoriesPage() {
       aria-label="add category"
       onClick={() => void navigate({ to: '/categories/new' })}
     >
-      <AddRounded />
+      <AddRounded fontSize="large" />
     </Fab>
   )
 
   return (
     <PageLayout title="Categories" action={fab}>
+      <ToggleButtonGroup
+        exclusive
+        fullWidth
+        size="small"
+        value={selectedType}
+        onChange={(_, value: CategoryType | null) => {
+          if (value) {
+            setSelectedType(value)
+          }
+        }}
+      >
+        <ToggleButton value={CategoryType.Expense}>Expense</ToggleButton>
+        <ToggleButton value={CategoryType.Income}>Income</ToggleButton>
+      </ToggleButtonGroup>
+
       {isPending ? (
         <Stack spacing={1.5}>
           {[1, 2, 3, 4].map((i) => (
@@ -40,8 +57,11 @@ export function CategoriesPage() {
         </Stack>
       ) : (
         <Stack spacing={3}>
-          <CategoryGroup items={expenses} label="Expenses" />
-          <CategoryGroup items={income} label="Income" />
+          {selectedType === CategoryType.Expense ? (
+            <CategoryGroup items={expenses} label="Expenses" />
+          ) : (
+            <CategoryGroup items={income} label="Income" />
+          )}
         </Stack>
       )}
     </PageLayout>

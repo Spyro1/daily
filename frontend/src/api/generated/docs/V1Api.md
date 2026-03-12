@@ -138,7 +138,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **createMyNewTransactionApiV1TransactionsPost**
-> any createMyNewTransactionApiV1TransactionsPost(createTransaction)
+> TransactionIndex createMyNewTransactionApiV1TransactionsPost(createTransaction)
 
 
 ### Example
@@ -172,7 +172,7 @@ const { status, data } = await apiInstance.createMyNewTransactionApiV1Transactio
 
 ### Return type
 
-**any**
+**TransactionIndex**
 
 ### Authorization
 

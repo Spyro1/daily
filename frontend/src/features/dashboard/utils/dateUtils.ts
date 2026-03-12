@@ -1,3 +1,5 @@
+import type { TransactionBrief } from "#/api/generated"
+
 /** Supported time intervals for the analytics chart */
 export type Interval = 'day' | 'week' | 'month' | 'year' | 'custom'
 
@@ -83,11 +85,9 @@ export interface BucketData {
   expense: number
 }
 
-type TxLike = { amount: string; transaction_type: string; date: string }
-
 /** Group transactions into chart buckets for the given interval + date range */
 export function deriveChartData(
-  transactions: TxLike[],
+  transactions: TransactionBrief[],
   interval: Interval,
   dateRange: [Date, Date],
 ): BucketData[] {
@@ -95,13 +95,13 @@ export function deriveChartData(
   const buckets = new Map<string, { label: string; income: number; expense: number }>()
 
   for (const tx of transactions) {
-    const txDate = new Date(tx.date)
+    const txDate = new Date(tx.occurred_at)
     if (txDate < start || txDate > end) continue
     const { label, sortKey } = getIntervalBucket(txDate, interval)
     const bucket = buckets.get(sortKey) ?? { label, income: 0, expense: 0 }
     const amount = parseFloat(tx.amount)
     if (tx.transaction_type === 'income') bucket.income += amount
-    else if (tx.transaction_type === 'expanse') bucket.expense += amount
+    else if (tx.transaction_type === 'expense') bucket.expense += amount
     buckets.set(sortKey, bucket)
   }
 
@@ -112,7 +112,7 @@ export function deriveChartData(
 
 /** Sum income and expense for transactions within the given interval window */
 export function deriveSummary(
-  transactions: TxLike[],
+  transactions: TransactionBrief[],
   interval: Interval,
   customRange?: [Date, Date],
 ): { totalIncome: number; totalExpense: number } {
@@ -120,11 +120,11 @@ export function deriveSummary(
   let totalIncome = 0
   let totalExpense = 0
   for (const tx of transactions) {
-    const d = new Date(tx.date)
+    const d = new Date(tx.occurred_at)
     if (d < start || d > end) continue
     const amount = parseFloat(tx.amount)
     if (tx.transaction_type === 'income') totalIncome += amount
-    else if (tx.transaction_type === 'expanse') totalExpense += amount
+    else if (tx.transaction_type === 'expense') totalExpense += amount
   }
   return { totalIncome, totalExpense }
 }

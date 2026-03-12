@@ -17,7 +17,7 @@ export function TransactionsPage() {
       aria-label="New transaction"
       onClick={() => void navigate({ to: '/transactions/new' })}
     >
-      <AddRounded />
+      <AddRounded fontSize="large"/>
     </Fab>
   )
 

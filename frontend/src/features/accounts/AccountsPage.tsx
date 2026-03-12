@@ -17,7 +17,7 @@ export function AccountsPage() {
       aria-label="add account"
       onClick={() => void navigate({ to: '/accounts/new' })}
     >
-      <AddRounded />
+      <AddRounded fontSize="large" />
     </Fab>
   )
 

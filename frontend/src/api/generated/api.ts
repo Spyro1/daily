@@ -88,8 +88,8 @@ export interface CreateCategory {
 export interface CreateTransaction {
     'amount': Amount;
     'transaction_type': TransactionType;
+    'occurred_at': string;
     'category_id': string;
-    'date': string;
     'source_account_id'?: string | null;
     'destination_account_id'?: string | null;
     'target_amount'?: TargetAmount | null;
@@ -116,7 +116,7 @@ export interface TransactionBrief {
     'amount': string;
     'transaction_type': TransactionType;
     'category': CategoryBrief;
-    'date': string;
+    'occurred_at': string;
 }
 
 
@@ -125,17 +125,17 @@ export interface TransactionIndex {
     'amount': string;
     'transaction_type': TransactionType;
     'category': CategoryBrief;
-    'date': string;
-    'source_account'?: AccountBrief | null;
-    'destination_account'?: AccountBrief | null;
-    'target_amount'?: string | null;
-    'note'?: string | null;
+    'occurred_at': string;
+    'source_account': AccountBrief;
+    'destination_account': AccountBrief;
+    'target_amount': string;
+    'note': string;
 }
 
 
 
 export const TransactionType = {
-    Expanse: 'expanse',
+    Expense: 'expense',
     Income: 'income',
     Transfer: 'transfer'
 } as const;
@@ -164,8 +164,8 @@ export interface UpdateCategory {
 export interface UpdateTransaction {
     'amount'?: Amount1 | null;
     'transaction_type'?: TransactionType | null;
+    'occurred_at'?: string | null;
     'category_id'?: string | null;
-    'date'?: string | null;
     'source_account_id'?: string | null;
     'destination_account_id'?: string | null;
     'target_amount'?: TargetAmount | null;
@@ -1792,7 +1792,7 @@ export const TransactionsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionIndex>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createMyNewTransactionApiV1TransactionsPost(createTransaction, accessToken, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TransactionsApi.createMyNewTransactionApiV1TransactionsPost']?.[localVarOperationServerIndex]?.url;
@@ -1871,7 +1871,7 @@ export const TransactionsApiFactory = function (configuration?: Configuration, b
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<any> {
+        createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<TransactionIndex> {
             return localVarFp.createMyNewTransactionApiV1TransactionsPost(createTransaction, accessToken, options).then((request) => request(axios, basePath));
         },
         /**
@@ -2796,7 +2796,7 @@ export const V1ApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+        async createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionIndex>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createMyNewTransactionApiV1TransactionsPost(createTransaction, accessToken, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['V1Api.createMyNewTransactionApiV1TransactionsPost']?.[localVarOperationServerIndex]?.url;
@@ -3099,7 +3099,7 @@ export const V1ApiFactory = function (configuration?: Configuration, basePath?: 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<any> {
+        createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<TransactionIndex> {
             return localVarFp.createMyNewTransactionApiV1TransactionsPost(createTransaction, accessToken, options).then((request) => request(axios, basePath));
         },
         /**
