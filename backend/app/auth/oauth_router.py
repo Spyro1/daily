@@ -36,7 +36,7 @@ def _cookie_options() -> dict[str, Any]:
     }
 
 
-@router.post("/logout", status_code=204)
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(response: Response):
     logger.info("[oauth/logout]: Clearing auth cookies")
     cookie_options = _cookie_options()
@@ -133,16 +133,22 @@ async def refresh_access_token(
 
 @router.get("/token", response_model=str)
 async def get_access_token_string(
-    current_user: Users = Depends(get_current_user)
+    current_user: Users = Depends(get_current_user),
+    access_token: Optional[str] = Cookie(None),
 ) -> str:
-    data = TokenData(
-        email=current_user.email,
-        sub=current_user.accounts[0].provider_user_id
-    )
-    
-    access_token = create_access_token(payload=dict(data))
+    logger.info(f"[oauth/token]: Generating access token string for user_id={current_user.id}")
+    try:
+        original_payload = decode_token(access_token)  # already validated by get_current_user
+        data = TokenData(
+            email=current_user.email,
+            sub=original_payload["sub"],
+        )
+        new_access_token = create_access_token(payload=data.model_dump())
+    except Exception as exc:
+        logger.exception(f"[oauth/token]: Failed to create access token for user_id={current_user.id}: {exc}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create access token")
 
-    return access_token
+    return new_access_token
 
 @router.get("/callback")
 async def oauth_callback(
