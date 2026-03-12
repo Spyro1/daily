@@ -19,6 +19,9 @@ from app.accounts.models import AccountIndex, CreateAccount, UpdateAccount
 
 router = APIRouter()
 
+# ================================
+# Helper functions
+# ================================
 
 def _payload_for_log(data: CreateAccount | UpdateAccount) -> dict:
     if hasattr(data, "model_dump"):
@@ -28,6 +31,10 @@ def _payload_for_log(data: CreateAccount | UpdateAccount) -> dict:
 
 def _log_context(current_user: Users, action: str) -> str:
     return f"[{current_user.display_name}][accounts/{action}]"
+
+# ================================
+# Endpoints
+# ================================
 
 @router.get("", response_model=list[AccountIndex])
 async def get_my_accounts(
@@ -71,7 +78,7 @@ async def get_my_account(
     return fill_account_index(db_account)
 
 
-@router.post("", status_code=201)
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create_my_new_account(
     data: CreateAccount,
     db: AsyncSession = Depends(get_db),
@@ -104,7 +111,7 @@ async def create_my_new_account(
 
     # TODO: Create starting balance transaction if balance is provided (need to add 'amount' to CreateAccount model and handle it in the service layer)
     logger.info(f"{log_context}: Created account id={created_account.id} name={created_account.name}")
-    return fill_account_index(created_account)
+    return
 
     
 @router.patch("/{account_id}", response_model=AccountIndex)

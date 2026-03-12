@@ -12,6 +12,9 @@ from app.categories.models import CategoryIndex, UpdateCategory, CreateCategory
 
 router = APIRouter()
 
+# ================================
+# Helper functions
+# ================================
 
 def _payload_for_log(data: CreateCategory | UpdateCategory) -> dict:
     if hasattr(data, "model_dump"):
@@ -21,6 +24,11 @@ def _payload_for_log(data: CreateCategory | UpdateCategory) -> dict:
 
 def _log_context(current_user: Users, action: str) -> str:
     return f"[{current_user.display_name}][categories/{action}]"
+
+
+# ================================
+# Endpoints
+# ================================
 
 @router.get('', response_model=list[CategoryIndex])
 async def get_my_categories(
@@ -64,7 +72,7 @@ async def get_my_category(
     return fill_category_index(db_category)
 
 
-@router.post('', status_code=201)
+@router.post('', status_code=status.HTTP_201_CREATED)
 async def create_my_new_category(
     data: CreateCategory,
     db: AsyncSession = Depends(get_db),
@@ -105,7 +113,7 @@ async def create_my_new_category(
         f"{log_context}: "
         f"Created category id={created_category.id} name={created_category.name}"
     )
-    return fill_category_index(created_category)
+    return
 
 @router.patch('/{category_id}', response_model=CategoryIndex)
 async def update_my_category(

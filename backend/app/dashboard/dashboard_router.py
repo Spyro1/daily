@@ -8,11 +8,21 @@ from db.core import get_db
 from app.dashboard.models import DashboardIndex
 from app.accounts.services import get_accounts_for_user
 from app.dashboard.services import get_dashboard_for_user
+
+
 router = APIRouter()
 
+# ================================
+# Helper functions
+# ================================
 
 def _log_context(current_user: Users, action: str) -> str:
     return f"[{current_user.display_name}][dashboard/{action}]"
+
+
+# ================================
+# Endpoints
+# ================================
 
 @router.get('')
 async def get_my_dashboard(
@@ -23,7 +33,7 @@ async def get_my_dashboard(
     logger.info(f"{log_context}: Fetching dashboard data")
 
     try:
-        dashboard = await get_dashboard_for_user(current_user.id)
+        dashboard = await get_dashboard_for_user(db, current_user.id)
     except NotImplementedError as ne:
         logger.warning(f"{log_context}: Dashboard service not implemented: {ne}")
         raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Dashboard endpoint not implemented")
