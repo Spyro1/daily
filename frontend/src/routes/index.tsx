@@ -15,8 +15,7 @@ function App() {
   }
 
   return (
-    <PageLayout>
-
+    <PageLayout centered>
       <Stack
         spacing={3}
         alignItems="center"
@@ -55,7 +54,7 @@ function App() {
             </Typography>
             <Typography variant="h4">Welcome back</Typography>
             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 360 }}>
-              Sign in with Google to continue to your Daily dashboard.
+              Sign in with Google to continue.
             </Typography>
           </Stack>
         </Stack>
@@ -77,9 +76,9 @@ function App() {
           Login via Google
         </Button>
 
-        <Typography variant="body2" color="text.secondary" sx={{ position: 'relative' }}>
+        {/* <Typography variant="body2" color="text.secondary" sx={{ position: 'relative' }}>
           Secure OAuth login. You will be redirected back here after authentication.
-        </Typography>
+        </Typography> */}
       </Stack>
     </PageLayout>
   )

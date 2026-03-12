@@ -28,7 +28,7 @@ function RegisterPage() {
         py: 4,
       }}
     >
-      <Paper elevation={0} sx={{ width: '100%', maxWidth: 520, p: { xs: 3, md: 4 }, borderRadius: 8 }}>
+      <Paper elevation={0} sx={{ width: '100%', maxWidth: 520, p: { xs: 3, md: 4 }, borderRadius: 3 }}>
         <Stack spacing={2.5}>
           <Stack spacing={0.75}>
             <Typography variant="h4">Create account</Typography>

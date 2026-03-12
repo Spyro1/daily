@@ -16,4 +16,9 @@
 - Based on the tanstack react application from the beleptetosch-frontend folder, try to remake and fix any erros on t he daily/frontend folder and project. Make the theming work, the routers and the queryclient alike in the beleptetosch-frontend and make everything tidy and professional if a senior developer made it.
 - make the frontend read env var from the root dir
 - emove te auth shell and the created index content which i did not ask for. put the given colors (wallet gold, leaf green, coin glow, forest ink, canvas cream) in the theme file, and create the moden and clean login screen in the index.tsx file with the logo in the middle top and the login via Google button which redirects to backend. And then make the callback page which the backend redirects to after login and if i got the access-token it will redirect to the home dashboard page which should have a placeholder for now.
-- 
+- Make it that by default that the pages have a maxium width which corresponds to mobile view and everything adjust to that, even the nav bar. Apply only borderRadius: 3 at components. Create the other pages defined by the nav bar.
+- Seperate all component functions into their own component file. Modify and use the PageLayout for the templated unified look of every page (e.g: title, subtitle, content, poadding, etc), and make every recurring element of the sites a component for reuseability.
+- Create an auth guard and verification hook in api folder that is required before each page except the "/" and the login ones that can show before login.
+Use the endpoints /validate and /refresh if the access_token is expired or want to check if valid. If the refresh_token is expired too then redirect to the home page "/" for login.
+- Create an response handeler for the queries and the mutation which is calledu pon error or success to display the response message and alert if was prohibited to call the endpoint. Give feedback based on status codes and the message in the request.
+- Make a snackbar component provider for the toast message notifications.

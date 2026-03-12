@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { useNavigate, createFileRoute } from '@tanstack/react-router'
-import { Alert, Box, CircularProgress, Paper, Stack, Typography } from '@mui/material'
+import { Alert, CircularProgress, Stack, Typography } from '@mui/material'
 
 import { oauthApi } from '@/api/clients'
 import { PageLayout } from '#/shared/layout/PageLayout'
@@ -38,7 +38,7 @@ function CallbackPage() {
   }, [navigate])
 
   return (
-    <PageLayout>
+    <PageLayout centered>
         <Stack spacing={2.5} alignItems="center" textAlign="center">
           {errorMessage ? <ErrorRounded /> : <CircularProgress color="primary" />}
           <Typography variant="h4">Signing in...</Typography>

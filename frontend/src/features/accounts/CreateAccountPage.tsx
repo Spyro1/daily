@@ -24,6 +24,7 @@ import {
     Typography,
 } from '@mui/material'
 import { useState } from 'react'
+import { PageLayout } from '#/shared/layout/PageLayout'
 
 const ACCOUNT_ICONS = [
     { value: 'wallet', label: 'Wallet', Icon: WalletRounded },
@@ -49,34 +50,10 @@ export function CreateAccountPage() {
     }
 
     return (
-        <Box
-            component="form"
-            onSubmit={onSubmit}
-            sx={{
-                display: 'flex',
-                flex: 1,
-                flexDirection: 'column',
-                minHeight: '100%',
-                gap: { xs: 2, sm: 3 },
-                p: 1,
-            }}
-        >
-            <Box
-                sx={{
-                    display: 'flex',
-                    flex: 1,
-                    flexDirection: 'column',
-                    gap: 2,
-                }}
-            >
-                <Stack>
-                    <Typography variant="overline" sx={{ color: 'primary.main', letterSpacing: '0.18em', fontWeight: 800 }}>
-                        Accounts
-                    </Typography>
-                    <Typography variant="h3">Create Account</Typography>
-                </Stack>
-
-                <Stack spacing={2.5} id="create-account-input-fields">
+        <Box component="form" onSubmit={onSubmit} sx={{ display: 'contents' }}>
+            <PageLayout overline="Accounts" title="Create Account">
+                <Paper elevation={2} sx={{ p: 2.5, borderRadius: 3 }}>
+                    <Stack spacing={2.5} id="create-account-input-fields">
                     <TextField
                         label="Account name"
                         value={accountName}
@@ -240,13 +217,12 @@ export function CreateAccountPage() {
                         />
                     </Box>
                 </Stack>
+            </Paper>
 
-                <Box sx={{ mt: 'auto', pt: { xs: 1, sm: 2 } }}>
-                    <Button type="submit" variant="contained" color="primary" size="large" fullWidth>
-                        Create account
-                    </Button>
-                </Box>
-            </Box>
+            <Button type="submit" variant="contained" color="primary" size="large" fullWidth>
+                    Create account
+                </Button>
+            </PageLayout>
         </Box>
     )
 }

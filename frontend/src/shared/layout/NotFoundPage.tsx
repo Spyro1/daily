@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router'
-import { Box, Button, Stack, Typography } from '@mui/material'
+import { Button, Stack, Typography } from '@mui/material'
 import { PageLayout } from './PageLayout'
 
 export function NotFoundPage() {
   return (
-    <PageLayout>
+    <PageLayout centered>
       <Stack spacing={2} alignItems="center" textAlign="center" maxWidth={420}>
         <Typography variant="h3">404 Page not found</Typography>
         <Typography color="text.secondary">
