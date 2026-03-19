@@ -67,6 +67,10 @@ app.add_middleware(
     # allow_headers=["Authorization"]
 )
 
+@app.get("/", status_code=200, tags=['Root'])
+async def read_main():
+    return {"msg": "Hello World"}
+
 @app.get('/health',
          status_code=200,
          tags=['Health'])

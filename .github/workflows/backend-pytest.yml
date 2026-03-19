@@ -1,0 +1,65 @@
+name: Backend Pytest
+
+on:
+  push:
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      log_level: INFO
+      db_host: 127.0.0.1
+      db_port: "5432"
+      db_username: postgres
+      db_password: password
+      db_name: daily
+      jwt_secret_key: test-secret-key-for-ci-only
+      jwt_algorithm: HS256
+      jwt_access_token_expire_minutes: "30"
+      jwt_refresh_token_expire_days: "7"
+      jwt_login_token_expire_minutes: "5"
+      google_client_id: ci-google-client-id
+      google_client_secret: ci-google-client-secret
+      google_redirect_uri: http://localhost:8000/api/v1/oauth/callback
+      google_token_url: https://oauth2.googleapis.com/token
+      google_userinfo_url: https://www.googleapis.com/oauth2/v3/userinfo
+      frontend_auth_callback: http://localhost:3000/callback
+      frontend_cors_origins: http://localhost:3000
+      TEST_DB_HOST: 127.0.0.1
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: python -m pytest
