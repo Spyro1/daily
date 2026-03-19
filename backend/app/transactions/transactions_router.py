@@ -85,7 +85,7 @@ async def create_my_new_transaction(
     data: CreateTransaction,
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
-) -> TransactionIndex:
+):
     log_context = _log_context(current_user, "create_my_new_transaction")
     logger.info(f"{log_context}: Creating new transaction")
     logger.debug(f"{log_context}: Payload={_payload_for_log(data)} user_id={current_user.id}")

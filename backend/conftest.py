@@ -2,6 +2,8 @@ import asyncio
 import os
 import socket
 import uuid
+from datetime import datetime, timezone
+from decimal import Decimal
 from collections.abc import AsyncGenerator, Generator
 
 import pytest
@@ -16,7 +18,7 @@ from app.auth.jwt_utils import get_current_user
 from app.core.config import database
 from app.main import app
 from db.core import get_db
-from db.models import Base, Users
+from db.models import Accounts, Base, Categories, Transactions, Users
 
 
 def _resolve_test_db_host() -> str:
@@ -166,3 +168,79 @@ def client(
         yield test_client
 
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(scope="function")
+def seed_account(test_sync_session_factory: sessionmaker[Session], test_user: dict[str, str]) -> dict[str, str]:
+    account_name = f"Test Account {uuid.uuid4().hex[:8]}"
+
+    with test_sync_session_factory() as session:
+        account = Accounts(
+            user_id=uuid.UUID(test_user["id"]),
+            name=account_name,
+            currency_code="USD",
+            icon_name="Savings",
+            color="#112233",
+            include_in_total=True,
+        )
+        session.add(account)
+        session.commit()
+        session.refresh(account)
+
+        return {
+            "id": str(account.id),
+            "name": account.name,
+            "currency_code": account.currency_code,
+        }
+
+
+@pytest.fixture(scope="function")
+def seed_category(test_sync_session_factory: sessionmaker[Session], test_user: dict[str, str]) -> dict[str, str]:
+    category_name = f"Test Category {uuid.uuid4().hex[:8]}"
+
+    with test_sync_session_factory() as session:
+        category = Categories(
+            user_id=uuid.UUID(test_user["id"]),
+            name=category_name,
+            category_type="expense",
+            icon_name="Savings",
+            color="#334455",
+        )
+        session.add(category)
+        session.commit()
+        session.refresh(category)
+
+        return {
+            "id": str(category.id),
+            "name": category.name,
+            "type": category.category_type,
+        }
+
+
+@pytest.fixture(scope="function")
+def seed_transaction(
+    test_sync_session_factory: sessionmaker[Session],
+    test_user: dict[str, str],
+    seed_account: dict[str, str],
+    seed_category: dict[str, str],
+) -> dict[str, str]:
+    with test_sync_session_factory() as session:
+        transaction = Transactions(
+            user_id=uuid.UUID(test_user["id"]),
+            source_account_id=uuid.UUID(seed_account["id"]),
+            destination_account_id=None,
+            category_id=uuid.UUID(seed_category["id"]),
+            transaction_type="expense",
+            amount=Decimal("10.00"),
+            target_amount=None,
+            occurred_at=datetime.now(timezone.utc),
+            note="Seeded transaction",
+        )
+        session.add(transaction)
+        session.commit()
+        session.refresh(transaction)
+
+        return {
+            "id": str(transaction.id),
+            "type": transaction.transaction_type,
+        }
