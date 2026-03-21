@@ -24,10 +24,10 @@ class TransactionBrief(BaseModel):
 
 
 class TransactionIndex(TransactionBrief):
-    source_account: AccountBrief
-    destination_account: AccountBrief
-    target_amount: Decimal
-    note: str
+    source_account: Optional[AccountBrief] | None
+    destination_account: Optional[AccountBrief] | None
+    target_amount: Optional[Decimal] | None
+    note: Optional[str] | None
 
 
 class CreateTransaction(BaseModel):
@@ -50,3 +50,10 @@ class UpdateTransaction(BaseModel):
     destination_account_id: Optional[uuid.UUID] = None
     target_amount: Optional[Decimal] = None
     note: Optional[str] = None
+
+
+class TransactionListResponse(BaseModel):
+    data: list[TransactionIndex]
+    total: int
+    skip: int
+    limit: int

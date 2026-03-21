@@ -106,9 +106,15 @@ async def delete_category(db: AsyncSession, category: Categories) -> None:
 
 
 def fill_category_brief(category: Categories) -> CategoryBrief:
-    return CategoryBrief(
-        id=category.id,
-        name=category.name,
+    if category is not None:
+        return CategoryBrief(
+            id=category.id,
+            name=category.name,
+        )
+    else:
+        return CategoryBrief(
+            id=uuid.UUID(int=0),
+            name="Transfer",
     )
 
 def fill_category_index(category: Categories) -> CategoryIndex:

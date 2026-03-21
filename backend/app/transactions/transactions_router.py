@@ -1,5 +1,7 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, status
+from datetime import datetime
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
@@ -14,8 +16,9 @@ from app.transactions.services import (
     fill_transaction_index,
     get_transaction_for_user_by_id,
     get_transactions_for_user,
+    get_transactions_for_user_filtered,
 )
-from app.transactions.models import CreateTransaction, TransactionIndex, UpdateTransaction
+from app.transactions.models import CreateTransaction, TransactionIndex, UpdateTransaction, TransactionListResponse, TransactionType
 
 router = APIRouter()
 
@@ -37,23 +40,50 @@ def _log_context(current_user: Users, action: str) -> str:
 # Endpoints
 # ================================
 
-@router.get('', response_model=list[TransactionIndex])
+@router.get('', response_model=TransactionListResponse)
 async def get_my_transactions(
     db: AsyncSession = Depends(get_db),
-    current_user: Users = Depends(get_current_user)
-) -> list[TransactionIndex]:
+    current_user: Users = Depends(get_current_user),
+    date_from: Optional[datetime] = Query(None, description="Start date for transaction filtering (ISO 8601 format)"),
+    date_to: Optional[datetime] = Query(None, description="End date for transaction filtering (ISO 8601 format)"),
+    category_id: Optional[uuid.UUID] = Query(None, description="Filter by category ID"),
+    account_id: Optional[uuid.UUID] = Query(None, description="Filter by source or destination account ID"),
+    transaction_type: Optional[TransactionType] = Query(None, description="Filter by transaction type (income, expense, transfer)"),
+    skip: int = Query(0, ge=0, description="Number of records to skip (pagination)"),
+    limit: int = Query(100, ge=1, le=1000, description="Number of records to return (pagination)"),
+) -> TransactionListResponse:
     log_context = _log_context(current_user, "get_my_transactions")
-    logger.info(f"{log_context}: Fetching user transactions")
+    logger.info(f"{log_context}: Fetching user transactions with filters")
+    logger.debug(
+        f"{log_context}: Filters - date_from={date_from}, date_to={date_to}, "
+        f"category_id={category_id}, account_id={account_id}, type={transaction_type}, skip={skip}, limit={limit}"
+    )
 
     try:
-        db_transactions = await get_transactions_for_user(db, current_user.id, eager=True)
+        db_transactions, total_count = await get_transactions_for_user_filtered(
+            db,
+            current_user.id,
+            date_from=date_from,
+            date_to=date_to,
+            category_id=category_id,
+            account_id=account_id,
+            transaction_type=transaction_type.value if transaction_type else None,
+            skip=skip,
+            limit=limit,
+            eager=True,
+        )
     except Exception as e:
         logger.exception(f"{log_context}: Error fetching user transactions: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error fetching user transactions")
 
     transactions = [fill_transaction_index(t) for t in db_transactions]
-    logger.info(f"{log_context}: Returning {len(transactions)} transactions")
-    return transactions
+    logger.info(f"{log_context}: Returning {len(transactions)} of {total_count} transactions")
+    return TransactionListResponse(
+        data=transactions,
+        total=total_count,
+        skip=skip,
+        limit=limit,
+    )
 
 
 @router.get('/{transaction_id}', response_model=TransactionIndex)
@@ -85,7 +115,7 @@ async def create_my_new_transaction(
     data: CreateTransaction,
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
-):
+) -> None:
     log_context = _log_context(current_user, "create_my_new_transaction")
     logger.info(f"{log_context}: Creating new transaction")
     logger.debug(f"{log_context}: Payload={_payload_for_log(data)} user_id={current_user.id}")
