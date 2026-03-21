@@ -7,11 +7,13 @@ from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
+from sqlalchemy.exc import OperationalError
 # from fastapi.openapi.utils import get_openapi
 
 from app.core.config import frontend_config
 from app.core.logging import configure_logging
 from app.routers import router
+from db.core import ensure_database_exists, should_create_database_for_error
 
 origins = frontend_config.allowed_origins
 
@@ -19,6 +21,19 @@ async def run_migrations():
     try:
         alembic_cfg = Config("alembic.ini")
         command.upgrade(alembic_cfg, "head")
+    except OperationalError as e:
+        if should_create_database_for_error(e):
+            logger.warning("Configured database is missing, attempting to create it")
+            try:
+                created = ensure_database_exists()
+                if created:
+                    alembic_cfg = Config("alembic.ini")
+                    command.upgrade(alembic_cfg, "head")
+                    return
+            except Exception as create_err:
+                logger.error(f"Failed to create missing database: {create_err}")
+
+        logger.error(f"Error running migrations: {e}")
     except Exception as e:
         logger.error(f"Error running migrations: {e}")
 
