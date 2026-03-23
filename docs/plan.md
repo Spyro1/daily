@@ -1,213 +1,162 @@
-# Daily költségvetéskezelő alkalmazás – Terv
+# Daily költségvetéskezelő alkalmazás - Terv
 
 ## Edited
 
-- 2026-03-11: A DB dokumentáció frissítve lett a refaktorált backend séma alapján.
-- 2026-03-11: A `external_identities` helyett `provided_users`, az `icon_id` helyett `icon_name`, valamint a jelenleg nem aktív `icons` és `notification_logs` táblák dokumentációja kivezetésre került az aktuális sémaleírásból.
-- 2026-03-11: A tranzakciós integritási szabályok, indexek és provider mezők a jelenlegi `backend/db/models.py` implementációhoz lettek igazítva.
+- 2026-03-23: A terv Kotlin/Ktor/Compose irányról FastAPI (Python) backend + React frontend irányra lett átállítva.
+- 2026-03-23: PWA-felkészítési követelmények és roadmap hozzáadva (offline cache, manifest, service worker, installálhatóság).
 
-## Technikai Architektúra & Minták
+## Technikai Architektúra és Minták
 
 ### 1. Rétegek (Layering)
 
-* **Domain Layer:** Business Logic, UseCases, Domain Models (`data class`), Repository Interfaces. **Függőségmentes.**
-* **Data Layer:** Repository Implementation, Room (Local), Ktor (Remote), Mappers (Entity/DTO ↔ Domain).
-* **Presentation Layer:** Compose Multiplatform, State-holder ViewModels, Voyager Navigation.
+- Backend API layer: FastAPI routerek, input/output schema validáció, auth guardok.
+- Backend application layer: szolgáltatások (use-case szintű üzleti logika), tranzakciókezelés.
+- Backend persistence layer: SQLAlchemy modellek, migrációk (Alembic), repository-jellegű adatelérő minták.
+- Frontend presentation layer: React oldalak, feature komponensek, route-level layoutok.
+- Frontend state/data layer: TanStack Query cache, API kliensek, form state, optimistic update minták.
 
 ### 2. Tervezési Minták
 
-* **MVI (Model-View-Intent):** Determinisztikus UI állapotkezelés. A View `Intent`-eket küld, a ViewModel `State`-et publikál.
-* **Observer Pattern:** `kotlinx.coroutines.flow` használata a reaktív adatfolyamhoz a DB-től a UI-ig.
-* **Strategy Pattern:** Export/Import motor (`Exporter<T>` interfész: `JsonExporter`, `CsvExporter`).
-* **Factory Pattern:** Dinamikus kategória-ikon és szín generálás.
+- Feature-first modularitás: külön csomagok a `accounts`, `categories`, `transactions`, `dashboard`, `auth` funkcióknak.
+- Service layer minta: a routerek vékonyak maradnak, az üzleti logika a `services.py` fájlokban él.
+- DTO/schema separation: API schema modellek elkülönítve az adatbázis modellektől.
+- Request scope + dependency injection: FastAPI `Depends` alapú session/user dependencyk.
+- Cache-aside frontend adatelkérés: query cache-ből olvasás, invalidate mutációk után.
 
 ---
 
 ## Implementációs Ütemterv (Phases)
 
-### Phase 1: Alapozás & Perzisztencia (Infrastructure)
+### Phase 1: Stabil FastAPI alapok
 
-* **Dependency Injection:** Koin alapmodulok felállítása (`coreMain`, `androidMain`, `iosMain`).
-* **Adatmodell:** Room Entity-k definiálása: `Account`, `Category`, `Transaction`.
-* **Type Converters:** Pénznem (`Long` alapú tárolás) és `Instant` (időbélyeg) konverterek.
-* **Shared Models:** Szerver-kliens közös DTO-k definiálása a `shared` modulban.
+- Egységesített konfiguráció (`backend/app/core/config.py`) és environment profile-ok.
+- Auth megerősítése (JWT + OAuth callback flow), jogosultság-ellenőrzés endpoint szinten.
+- Adatbázis integritás: kulcs indexek, constraint-ek, migrációk revíziója.
+- Egyszerű health és readiness endpointok (docker/deploy kompatibilitás miatt).
 
-### Phase 2: Core Üzleti Logika (Domain & Data)
+### Phase 2: Domain use-case finomítás
 
-* **Repository Logic:** Az "Offline-first" logika implementálása (a UI Flow-n keresztül figyeli a lokális DB-t, miközben a Repository aszinkron szinkronizál a Ktor-ral).
-* **UseCases:**
-* `AddTransactionUseCase`: Tranzakció rögzítés + számlaegyenleg kalkuláció.
-* `DeleteCategoryUseCase`: Kapcsolódó tételek átmozgatása "Egyéb" kategóriába (Spec 2.3).
-* `AccountTransferUseCase`: Belső átutalás atomi tranzakcióként kezelése.
+- Tranzakció workflow-k atomizálása (létrehozás, módosítás, törlés, átvezetés).
+- Kategória törlés/összevonás szabályok tisztázása szolgáltatás oldalon.
+- Dashboard aggregációk teljesítmény-optimalizálása (index + query tuning).
+- Tesztfedés bővítése router + service szinteken.
 
+### Phase 3: React frontend megerősítése
 
-### Phase 3: UI & Navigation (Presentation)
+- Route alapú code split a kritikus oldalakra.
+- Központi API hiba- és authkezelés (`responseHandler`, refresh/redirect policy).
+- Query kulcs-stratégia egysítése (`queryKeys.ts`) minden feature-re.
+- Form validáció és UX állapotok (loading/error/empty) konzisztens kezelése.
 
-* **Design System:** Material 3 `ColorScheme` és `Typography` implementálása.
-* **Navigation:** Voyager `Screen` alapú navigáció + `ScreenModel` (ViewModel) integráció.
-* **Dashboard:** Pénzforgalmi összesítők (Aggregate SQL lekérdezések alapján).
+### Phase 4: PWA felkészítés (React + Vite)
 
-### Phase 4: Automatizáció & Notification (Platform Specific)
+- Web app manifest véglegesítése (`name`, `short_name`, `icons`, `theme_color`, `display`, `start_url`).
+- Service worker bevezetése (ajánlott: `vite-plugin-pwa` Workbox-szal) az alábbi stratégiákkal:
+  - App shell: precache.
+  - API GET: runtime cache stale-while-revalidate.
+  - Statikus assetek: cache-first verziózott fájlokkal.
+- Offline fallback nézetek a fő route-okhoz.
+- Install prompt UX (custom "Install app" call-to-action).
+- Verzionált cache invalidálás release-enként.
 
-* **Android Service:** `NotificationListenerService` implementáció.
-* **Parsing Engine:** Regex alapú kinyerő logika (Regex minták tárolása és frissítése).
-* **Pending Queue:** Room tábla a sikertelenül feldolgozott/szinkronizált tranzakcióknak.
+### Phase 5: Offline-first tranzakciós viselkedés
 
-### Phase 5: Auth & Cloud (Backend Integration)
-
-* **Ktor Server:** OAuth 2.0 endpointok, PostgreSQL perzisztencia.
-* **Sync Engine:** `Last-Write-Wins` szabály alapú delta-szinkronizáció.
-* **Export/Import:** Fájlrendszer elérése platform-specifikusan (`expect/actual`) a CSV/JSON fájlok mentéséhez.
+- Lokális queue nem idempotens mutációkra (pl. új tranzakció), újraküldés reconnect után.
+- Konfliktuskezelési szabály (szerver timestamp vagy revision alapú policy).
+- Sync állapot jelzése a frontendben (queued/synced/failed badge-ek).
+- PWA tesztelés offline módban, majd sync
 
 ---
 
-##  Megvalósítási szempontok (Best Practices)
+## Megvalósítási szempontok (Best Practices)
 
-| Feladat         | Megoldás                                                                             |
-| --------------- | ------------------------------------------------------------------------------------ |
-| **Pénzkezelés** | `Long` típus (cent/fillér) vagy `BigDecimal`.                                        |
-| **Hálózat**     | Ktor `ContentNegotiation` + `kotlinx-serialization`.                                 |
-| **Navigáció**   | Voyager (támogatja a tab-alapú navigációt és a stack kezelést).                      |
-| **Koncurrency** | Structured Concurrency (Coroutine scopes kezelése a ViewModel élettartamához kötve). |
-s
-## Mappastruktúra
+| Feladat              | Megoldás                                                                     |
+| -------------------- | ---------------------------------------------------------------------------- |
+| Pénzkezelés          | Backend oldalon decimal alapú tárolás, API-ban pontos formátum.              |
+| Dátum/idő            | UTC tárolás, frontend local megjelenítés.                                    |
+| API stabilitás       | Verzionált API prefix vagy schema kompatibilitási szabályok.                 |
+| Frontend adatkezelés | TanStack Query + finomhangolt staleTime/cacheTime endpoint típustól függően. |
+| PWA cache            | App shell precache + runtime cache policy endpoint osztályonként.            |
+| Security             | JWT tárolása kockázatminimalizálva, CORS/CSRF stratégia dokumentálva.        |
 
-### 1. Teljes Projektszintű Struktúra
+---
 
-A projekt gyökerében külön választjuk a kliens alkalmazást (composeApp), a szervert (server) és a közös adatmodelleket (shared-models).
-```
-DailyRoot/
-├── composeApp/                 # KMP Kliens modul (UI + Üzleti logika)
-├── server/                     # Ktor Szerver modul (Backend)
-├── shared/                     # Opcionális: Tisztán logika, ha a UI-t teljesen külön akarod
-└── build.gradle.kts
-```
+## Mappastruktúra (jelenlegi projekthez igazítva)
 
-### 2. A composeApp (Kliens) Részletes Struktúrája
-Itt dől el az Offline-first működés. A commonMain tartalmazza a Repository-t, amely eldönti, hogy a LocalDataSource-ból (Room) vagy a RemoteDataSource-ból (Ktor) kérje az adatokat.
-
-```
-composeApp/
-├── commonMain/kotlin/hu/daily/app/
-│   ├── core/                        # Alapkövek (DI, Network, DB config)
-│   │   ├── di/                      # Koin modulok (Dependency Injection)
-│   │   ├── error/                   # Failure osztályok (NetworkError, DatabaseError)
-│   │   └── util/                    # Platform-független helper-ek
-│   ├── data/                        # ADAT RÉTEG (Implementációk)
-│   │   ├── local/                   # Helyi adatbázis (Room)
-│   │   │   ├── dao/                 # Adatbázis műveletek interfészei
-│   │   │   └── entity/              # Adatbázis táblák (@Entity)
-│   │   ├── remote/                  # Hálózati elérés (Ktor)
-│   │   │   ├── api/                 # API hívások (EndPoint-ok)
-│   │   │   └── dto/                 # Szerverről érkező adatmodellek
-│   │   ├── repository/              # A REPOSITORY megvalósítása (itt van a Sync logika)
-│   │   └── mapper/                  # DTO -> Domain és Entity -> Domain átalakítók
-│   ├── domain/                      # DOMAIN RÉTEG (Üzleti szabályok)
-│   │   ├── model/                   # "Tiszta" adatmodellek (Transaction, Account)
-│   │   ├── repository/              # Repository INTERFÉSZEK
-│   │   └── usecase/                 # Egy funkció = egy osztály (pl. AddTransactionUseCase)
-│   └── ui/                          # MEGJELENÍTÉS RÉTEG
-│       ├── theme/                   # Színpaletta, Tipográfia (Material 3)
-│       ├── components/              # Újrafelhasználható gombok, kártyák
-│       ├── navigation/              # Navigációs gráf (Voyager/Decompose)
-│       └── features/                # Funkció alapú bontás (MVI/MVVM mintával)
-│           ├── dashboard/           # View, ViewModel, State, Intent (ha MVI)
-│           ├── transaction/
-│           └── settings/
-├── androidMain/                     # Android-specifikus megvalósítások (pl. WorkManager)
-├── iosMain/                         # iOS-specifikus (pl. Background fetch)
-└── desktopMain/                     # Desktop-specifikus (pl. SQLite driver)
-```
-
-### 3. A server (Backend) Struktúrája
-A szerver felel az OAuth hitelesítésért és a felhő alapú szinkronizációért (PostgreSQL használata javasolt).
-
-```
-server/src/main/kotlin/hu/daily/server/
-├── plugins/                         # Ktor plugin-ek (Auth, Serialization, HTTP, Routing)
-├── features/                        # Backend funkciók
-│   ├── auth/                        # Google OAuth 2.0 kezelése
-│   ├── sync/                        # Delta-sync logika a kliensnek
-│   └── transaction/                 # Tranzakciós API végpontok
-├── database/                        # Szerveroldali adatbázis (Exposed vagy Hibernate)
-│   ├── tables/                      # DB Séma definíciók
-│   └── DatabaseFactory.kt           # Connection pool és inicializálás
-└── Application.kt                   # Szerver belépési pont
-```
-
-### 4. Hogyan működik a különbség? (Tervezési minták)
-A DB és a Remote definiálása:
-Adatbázis (Room): A commonMain/data/local-ban definiálod az @Entity-ket és a Dao-kat. Az adatbázis példányosítását viszont az androidMain és iosMain alatt kell megtenni (a Driver miatt), majd a Koin segítségével "beadni" a common részbe.
-
-Remote vs Lokális: A Repository minta (pl. TransactionRepositoryImpl) a kulcs. Ez az osztály kap egy TransactionDao-t és egy TransactionApi-t.
-
-Íráskor: Először elmenti a helyi DB-be, majd elindít egy háttérfolyamatot a szerverre küldéshez.
-
-Olvasáskor: A UI felé a helyi DB-ből streameli az adatokat (Flow), így offline is azonnali a válasz.
-
-A Repository minta működése (Példa):
-Kotlin
-```kotlin
-// commonMain/domain/repository/TransactionRepository.kt
-interface TransactionRepository {
-    fun getTransactions(): Flow<List<Transaction>>
-    suspend fun addTransaction(transaction: Transaction)
-    suspend fun syncWithServer() // Ez hívja meg a Remote-ot
-}
-```
-Értesítés-feldolgozás helye:
-Mivel ez egy platformspecifikus dolog (Androidon NotificationListenerService), az értesítés elkapása az androidMain-ben történik, de az üzenet szövegének parzolása és tranzakcióvá alakítása már a commonMain/notification mappában lévő platformfüggetlen logikával megy.
-
-## Leírás
+### 1. Projektszintű áttekintés
 
 ```text
-DailyRoot/
-├── composeApp/                         # KMP Kliens modul (Android, iOS, Desktop)
-│   ├── commonMain/                     # A KÓD 90%-A ITT VAN
-│   │   └── kotlin/hu/daily/app/
-│   │       ├── core/                   # Infrastruktúra
-│   │       │   ├── di/                 # Koin Modulok (AppModule, NetworkModule)
-│   │       │   ├── network/            # Ktor kliens konfiguráció
-│   │       │   ├── database/           # Room Database definíció
-│   │       │   └── util/               # Formatterek, konstansok, kiterjesztések
-│   │       ├── domain/                 # ÜZLETI LOGIKA (Tisztán Kotlin)
-│   │       │   ├── model/              # Domain Modellek (Transaction, Account)
-│   │       │   ├── repository/         # Interfészek (TransactionRepository)
-│   │       │   └── usecase/            # Egy funkció - egy osztály (AddTransactionUseCase)
-│   │       ├── data/                   # ADAT IMPLEMENTÁCIÓ
-│   │       │   ├── local/              # Room Entity-k és DAO-k
-│   │       │   ├── remote/             # Ktor API hívások és DTO-k
-│   │       │   ├── repository/         # Repo Impl (Offline-first logika)
-│   │       │   └── mapper/             # Konvertálók (Entity <-> Domain <-> DTO)
-│   │       ├── ui/                     # MEGJELENÍTÉS (Compose Multiplatform)
-│   │       │   ├── theme/              # Színpaletta, Tipográfia (Material 3)
-│   │       │   ├── components/         # Újrafelhasználható UI elemek
-│   │       │   ├── navigation/         # Navigációs gráf (Voyager/Decompose)
-│   │       │   └── features/           # Funkció alapú bontás (Screen + ViewModel)
-│   │       │       ├── dashboard/      # Összesítések, diagramok
-│   │       │       ├── transaction/    # Tranzakció lista és szerkesztés
-│   │       │       └── settings/       # Import/Export, Kategória kezelés
-│   │       └── notification/           # Értesítés-feldolgozó motor (Platformfüggetlen rész)
-│   ├── androidMain/                    # Android specifikus kód (Notification Listener, WorkManager)
-│   ├── iosMain/                        # iOS specifikus kód (Background Task, Native Drivers)
-│   └── desktopMain/                    # Desktop specifikus kód (SQLite driver)
-│
-├── server/                             # Ktor Backend modul
-│   └── src/main/kotlin/hu/daily/server/
-│       ├── plugins/                    # Auth, Serialization, Routing
-│       ├── database/                   # PostgreSQL séma (Exposed/Hibernate)
-│       └── features/                   # Backend API végpontok (Sync, Auth)
-│
-├── shared-models/                      # Közös DTO-k a szerver és kliens között (Opcionális)
-│   └── commonMain/kotlin/              # Típusbiztos kommunikációhoz
-│
-├── build.gradle.kts                    # Projekt szintű gradle beállítások
-└── settings.gradle.kts                 # Modulok regisztrációja
-
+Daily/
+├── backend/                 # FastAPI backend
+├── frontend/                # React + Vite frontend
+├── docs/                    # Terv, spec, schema, feljegyzések
+├── assets/                  # Logo, ikonok
+└── docker-compose.yml       # Lokális stack futtatás
 ```
 
-### Néhány fontos megjegyzés a struktúrához:
+### 2. Backend részletes struktúra (FastAPI)
 
-* **`domain/`**: Ebben a mappában soha ne legyen `import android.*` vagy `import androidx.room.*`. Ez a réteg maradjon érintetlenül "tiszta" Kotlin.
-* **`data/mapper/`**: Ezek kulcsfontosságúak. Itt választod el az adatbázis tábláit (`Entity`) a felületen megjelenő modellektől (`Domain`). Ha változik a DB séma, csak a mappert és az entity-t kell módosítanod, a UI-t nem.
-* **`ui/features/`**: Javaslom, hogy minden feature-nek legyen saját almapája (pl. `dashboard`), amiben ott van a `DashboardScreen.kt` (UI) és a `DashboardViewModel.kt` is. Így egy helyen találsz meg mindent, ami egy funkcióhoz tartozik.
+```text
+backend/
+├── app/
+│   ├── main.py
+│   ├── routers.py
+│   ├── core/                # config, logging
+│   ├── auth/
+│   ├── users/
+│   ├── accounts/
+│   ├── categories/
+│   ├── transactions/
+│   ├── dashboard/
+│   └── icons/
+├── db/
+│   ├── core.py
+│   ├── models.py
+│   ├── migrations/
+│   └── seed/
+├── requirements.txt
+└── alembic.ini
+```
+
+### 3. Frontend részletes struktúra (React)
+
+```text
+frontend/
+├── src/
+│   ├── api/                 # authClient, clients, queryClient, responseHandler
+│   ├── features/            # accounts, auth, categories, dashboard, settings, transactions
+│   ├── routes/              # route-level oldalak
+│   ├── shared/              # közös UI/util elemek
+│   ├── theme/
+│   ├── constants.ts
+│   ├── router.tsx
+│   └── main.tsx
+├── public/
+│   ├── manifest.json
+│   └── brand/
+└── vite.config.ts
+```
+
+### 4. PWA-hoz szükséges plusz elemek
+
+- `frontend/vite.config.ts`: PWA plugin regisztráció.
+- `frontend/public/manifest.json`: véglegesített metadata és ikon készlet.
+- `frontend/public/sw.js` vagy Workbox által generált service worker.
+- `frontend/src/shared/pwa/`: install prompt, update notice, online/offline status hookok.
+
+---
+
+## Checklist a megvalósításhoz
+
+- [x] Backend API CRUD endpointok elkészítése és dokumentálása.
+- [ ] Backend synchronization logika implementálása
+- [50%] Frontend route-ok és feature komponensek implementálása.
+  - [x] Login/logout flow 
+  - [x] Tranzakció CRUD műveletek
+  - [ ] Dashboard
+  - [ ] Kategória kezelés
+  - [ ] Settings oldal
+  - [x] Server Offline állapot jelzése
+- [ ] PWA manifest és service worker bevezetése.
+- [ ] Tesztelés offline módban, sync viselkedés validálása.
+- [ ] Dokumentáció frissítése a végleges implementációhoz.
