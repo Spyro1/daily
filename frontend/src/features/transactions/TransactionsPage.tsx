@@ -38,16 +38,16 @@ export function TransactionsPage() {
             ))}
           </Stack>
         </Paper>
-      ) : !transactions?.length ? (
+      ) : !transactions?.data?.length ? (
         <EmptyState message="No transactions yet. Tap + to record one." />
       ) : (
         <Paper elevation={2} sx={{ px: 2.5, borderRadius: 3, overflow: 'hidden' }}>
           <List disablePadding>
-            {transactions.map((tx, idx) => (
+            {transactions.data.map((tx, idx) => (
               <TransactionCard
                 key={tx.id}
                 transaction={tx}
-                showDivider={idx < transactions.length - 1}
+                showDivider={idx < transactions.data.length - 1}
               />
             ))}
           </List>

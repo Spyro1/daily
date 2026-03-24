@@ -3,10 +3,28 @@ import type { CreateTransaction, UpdateTransaction } from '@/api/generated'
 import { transactionsApi } from '@/api/clients'
 import { queryKeys } from '@/api/queryKeys'
 
-export function useTransactions() {
+export function useTransactions({
+  dateFrom,
+  dateTo,
+  categoryId,
+  accountId,
+  transactionType,
+  skip,
+  limit,
+}: {
+  dateFrom?: string | null
+  dateTo?: string | null
+  categoryId?: string | null
+  accountId?: string | null
+  transactionType?: string | null
+  skip?: number
+  limit?: number
+} = {}) {
   return useQuery({
-    queryKey: queryKeys.transactions.all,
-    queryFn: () => transactionsApi.getMyTransactionsApiV1TransactionsGet().then((r) => r.data),
+    queryKey: [...queryKeys.transactions.all, { dateFrom, dateTo, categoryId, accountId, transactionType, skip, limit }],
+    queryFn: () => transactionsApi.getMyTransactionsApiV1TransactionsGet(
+      dateFrom, dateTo, categoryId, accountId, transactionType as any, skip, limit
+    ).then((r) => r.data),
   })
 }
 

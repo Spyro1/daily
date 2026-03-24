@@ -126,13 +126,19 @@ export interface TransactionIndex {
     'transaction_type': TransactionType;
     'category': CategoryBrief;
     'occurred_at': string;
-    'source_account': AccountBrief;
-    'destination_account': AccountBrief;
-    'target_amount': string;
-    'note': string;
+    'source_account'?: AccountBrief | null;
+    'destination_account'?: AccountBrief | null;
+    'target_amount'?: string | null;
+    'note'?: string | null;
 }
 
 
+export interface TransactionListResponse {
+    'data': Array<TransactionIndex>;
+    'total': number;
+    'skip': number;
+    'limit': number;
+}
 
 export const TransactionType = {
     Expense: 'expense',
@@ -380,7 +386,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createMyNewAccountApiV1AccountsPost(createAccount: CreateAccount, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AccountIndex>> {
+        async createMyNewAccountApiV1AccountsPost(createAccount: CreateAccount, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createMyNewAccountApiV1AccountsPost(createAccount, accessToken, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AccountsApi.createMyNewAccountApiV1AccountsPost']?.[localVarOperationServerIndex]?.url;
@@ -459,7 +465,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createMyNewAccountApiV1AccountsPost(createAccount: CreateAccount, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<AccountIndex> {
+        createMyNewAccountApiV1AccountsPost(createAccount: CreateAccount, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<any> {
             return localVarFp.createMyNewAccountApiV1AccountsPost(createAccount, accessToken, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1594,6 +1600,100 @@ export class OauthApi extends BaseAPI {
 
 
 /**
+ * RootApi - axios parameter creator
+ */
+export const RootApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Read Main
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        readMainGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * RootApi - functional programming interface
+ */
+export const RootApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = RootApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Read Main
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async readMainGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.readMainGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['RootApi.readMainGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * RootApi - factory interface
+ */
+export const RootApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = RootApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Read Main
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        readMainGet(options?: RawAxiosRequestConfig): AxiosPromise<any> {
+            return localVarFp.readMainGet(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * RootApi - object-oriented interface
+ */
+export class RootApi extends BaseAPI {
+    /**
+     * 
+     * @summary Read Main
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public readMainGet(options?: RawAxiosRequestConfig) {
+        return RootApiFp(this.configuration).readMainGet(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
  * TransactionsApi - axios parameter creator
  */
 export const TransactionsApiAxiosParamCreator = function (configuration?: Configuration) {
@@ -1707,11 +1807,18 @@ export const TransactionsApiAxiosParamCreator = function (configuration?: Config
         /**
          * 
          * @summary Get My Transactions
+         * @param {string | null} [dateFrom] Start date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [dateTo] End date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [categoryId] Filter by category ID
+         * @param {string | null} [accountId] Filter by source or destination account ID
+         * @param {TransactionType | null} [transactionType] Filter by transaction type (income, expense, transfer)
+         * @param {number} [skip] Number of records to skip (pagination)
+         * @param {number} [limit] Number of records to return (pagination)
          * @param {string | null} [accessToken] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMyTransactionsApiV1TransactionsGet: async (accessToken?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getMyTransactionsApiV1TransactionsGet: async (dateFrom?: string | null, dateTo?: string | null, categoryId?: string | null, accountId?: string | null, transactionType?: TransactionType | null, skip?: number, limit?: number, accessToken?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/transactions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1723,6 +1830,38 @@ export const TransactionsApiAxiosParamCreator = function (configuration?: Config
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (dateFrom !== undefined) {
+                localVarQueryParameter['date_from'] = (dateFrom as any instanceof Date) ?
+                    (dateFrom as any).toISOString() :
+                    dateFrom;
+            }
+
+            if (dateTo !== undefined) {
+                localVarQueryParameter['date_to'] = (dateTo as any instanceof Date) ?
+                    (dateTo as any).toISOString() :
+                    dateTo;
+            }
+
+            if (categoryId !== undefined) {
+                localVarQueryParameter['category_id'] = categoryId;
+            }
+
+            if (accountId !== undefined) {
+                localVarQueryParameter['account_id'] = accountId;
+            }
+
+            if (transactionType !== undefined) {
+                localVarQueryParameter['transaction_type'] = transactionType;
+            }
+
+            if (skip !== undefined) {
+                localVarQueryParameter['skip'] = skip;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -1792,7 +1931,7 @@ export const TransactionsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionIndex>> {
+        async createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createMyNewTransactionApiV1TransactionsPost(createTransaction, accessToken, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TransactionsApi.createMyNewTransactionApiV1TransactionsPost']?.[localVarOperationServerIndex]?.url;
@@ -1829,12 +1968,19 @@ export const TransactionsApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get My Transactions
+         * @param {string | null} [dateFrom] Start date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [dateTo] End date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [categoryId] Filter by category ID
+         * @param {string | null} [accountId] Filter by source or destination account ID
+         * @param {TransactionType | null} [transactionType] Filter by transaction type (income, expense, transfer)
+         * @param {number} [skip] Number of records to skip (pagination)
+         * @param {number} [limit] Number of records to return (pagination)
          * @param {string | null} [accessToken] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMyTransactionsApiV1TransactionsGet(accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<TransactionIndex>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getMyTransactionsApiV1TransactionsGet(accessToken, options);
+        async getMyTransactionsApiV1TransactionsGet(dateFrom?: string | null, dateTo?: string | null, categoryId?: string | null, accountId?: string | null, transactionType?: TransactionType | null, skip?: number, limit?: number, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMyTransactionsApiV1TransactionsGet(dateFrom, dateTo, categoryId, accountId, transactionType, skip, limit, accessToken, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TransactionsApi.getMyTransactionsApiV1TransactionsGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -1871,7 +2017,7 @@ export const TransactionsApiFactory = function (configuration?: Configuration, b
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<TransactionIndex> {
+        createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<any> {
             return localVarFp.createMyNewTransactionApiV1TransactionsPost(createTransaction, accessToken, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1899,12 +2045,19 @@ export const TransactionsApiFactory = function (configuration?: Configuration, b
         /**
          * 
          * @summary Get My Transactions
+         * @param {string | null} [dateFrom] Start date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [dateTo] End date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [categoryId] Filter by category ID
+         * @param {string | null} [accountId] Filter by source or destination account ID
+         * @param {TransactionType | null} [transactionType] Filter by transaction type (income, expense, transfer)
+         * @param {number} [skip] Number of records to skip (pagination)
+         * @param {number} [limit] Number of records to return (pagination)
          * @param {string | null} [accessToken] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMyTransactionsApiV1TransactionsGet(accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<Array<TransactionIndex>> {
-            return localVarFp.getMyTransactionsApiV1TransactionsGet(accessToken, options).then((request) => request(axios, basePath));
+        getMyTransactionsApiV1TransactionsGet(dateFrom?: string | null, dateTo?: string | null, categoryId?: string | null, accountId?: string | null, transactionType?: TransactionType | null, skip?: number, limit?: number, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<TransactionListResponse> {
+            return localVarFp.getMyTransactionsApiV1TransactionsGet(dateFrom, dateTo, categoryId, accountId, transactionType, skip, limit, accessToken, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1964,12 +2117,19 @@ export class TransactionsApi extends BaseAPI {
     /**
      * 
      * @summary Get My Transactions
+     * @param {string | null} [dateFrom] Start date for transaction filtering (ISO 8601 format)
+     * @param {string | null} [dateTo] End date for transaction filtering (ISO 8601 format)
+     * @param {string | null} [categoryId] Filter by category ID
+     * @param {string | null} [accountId] Filter by source or destination account ID
+     * @param {TransactionType | null} [transactionType] Filter by transaction type (income, expense, transfer)
+     * @param {number} [skip] Number of records to skip (pagination)
+     * @param {number} [limit] Number of records to return (pagination)
      * @param {string | null} [accessToken] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public getMyTransactionsApiV1TransactionsGet(accessToken?: string | null, options?: RawAxiosRequestConfig) {
-        return TransactionsApiFp(this.configuration).getMyTransactionsApiV1TransactionsGet(accessToken, options).then((request) => request(this.axios, this.basePath));
+    public getMyTransactionsApiV1TransactionsGet(dateFrom?: string | null, dateTo?: string | null, categoryId?: string | null, accountId?: string | null, transactionType?: TransactionType | null, skip?: number, limit?: number, accessToken?: string | null, options?: RawAxiosRequestConfig) {
+        return TransactionsApiFp(this.configuration).getMyTransactionsApiV1TransactionsGet(dateFrom, dateTo, categoryId, accountId, transactionType, skip, limit, accessToken, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2438,11 +2598,18 @@ export const V1ApiAxiosParamCreator = function (configuration?: Configuration) {
         /**
          * 
          * @summary Get My Transactions
+         * @param {string | null} [dateFrom] Start date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [dateTo] End date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [categoryId] Filter by category ID
+         * @param {string | null} [accountId] Filter by source or destination account ID
+         * @param {TransactionType | null} [transactionType] Filter by transaction type (income, expense, transfer)
+         * @param {number} [skip] Number of records to skip (pagination)
+         * @param {number} [limit] Number of records to return (pagination)
          * @param {string | null} [accessToken] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMyTransactionsApiV1TransactionsGet: async (accessToken?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getMyTransactionsApiV1TransactionsGet: async (dateFrom?: string | null, dateTo?: string | null, categoryId?: string | null, accountId?: string | null, transactionType?: TransactionType | null, skip?: number, limit?: number, accessToken?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/transactions`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -2454,6 +2621,38 @@ export const V1ApiAxiosParamCreator = function (configuration?: Configuration) {
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (dateFrom !== undefined) {
+                localVarQueryParameter['date_from'] = (dateFrom as any instanceof Date) ?
+                    (dateFrom as any).toISOString() :
+                    dateFrom;
+            }
+
+            if (dateTo !== undefined) {
+                localVarQueryParameter['date_to'] = (dateTo as any instanceof Date) ?
+                    (dateTo as any).toISOString() :
+                    dateTo;
+            }
+
+            if (categoryId !== undefined) {
+                localVarQueryParameter['category_id'] = categoryId;
+            }
+
+            if (accountId !== undefined) {
+                localVarQueryParameter['account_id'] = accountId;
+            }
+
+            if (transactionType !== undefined) {
+                localVarQueryParameter['transaction_type'] = transactionType;
+            }
+
+            if (skip !== undefined) {
+                localVarQueryParameter['skip'] = skip;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
 
             localVarHeaderParameter['Accept'] = 'application/json';
 
@@ -2768,7 +2967,7 @@ export const V1ApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createMyNewAccountApiV1AccountsPost(createAccount: CreateAccount, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AccountIndex>> {
+        async createMyNewAccountApiV1AccountsPost(createAccount: CreateAccount, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createMyNewAccountApiV1AccountsPost(createAccount, accessToken, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['V1Api.createMyNewAccountApiV1AccountsPost']?.[localVarOperationServerIndex]?.url;
@@ -2796,7 +2995,7 @@ export const V1ApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionIndex>> {
+        async createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createMyNewTransactionApiV1TransactionsPost(createTransaction, accessToken, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['V1Api.createMyNewTransactionApiV1TransactionsPost']?.[localVarOperationServerIndex]?.url;
@@ -2941,12 +3140,19 @@ export const V1ApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get My Transactions
+         * @param {string | null} [dateFrom] Start date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [dateTo] End date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [categoryId] Filter by category ID
+         * @param {string | null} [accountId] Filter by source or destination account ID
+         * @param {TransactionType | null} [transactionType] Filter by transaction type (income, expense, transfer)
+         * @param {number} [skip] Number of records to skip (pagination)
+         * @param {number} [limit] Number of records to return (pagination)
          * @param {string | null} [accessToken] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getMyTransactionsApiV1TransactionsGet(accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<TransactionIndex>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getMyTransactionsApiV1TransactionsGet(accessToken, options);
+        async getMyTransactionsApiV1TransactionsGet(dateFrom?: string | null, dateTo?: string | null, categoryId?: string | null, accountId?: string | null, transactionType?: TransactionType | null, skip?: number, limit?: number, accessToken?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionListResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMyTransactionsApiV1TransactionsGet(dateFrom, dateTo, categoryId, accountId, transactionType, skip, limit, accessToken, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['V1Api.getMyTransactionsApiV1TransactionsGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -3077,7 +3283,7 @@ export const V1ApiFactory = function (configuration?: Configuration, basePath?: 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createMyNewAccountApiV1AccountsPost(createAccount: CreateAccount, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<AccountIndex> {
+        createMyNewAccountApiV1AccountsPost(createAccount: CreateAccount, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<any> {
             return localVarFp.createMyNewAccountApiV1AccountsPost(createAccount, accessToken, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3099,7 +3305,7 @@ export const V1ApiFactory = function (configuration?: Configuration, basePath?: 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<TransactionIndex> {
+        createMyNewTransactionApiV1TransactionsPost(createTransaction: CreateTransaction, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<any> {
             return localVarFp.createMyNewTransactionApiV1TransactionsPost(createTransaction, accessToken, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3211,12 +3417,19 @@ export const V1ApiFactory = function (configuration?: Configuration, basePath?: 
         /**
          * 
          * @summary Get My Transactions
+         * @param {string | null} [dateFrom] Start date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [dateTo] End date for transaction filtering (ISO 8601 format)
+         * @param {string | null} [categoryId] Filter by category ID
+         * @param {string | null} [accountId] Filter by source or destination account ID
+         * @param {TransactionType | null} [transactionType] Filter by transaction type (income, expense, transfer)
+         * @param {number} [skip] Number of records to skip (pagination)
+         * @param {number} [limit] Number of records to return (pagination)
          * @param {string | null} [accessToken] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getMyTransactionsApiV1TransactionsGet(accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<Array<TransactionIndex>> {
-            return localVarFp.getMyTransactionsApiV1TransactionsGet(accessToken, options).then((request) => request(axios, basePath));
+        getMyTransactionsApiV1TransactionsGet(dateFrom?: string | null, dateTo?: string | null, categoryId?: string | null, accountId?: string | null, transactionType?: TransactionType | null, skip?: number, limit?: number, accessToken?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<TransactionListResponse> {
+            return localVarFp.getMyTransactionsApiV1TransactionsGet(dateFrom, dateTo, categoryId, accountId, transactionType, skip, limit, accessToken, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -3465,12 +3678,19 @@ export class V1Api extends BaseAPI {
     /**
      * 
      * @summary Get My Transactions
+     * @param {string | null} [dateFrom] Start date for transaction filtering (ISO 8601 format)
+     * @param {string | null} [dateTo] End date for transaction filtering (ISO 8601 format)
+     * @param {string | null} [categoryId] Filter by category ID
+     * @param {string | null} [accountId] Filter by source or destination account ID
+     * @param {TransactionType | null} [transactionType] Filter by transaction type (income, expense, transfer)
+     * @param {number} [skip] Number of records to skip (pagination)
+     * @param {number} [limit] Number of records to return (pagination)
      * @param {string | null} [accessToken] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public getMyTransactionsApiV1TransactionsGet(accessToken?: string | null, options?: RawAxiosRequestConfig) {
-        return V1ApiFp(this.configuration).getMyTransactionsApiV1TransactionsGet(accessToken, options).then((request) => request(this.axios, this.basePath));
+    public getMyTransactionsApiV1TransactionsGet(dateFrom?: string | null, dateTo?: string | null, categoryId?: string | null, accountId?: string | null, transactionType?: TransactionType | null, skip?: number, limit?: number, accessToken?: string | null, options?: RawAxiosRequestConfig) {
+        return V1ApiFp(this.configuration).getMyTransactionsApiV1TransactionsGet(dateFrom, dateTo, categoryId, accountId, transactionType, skip, limit, accessToken, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

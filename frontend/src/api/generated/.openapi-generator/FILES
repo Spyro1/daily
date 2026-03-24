@@ -24,9 +24,11 @@ docs/HealthApi.md
 docs/LocationInner.md
 docs/OauthApi.md
 docs/ResponseMessage.md
+docs/RootApi.md
 docs/TargetAmount.md
 docs/TransactionBrief.md
 docs/TransactionIndex.md
+docs/TransactionListResponse.md
 docs/TransactionType.md
 docs/TransactionsApi.md
 docs/UpdateAccount.md

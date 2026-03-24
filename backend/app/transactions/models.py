@@ -24,10 +24,10 @@ class TransactionBrief(BaseModel):
 
 
 class TransactionIndex(TransactionBrief):
-    source_account: Optional[AccountBrief] | None
-    destination_account: Optional[AccountBrief] | None
-    target_amount: Optional[Decimal] | None
-    note: Optional[str] | None
+    source_account: Optional[AccountBrief] = None
+    destination_account: Optional[AccountBrief] = None
+    target_amount: Optional[Decimal] = None
+    note: Optional[str] = None
 
 
 class CreateTransaction(BaseModel):

@@ -92,7 +92,7 @@ export function NewTransactionPage() {
         amount: toApiAmount(trimmedAmount),
         transaction_type: txType,
         category_id: categoryId,
-        occurred_at: date,
+        occurred_at: new Date(date).toISOString(),
         source_account_id: sourceAccountRequired ? sourceAccountId : null,
         destination_account_id: destinationAccountRequired ? destinationAccountId : null,
         note: note.trim() || null,

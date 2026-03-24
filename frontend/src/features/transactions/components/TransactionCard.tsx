@@ -18,7 +18,7 @@ const TYPE_CONFIG: Record<
   TxType,
   { Icon: React.ElementType; color: string; sign: string }
 > = {
-  expanse: { Icon: ArrowDownwardRounded, color: '#f44336', sign: '-' },
+  expense: { Icon: ArrowDownwardRounded, color: '#f44336', sign: '-' },
   income: { Icon: ArrowUpwardRounded, color: '#4caf50', sign: '+' },
   transfer: { Icon: SwapHorizRounded, color: '#2196f3', sign: '' },
 }
@@ -67,7 +67,7 @@ export function TransactionCard({ transaction: tx, showDivider = true }: Transac
           }
           secondary={
             <Typography variant="caption" color="text.secondary">
-              {formatDate(tx.date)}
+              {formatDate(tx.occurred_at)}
               {tx.note ? ` · ${tx.note}` : ''}
             </Typography>
           }

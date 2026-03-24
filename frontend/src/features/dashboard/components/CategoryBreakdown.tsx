@@ -50,7 +50,7 @@ export function CategoryBreakdown({ transactions, isLoading }: Props) {
   return (
     <Paper elevation={2} sx={{ p: 2.5, borderRadius: 2 }}>
       <Typography variant="h6" gutterBottom>
-        Top Spending Categories
+        Categories
       </Typography>
 
       {isLoading ? (
