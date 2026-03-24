@@ -42,10 +42,8 @@ node_modules/
 /frontend/dist/
 
 # Local environment variable overrides
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*
+!.env.example
 /frontend/.env.local
 
 # Optional TypeScript search cache
