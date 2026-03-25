@@ -10,6 +10,7 @@ import { BottomNav } from '#/shared/layout/BottomNav'
 import { SnackbarProvider } from '#/shared/providers/SnackbarProvider'
 import { AuthGuard } from '#/features/auth/components/AuthGuard'
 import { initResponseHandler } from '#/api/responseHandler'
+import { OfflineBanner, UpdatePrompt } from '@/pwa'
 
 const MOBILE_MAX_WIDTH = 480
 
@@ -27,6 +28,8 @@ function RootLayout() {
   return (
     <ThemeProvider theme={getThemeByName(mode)}>
       <CssBaseline />
+      <UpdatePrompt />
+      <OfflineBanner />
 
       <Box
         sx={{

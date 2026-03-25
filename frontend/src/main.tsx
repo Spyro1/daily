@@ -14,6 +14,12 @@ import { RouterProvider } from '@tanstack/react-router'
 
 import { queryClient } from '#/api/queryClient'
 import { getRouter } from '@/router'
+import { initOfflineInterceptor, initSyncManager } from '@/pwa'
+
+// PWA: queue mutations when offline (must run before initResponseHandler)
+initOfflineInterceptor()
+// PWA: replay queued mutations when back online
+initSyncManager()
 
 const router = getRouter()
 
