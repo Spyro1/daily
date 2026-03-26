@@ -7,7 +7,7 @@ from db.core import get_db
 from app.auth.jwt_utils import get_current_user
 from db.models import Accounts, Users
 
-from app.accounts.services import (
+from backend.app.accounts.service import (
     create_account,
     update_account,
     delete_account,
@@ -15,7 +15,7 @@ from app.accounts.services import (
     get_account_for_user_by_id,
     get_accounts_for_user,
 )
-from app.accounts.models import AccountIndex, CreateAccount, UpdateAccount
+from backend.app.accounts.schemas import AccountIndex, CreateAccount, UpdateAccount
 
 router = APIRouter()
 

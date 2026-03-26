@@ -4,13 +4,13 @@
 from typing import Optional
 import jwt
 from jwt.exceptions import InvalidTokenError
-from app.auth.models import TokenData, TokenType
+from backend.app.auth.schema import TokenData, TokenType
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Cookie, Depends, HTTPException, status
 from datetime import datetime, timedelta, timezone
 from db.core import get_db
 from db.models import Users
-from app.users.services import get_user_by_email
+from backend.app.users.service import get_user_by_email
 from app.core.config import jwt_config
 from pydantic import ValidationError
 

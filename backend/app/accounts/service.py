@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
-from app.accounts.models import AccountBrief, AccountIndex
+from backend.app.accounts.schemas import AccountBrief, AccountIndex
 from db.models import Accounts
 
 

@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
-from app.categories.models import CategoryBrief, CategoryIndex
+from backend.app.categories.schemas import CategoryBrief, CategoryIndex
 from db.models import Categories
 
 

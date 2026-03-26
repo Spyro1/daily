@@ -7,8 +7,8 @@ from db.core import get_db
 from app.auth.jwt_utils import get_current_user
 from db.models import Categories, Users
 
-from app.categories.services import create_category, delete_category, get_categories_for_user, fill_category_index, get_category_for_user_by_id, update_category
-from app.categories.models import CategoryIndex, UpdateCategory, CreateCategory
+from backend.app.categories.service import create_category, delete_category, get_categories_for_user, fill_category_index, get_category_for_user_by_id, update_category
+from backend.app.categories.schemas import CategoryIndex, UpdateCategory, CreateCategory
 
 router = APIRouter()
 
