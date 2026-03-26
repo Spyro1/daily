@@ -10,10 +10,10 @@ from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.jwt_utils import create_access_token, create_refresh_token, decode_token, get_current_user
-from backend.app.auth.schema import ResponseMessage, TokenData, TokenType
+from app.auth.schema import ResponseMessage, TokenData, TokenType
 from app.core.config import frontend_config, google_config, jwt_config
-from backend.app.users.schemas import UserCreate, ProviderCreate, ProvidedUserCreate
-from backend.app.users.service import get_or_create_provided_user, get_provided_user_by_sub
+from app.users.schemas import UserCreate, ProviderCreate, ProvidedUserCreate
+from app.users.service import get_or_create_provided_user, get_provided_user_by_sub
 from db.models import Users
 from db.core import get_db
 

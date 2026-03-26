@@ -1,8 +1,8 @@
 import uuid
 from typing import Optional
 from pydantic import BaseModel
-from backend.app.accounts.schemas import AccountBrief
-from backend.app.transactions.schemas import TransactionBrief
+from app.accounts.schemas import AccountBrief
+from app.transactions.schemas import TransactionBrief
 
 class DashboardIndex(BaseModel):
     accounts: list[AccountBrief]

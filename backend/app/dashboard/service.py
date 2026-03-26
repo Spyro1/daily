@@ -8,9 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 
-from backend.app.dashboard.schemas import DashboardIndex
-from backend.app.accounts.service import fill_account_brief, get_accounts_for_user
-from backend.app.transactions.service import fill_transaction_brief, get_transactions_for_user
+from app.dashboard.schemas import DashboardIndex
+from app.accounts.service import fill_account_brief, get_accounts_for_user
+from app.transactions.service import fill_transaction_brief, get_transactions_for_user
 
 async def get_dashboard_for_user(db: AsyncSession, user_id: uuid.UUID) -> DashboardIndex:
     logger.debug(f"[get_dashboard_for_user]: Fetching dashboard data for user {user_id}")

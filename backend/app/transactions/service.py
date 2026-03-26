@@ -10,9 +10,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 
 from db.models import Transactions
-from backend.app.transactions.schemas import TransactionBrief, TransactionIndex, TransactionType
-from backend.app.categories.service import fill_category_brief
-from backend.app.accounts.service import fill_account_brief
+from app.transactions.schemas import TransactionBrief, TransactionIndex, TransactionType
+from app.categories.service import fill_category_brief
+from app.accounts.service import fill_account_brief
 
 
 def _get_transaction_eager_options():

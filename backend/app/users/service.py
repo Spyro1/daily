@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from db.models import ProvidedUsers, Users, Providers
-from backend.app.users.schemas import ProvidedUserCreate, UserCreate, ProviderCreate
+from app.users.schemas import ProvidedUserCreate, UserCreate, ProviderCreate
 from loguru import logger
 
 

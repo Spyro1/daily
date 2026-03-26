@@ -5,9 +5,9 @@ from app.auth.jwt_utils import get_current_user
 from db.models import Users
 from db.core import get_db
 
-from backend.app.dashboard.schemas import DashboardIndex
-from backend.app.accounts.service import get_accounts_for_user
-from backend.app.dashboard.service import get_dashboard_for_user
+from app.dashboard.schemas import DashboardIndex
+from app.accounts.service import get_accounts_for_user
+from app.dashboard.service import get_dashboard_for_user
 
 
 router = APIRouter()

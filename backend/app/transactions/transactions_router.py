@@ -9,7 +9,7 @@ from db.core import get_db
 from app.auth.jwt_utils import get_current_user
 from db.models import Transactions, Users
 
-from backend.app.transactions.service import (
+from app.transactions.service import (
     create_transaction,
     update_transaction,
     delete_transaction,
@@ -18,7 +18,7 @@ from backend.app.transactions.service import (
     get_transactions_for_user,
     get_transactions_for_user_filtered,
 )
-from backend.app.transactions.schemas import CreateTransaction, TransactionIndex, UpdateTransaction, TransactionListResponse, TransactionType
+from app.transactions.schemas import CreateTransaction, TransactionIndex, UpdateTransaction, TransactionListResponse, TransactionType
 
 router = APIRouter()
 

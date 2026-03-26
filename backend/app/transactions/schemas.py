@@ -5,8 +5,8 @@ from datetime import datetime
 from pydantic import BaseModel
 from enum import Enum
 
-from backend.app.accounts.schemas import AccountBrief
-from backend.app.categories.schemas import CategoryBrief
+from app.accounts.schemas import AccountBrief
+from app.categories.schemas import CategoryBrief
 
 
 class TransactionType(str, Enum):
