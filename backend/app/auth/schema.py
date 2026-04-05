@@ -1,23 +1,32 @@
-# This file was originally written by Kardos Bendegúz who gave permission to use this code.
-
-from pydantic import BaseModel, EmailStr
-from typing import Optional, List
-from datetime import datetime
 from enum import Enum
+from typing import Optional
 
-# JWT token schemas
+from pydantic import BaseModel
+
+
+# ─── Enums ──────────────────────────────────────────────────────────
+
 class TokenType(str, Enum):
     ACCESS_TOKEN = "access_token"
     REFRESH_TOKEN = "refresh_token"
 
+
+class FlowType(str, Enum):
+    LOGIN = "login"
+
+
+class AuthMethod(str, Enum):
+    GOOGLE = "google"
+
+
+# ─── Models ─────────────────────────────────────────────────────────
+
 class TokenData(BaseModel):
-    sub: str
-    email: EmailStr
- 
-class TokenResponse(BaseModel):
-    access_token: str
-    refresh_token: str
-    token_type: str = 'bearer' 
+    """JWT payload carried inside access / refresh tokens."""
+    user_id: str  # Internal user UUID — the primary principal
+    email: Optional[str] = None
+    auth_method: str = AuthMethod.GOOGLE.value
+
 
 class ResponseMessage(BaseModel):
     message: str

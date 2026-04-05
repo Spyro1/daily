@@ -18,7 +18,7 @@ from app.auth.jwt_utils import get_current_user
 from app.core.config import database
 from app.main import app
 from db.core import get_db
-from db.models import Accounts, Base, Categories, Transactions, Users
+from db.models import Accounts, Base, Categories, Providers, ProvidedUsers, Transactions, Users
 
 
 def _resolve_test_db_host() -> str:

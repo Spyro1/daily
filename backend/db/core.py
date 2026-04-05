@@ -1,37 +1,39 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy import create_engine, text
-from sqlalchemy.engine import make_url
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import OperationalError
+"""Database engine, session factories, and connection helpers."""
+
+from collections.abc import AsyncGenerator
+
 from loguru import logger
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine import URL, make_url
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import Session, sessionmaker
+
 from app.core.config import database
 
-def init_async_url():    
-    user = database.username
-    password = database.password
-    host = database.host
-    port = database.port
-    db_name = database.name
 
-    return f'postgresql+asyncpg://{user}:{password}@{host}:{port}/{db_name}'
+# ─── URL builders ────────────────────────────────────────────────────
 
-def init_url():    
-    user = database.username
-    password = database.password
-    host = database.host
-    port = database.port
-    db_name = database.name
-    
-    return f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{db_name}'
+def _build_url(driver: str) -> URL:
+    return URL.create(
+        drivername=driver,
+        username=database.username,
+        password=database.password,
+        host=database.host,
+        port=database.port,
+        database=database.name,
+    )
 
+
+# ─── Database auto-creation ─────────────────────────────────────────
 
 def ensure_database_exists() -> bool:
     """Create the configured Postgres database if it does not exist."""
-    target_url = make_url(init_url())
+    target_url = _build_url("postgresql+psycopg2")
     db_name = target_url.database
 
     if not db_name:
-        logger.warning("Database name is empty; skipping database auto-create")
+        logger.warning("Database name is empty — skipping database auto-create")
         return False
 
     admin_url = target_url.set(database="postgres")
@@ -56,32 +58,41 @@ def ensure_database_exists() -> bool:
 
 
 def should_create_database_for_error(error: OperationalError) -> bool:
-    """Return True if an OperationalError indicates a missing configured database."""
-    missing_db_msg = f'database "{database.name}" does not exist'
-    return missing_db_msg in str(error)
+    """Return ``True`` if an ``OperationalError`` indicates a missing database."""
+    return f'database "{database.name}" does not exist' in str(error)
+
+
+# ─── Async engine / session (used by the app) ───────────────────────
 
 async_engine = create_async_engine(
-    init_async_url(),
-    pool_size = 20,
-    max_overflow = 30,
-    pool_pre_ping = True
-)
-AsyncSessionLocal = async_sessionmaker(
-    bind=async_engine,
-    class_= AsyncSession,
-    expire_on_commit=False
+    _build_url("postgresql+asyncpg"),
+    pool_size=20,
+    max_overflow=30,
+    pool_pre_ping=True,
 )
 
-async def get_db():
+AsyncSessionLocal = async_sessionmaker(
+    bind=async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
+
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
         yield session
-        
-sync_engine = create_engine(init_url())
+
+
+# ─── Sync engine / session (used by seed scripts) ───────────────────
+
+sync_engine = create_engine(_build_url("postgresql+psycopg2"))
+
 SyncSessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
-    bind=sync_engine
-    )
+    bind=sync_engine,
+)
+
 
 def get_sync_db():
     db = SyncSessionLocal()

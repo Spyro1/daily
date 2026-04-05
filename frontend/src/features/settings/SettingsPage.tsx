@@ -135,14 +135,14 @@ export function SettingsPage() {
                   Link Google
                 </Button>
               }
-              sx={{ py: 1.5 }}
+              sx={{ py: 1.5, pr: 18 }}
             >
               <ListItemIcon sx={{ minWidth: 40 }}>
                 <CloudSyncRounded />
               </ListItemIcon>
               <ListItemText
                 primary="Sync to cloud"
-                secondary="Link your Google account."
+                secondary="Sign in with Google to back up your data."
               />
             </ListItem>
           </List>
@@ -161,10 +161,10 @@ export function SettingsPage() {
                   disabled={syncing}
                   onClick={handleManualSync}
                 >
-                  {syncing ? 'Syncing...' : 'Sync now'}
+                  {syncing ? 'Syncing…' : 'Sync now'}
                 </Button>
               }
-              sx={{ py: 1.5 }}
+              sx={{ py: 1.5, pr: 16 }}
             >
               <ListItemIcon sx={{ minWidth: 40 }}>
                 <CloudSyncRounded />

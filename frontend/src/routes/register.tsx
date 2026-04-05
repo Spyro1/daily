@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   Button,
   Divider,
+  Link as MuiLink,
   Stack,
   TextField,
   Typography,
@@ -107,7 +108,18 @@ function RegisterPage() {
           <Divider sx={{ my: 2 }} />
 
           <Typography variant="body2" color="text.secondary">
-            Already have an account? <Link to="/">Go back to sign in</Link>
+            Already have an account?{' '}
+            <MuiLink
+              component="a"
+              href="/"
+              onClick={(e: React.MouseEvent) => {
+                e.preventDefault()
+                void navigate({ to: '/' })
+              }}
+              underline="hover"
+            >
+              Go back to sign in
+            </MuiLink>
           </Typography>
         </Stack>
       </Paper>

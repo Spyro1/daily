@@ -1,12 +1,14 @@
+"""SQLAlchemy ORM models for the Daily database."""
+
 from __future__ import annotations
 
 import datetime
 import uuid
 from decimal import Decimal
-from typing import Any, Optional
+from typing import Optional
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, Numeric, String, Text, case, func, text, select
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, Numeric, String, Text, case, func, select, text
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, column_property, mapped_column, relationship
 
 
@@ -36,14 +38,13 @@ class Users(Base):
     display_name: Mapped[str] = mapped_column(String(255), nullable=False)
     avatar_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     
-    # Connections
+    # Relationships
     accounts: Mapped[list[Accounts]] = relationship(back_populates="user")
     categories: Mapped[list[Categories]] = relationship(back_populates="user")
     provided_users: Mapped[list[ProvidedUsers]] = relationship(back_populates="user")
     transactions: Mapped[list[Transactions]] = relationship(back_populates="user")
-    # notification_logs: Mapped[list[NotificationLogs]] = relationship(back_populates="user")
 
-# Static table of the connected SSO login providers
+
 class Providers(Base):
     __tablename__ = "providers"
     __table_args__ = (
@@ -62,7 +63,7 @@ class Providers(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     is_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
 
-    # Connection
+    # Relationship
     provided_users: Mapped[list[ProvidedUsers]] = relationship(back_populates="provider")
 
 
@@ -87,27 +88,10 @@ class ProvidedUsers(Base):
     provider_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("providers.id", ondelete="RESTRICT"), nullable=False)
     provider_user_id: Mapped[str] = mapped_column(String(255), nullable=False)
     
-    # Connections
+    # Relationships
     user: Mapped[Users] = relationship(back_populates="provided_users")
     provider: Mapped[Providers] = relationship(back_populates="provided_users")
 
-
-# class Icons(Base):
-#     __tablename__ = "icons"
-#     __table_args__ = (
-#         Index("ix_icons_system_deleted", "is_system", "deleted_at"),
-#     )
-
-#     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     name: Mapped[str] = mapped_column(String(255), nullable=False)
-#     svg_content: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-#     is_system: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
-#     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-#     updated_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
-#     deleted_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-
-#     accounts: Mapped[list[Accounts]] = relationship(back_populates="icon")
-#     categories: Mapped[list[Categories]] = relationship(back_populates="icon")
 
 class Categories(Base):
     __tablename__ = "categories"
@@ -134,14 +118,13 @@ class Categories(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     parent_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    category_type: Mapped[str] = mapped_column(String(20), nullable=False) # "expense" vagy "income"
+    category_type: Mapped[str] = mapped_column(String(20), nullable=False)  # "expense" or "income"
     is_system_category: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
     icon_name: Mapped[str] = mapped_column(String(100), server_default="Savings", nullable=False)
     color: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)
     
-    # Connections
+    # Relationships
     user: Mapped[Users] = relationship(back_populates="categories")
-    # icon: Mapped[Optional[Icons]] = relationship(back_populates="categories")
     parent: Mapped[Optional[Categories]] = relationship(remote_side=[id], back_populates="children")
     children: Mapped[list[Categories]] = relationship(back_populates="parent")
     transactions: Mapped[list[Transactions]] = relationship(back_populates="category")
@@ -158,22 +141,14 @@ class Transactions(Base):
         CheckConstraint("transaction_type IN ('income', 'expense', 'transfer', 'overwrite')", name="ck_transactions_type"),
         CheckConstraint("amount > 0", name="ck_transactions_amount_positive"),
         
-        # Új, szigorított integritási szabályok
         CheckConstraint(
-            # 1. INCOME: Csak cél számla van, kategória kötelező
+            # INCOME:   destination account required, no source, category required
             "(transaction_type = 'income' AND destination_account_id IS NOT NULL AND source_account_id IS NULL AND category_id IS NOT NULL) OR "
-            
-            # 2. EXPENSE: Csak forrás számla van, kategória kötelező
+            # EXPENSE:  source account required, no destination, category required
             "(transaction_type = 'expense' AND source_account_id IS NOT NULL AND destination_account_id IS NULL AND category_id IS NOT NULL) OR "
-            
-            # 3. TRANSFER: Mindkét számla megadva, kategória tilos, cél összeg kötelező (deviza miatt)
+            # TRANSFER: both accounts required (distinct), no category, target_amount required
             "(transaction_type = 'transfer' AND source_account_id IS NOT NULL AND destination_account_id IS NOT NULL "
             "AND source_account_id <> destination_account_id AND category_id IS NULL AND target_amount IS NOT NULL)",
-            
-            # 4. OVERWRITE: Csak forrás számla (vagy cél, de maradjunk a forrásnál), kategória tilos, összeg lehet negatív is? 
-            # (Az overwrite-nál az 'amount' a különbözet lesz: pl. -200 vagy +500)
-            # "(transaction_type = 'overwrite' AND source_account_id IS NOT NULL AND destination_account_id IS NULL AND category_id IS NULL)",
-            
             name="ck_transactions_type_integrity",
         ),
     )
@@ -185,20 +160,19 @@ class Transactions(Base):
     category_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
     transaction_type: Mapped[str] = mapped_column(String(20), nullable=False)
     
-    # Az 'amount' mindig a forrás szempontjából vett levonás, vagy a bevétel értéke
+    # Amount from the source account's perspective (always positive)
     amount: Mapped[Decimal] = mapped_column(Numeric(18, 4), nullable=False)
-    # Csak devizás átutalásnál lehet eltérő a cél összeg, ekkor a 'amount' a forrás számla terhelése, a 'target_amount' pedig a cél számla jóváírása lesz
+    # For cross-currency transfers: the credited amount on the destination account
     target_amount: Mapped[Optional[Decimal]] = mapped_column(Numeric(18, 4), nullable=True)
     
     occurred_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     
-    # Connections
+    # Relationships
     user: Mapped[Users] = relationship(back_populates="transactions")
     source_account: Mapped[Accounts] = relationship(back_populates="source_transactions", foreign_keys=[source_account_id])
     destination_account: Mapped[Optional[Accounts]] = relationship(back_populates="destination_transactions", foreign_keys=[destination_account_id])
     category: Mapped[Optional[Categories]] = relationship(back_populates="transactions")
-    # notification_logs: Mapped[list[NotificationLogs]] = relationship(back_populates="processed_transaction")
 
 
 class Accounts(Base):
@@ -228,9 +202,8 @@ class Accounts(Base):
     include_in_total: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
     is_archived: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="false")
     
-    # Connections
+    # Relationships
     user: Mapped[Users] = relationship(back_populates="accounts")
-    # icon: Mapped[Optional[Icons]] = relationship(back_populates="accounts")
     source_transactions: Mapped[list[Transactions]] = relationship(
         back_populates="source_account",
         foreign_keys="Transactions.source_account_id",
@@ -263,31 +236,3 @@ class Accounts(Base):
         .correlate_except(Transactions)
         .scalar_subquery()
     )
-
-
-
-
-# Future feature
-# class NotificationLogs(Base):
-#     __tablename__ = "notification_logs"
-#     __table_args__ = (
-#         Index("ix_notification_logs_user_status_created", "user_id", "status", "created_at"),
-#         Index("ix_notification_logs_user_created", "user_id", "created_at"),
-#         Index("ix_notification_logs_processed_transaction", "processed_transaction_id"),
-#         Index("ix_notification_logs_ai_feedback_json_gin", "ai_feedback_json", postgresql_using="gin"),
-#         CheckConstraint("status IN ('pending', 'processed', 'failed')", name="ck_notification_logs_status"),
-#         CheckConstraint("length(trim(raw_text)) > 0", name="ck_notification_logs_raw_text_not_empty"),
-#     )
-
-#     # Fields
-#     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-#     processed_transaction_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("transactions.id", ondelete="SET NULL"), nullable=True)
-#     raw_text: Mapped[str] = mapped_column(Text, nullable=False)
-#     source_app_package: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-#     status: Mapped[str] = mapped_column(String(20), nullable=False, server_default="pending")
-#     ai_feedback_json: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
-    
-#     # Connections
-#     user: Mapped[Users] = relationship(back_populates="notification_logs")
-#     processed_transaction: Mapped[Optional[Transactions]] = relationship(back_populates="notification_logs")

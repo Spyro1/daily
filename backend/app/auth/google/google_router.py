@@ -1,5 +1,4 @@
-# This file was originally written by Kardos Bendegúz who gave permission to use this code. 
-# Modifications were made by Szenes Márton, but the original code is still present in the file.
+"""Google OAuth login redirect endpoint."""
 
 from datetime import timedelta
 from urllib.parse import urlencode
@@ -9,27 +8,36 @@ from fastapi.responses import RedirectResponse
 from loguru import logger
 
 from app.auth.jwt_utils import create_token
+from app.auth.schema import AuthMethod, FlowType
 from app.core.config import google_config, jwt_config
 
-CLIENT_ID = google_config.client_id
-REDIRECT_URI = google_config.redirect_uri
-    
-router = APIRouter()    
+_GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 
-@router.get("/login")
-async def google_login():
-    logger.info("[google/login]: Starting Google OAuth login redirect")
-    state = create_token({"provider": "google"}, expires_delta=timedelta(minutes=jwt_config.login_token_expire_minutes))
-    query = urlencode(
+router = APIRouter()
+
+
+def _build_google_auth_query(state_token: str) -> str:
+    """Build the Google OAuth authorization URL query string."""
+    return urlencode(
         {
-            "client_id": CLIENT_ID,
-            "redirect_uri": REDIRECT_URI,
+            "client_id": google_config.client_id,
+            "redirect_uri": google_config.redirect_uri,
             "response_type": "code",
-            "state": state,
+            "state": state_token,
             "scope": "openid profile email",
             "access_type": "offline",
             "prompt": "consent",
         }
     )
-    logger.debug("[google/login]: Redirect URL prepared for Google OAuth")
-    return RedirectResponse(url=f"https://accounts.google.com/o/oauth2/v2/auth?{query}", status_code=302)
+
+
+@router.get("/login")
+async def google_login():
+    """Redirect the user to Google's OAuth consent screen."""
+    logger.info("[google/login]: Starting Google OAuth login redirect")
+    state = create_token(
+        {"provider": AuthMethod.GOOGLE.value, "flow_type": FlowType.LOGIN.value},
+        expires_delta=timedelta(minutes=jwt_config.login_token_expire_minutes),
+    )
+    query = _build_google_auth_query(state)
+    return RedirectResponse(url=f"{_GOOGLE_AUTH_URL}?{query}", status_code=302)

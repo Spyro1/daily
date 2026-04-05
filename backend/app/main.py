@@ -1,94 +1,94 @@
+"""Daily — FastAPI application entry point."""
+
+from contextlib import asynccontextmanager
 from time import perf_counter
 
 import uvicorn
 from alembic import command
 from alembic.config import Config
 from fastapi import FastAPI, Request
-from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 from sqlalchemy.exc import OperationalError
-# from fastapi.openapi.utils import get_openapi
 
 from app.core.config import frontend_config
 from app.core.logging import configure_logging
 from app.routers import router
 from db.core import ensure_database_exists, should_create_database_for_error
 
-origins = frontend_config.allowed_origins
 
-async def run_migrations():
+# ─── Startup ────────────────────────────────────────────────────────
+
+async def _run_migrations() -> None:
+    """Run Alembic migrations, creating the database first if necessary."""
     try:
         alembic_cfg = Config("alembic.ini")
         command.upgrade(alembic_cfg, "head")
-    except OperationalError as e:
-        if should_create_database_for_error(e):
-            logger.warning("Configured database is missing, attempting to create it")
+    except OperationalError as exc:
+        if should_create_database_for_error(exc):
+            logger.warning("Configured database is missing — attempting to create it")
             try:
-                created = ensure_database_exists()
-                if created:
-                    alembic_cfg = Config("alembic.ini")
-                    command.upgrade(alembic_cfg, "head")
+                if ensure_database_exists():
+                    command.upgrade(Config("alembic.ini"), "head")
                     return
             except Exception as create_err:
                 logger.error(f"Failed to create missing database: {create_err}")
-
-        logger.error(f"Error running migrations: {e}")
-    except Exception as e:
-        logger.error(f"Error running migrations: {e}")
+        logger.error(f"Error running migrations: {exc}")
+    except Exception as exc:
+        logger.error(f"Error running migrations: {exc}")
 
 
 @asynccontextmanager
 async def _lifespan(_app: FastAPI):
     configure_logging()
-    await run_migrations()
+    await _run_migrations()
     logger.info("Application startup complete.")
     yield
-    logger.info("Shutting down application...")
+    logger.info("Shutting down application…")
+
+
+# ─── Application ────────────────────────────────────────────────────
 
 app = FastAPI(
-    debug = False,
+    debug=False,
     title="Daily",
     version="1.0",
-    lifespan=_lifespan
+    lifespan=_lifespan,
 )
-
-@app.middleware("http")
-async def request_logging_middleware(request: Request, call_next):
-    start_time = perf_counter()
-    response = await call_next(request)
-    # try:
-    #     response = await call_next(request)
-    # except Exception:
-    #     duration_ms = (perf_counter() - start_time) * 1000
-    #     logger.exception(
-    #         f"[http]: {request.client.host}:{request.client.port} {request.method} {request.url.path} -> 500 ({duration_ms:.2f} ms)"
-    #     )
-    #     raise
-
-    duration_ms = (perf_counter() - start_time) * 1000
-    logger.info(f"[http]: {request.client.host}:{request.client.port} {request.method} {request.url.path} -> {response.status_code} ({duration_ms:.2f} ms)")
-    return response
 
 app.include_router(router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=frontend_config.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
-    # allow_methods=['GET', 'POST', 'OPTIONS', 'PATCH', 'PUT', 'DELETE'],
-    # allow_headers=["Authorization"]
+    allow_headers=["*"],
 )
 
-@app.get("/", status_code=200, tags=['Root'])
+
+# ─── Middleware ──────────────────────────────────────────────────────
+
+@app.middleware("http")
+async def request_logging_middleware(request: Request, call_next):
+    start = perf_counter()
+    response = await call_next(request)
+    ms = (perf_counter() - start) * 1000
+    logger.info(
+        f"[http]: {request.client.host}:{request.client.port} "
+        f"{request.method} {request.url.path} -> {response.status_code} ({ms:.2f} ms)"
+    )
+    return response
+
+
+# ─── Health / root ──────────────────────────────────────────────────
+
+@app.get("/", status_code=200, tags=["Root"])
 async def read_main():
     return {"msg": "Hello World"}
 
-@app.get('/health',
-         status_code=200,
-         tags=['Health'])
+
+@app.get("/health", status_code=200, tags=["Health"])
 async def health():
     return {"status": "ok"}
 
