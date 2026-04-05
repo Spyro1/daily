@@ -1,17 +1,34 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { alpha } from '@mui/material/styles'
 import GoogleIcon from '@mui/icons-material/Google'
-import { Box, Button, Stack, Typography } from '@mui/material'
+import PersonOutlineRounded from '@mui/icons-material/PersonOutlineRounded'
+import { Box, Button, Divider, Stack, Typography } from '@mui/material'
 import { API_BASE } from '@/constants'
 import { PageLayout } from '@/shared/layout/PageLayout'
+import { useLocalAuth } from '#/features/auth/hooks/useLocalAuth'
 
 export const Route = createFileRoute('/')({ component: App })
 
 const logoSrc = '/brand/happy-wallet-logo-nobg.png'
 
 function App() {
+  const navigate = useNavigate()
+  const { mode } = useLocalAuth()
+
+  // If the user already has a local session, redirect to dashboard
+  useEffect(() => {
+    if (mode === 'local') {
+      void navigate({ to: '/dashboard', replace: true })
+    }
+  }, [mode, navigate])
+
   const onGoogleLogin = () => {
     location.assign(`${API_BASE}/api/v1/google/login`)
+  }
+
+  const onLocalLogin = () => {
+    void navigate({ to: '/register' })
   }
 
   return (
@@ -54,31 +71,47 @@ function App() {
             </Typography>
             <Typography variant="h4">Welcome back</Typography>
             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 360 }}>
-              Sign in with Google to continue.
+              Sign in with Google or continue locally.
             </Typography>
           </Stack>
         </Stack>
 
-        <Button
-          variant="contained"
-          size="large"
-          onClick={onGoogleLogin}
-          startIcon={<GoogleIcon />}
-          sx={{
-            py: 1.6,
-            px: 3,
-            bgcolor: 'primary.main',
-            '&:hover': {
-              bgcolor: 'primary.dark',
-            },
-          }}
-        >
-          Login via Google
-        </Button>
+        <Stack spacing={1.5} sx={{ width: '100%', maxWidth: 320 }}>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={onGoogleLogin}
+            startIcon={<GoogleIcon />}
+            sx={{
+              py: 1.6,
+              px: 3,
+              bgcolor: 'primary.main',
+              '&:hover': {
+                bgcolor: 'primary.dark',
+              },
+            }}
+          >
+            Login via Google
+          </Button>
 
-        {/* <Typography variant="body2" color="text.secondary" sx={{ position: 'relative' }}>
-          Secure OAuth login. You will be redirected back here after authentication.
-        </Typography> */}
+          <Divider sx={{ my: 0.5 }}>
+            <Typography variant="caption" color="text.secondary">or</Typography>
+          </Divider>
+
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={onLocalLogin}
+            startIcon={<PersonOutlineRounded />}
+            sx={{ py: 1.4, px: 3 }}
+          >
+            Continue with local account
+          </Button>
+        </Stack>
+
+        <Typography variant="caption" color="text.secondary" sx={{ maxWidth: 320 }}>
+          Local mode stores data on this device only. You can link a Google account later to sync.
+        </Typography>
       </Stack>
     </PageLayout>
   )

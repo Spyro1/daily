@@ -9,6 +9,7 @@ import { HealthIcon } from '#/shared/ui/HealthIcon'
 import { BottomNav } from '#/shared/layout/BottomNav'
 import { SnackbarProvider } from '#/shared/providers/SnackbarProvider'
 import { AuthGuard } from '#/features/auth/components/AuthGuard'
+import { LocalAuthProvider } from '#/features/auth/hooks/useLocalAuth'
 import { initResponseHandler } from '#/api/responseHandler'
 
 const MOBILE_MAX_WIDTH = 480
@@ -58,7 +59,9 @@ function RootComponent() {
   return (
     <ThemeModeProvider>
       <SnackbarProvider>
-        <RootLayout />
+        <LocalAuthProvider>
+          <RootLayout />
+        </LocalAuthProvider>
       </SnackbarProvider>
     </ThemeModeProvider>
   )

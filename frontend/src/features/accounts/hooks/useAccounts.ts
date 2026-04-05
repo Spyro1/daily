@@ -2,27 +2,68 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { AccountIndex, CreateAccount, UpdateAccount } from '@/api/generated'
 import { accountsApi } from '@/api/clients'
 import { queryKeys } from '@/api/queryKeys'
+import { useLocalAuth } from '#/features/auth/hooks/useLocalAuth'
+import {
+  getLocalAccounts,
+  getLocalAccount,
+  createLocalAccount,
+  updateLocalAccount,
+  deleteLocalAccount,
+} from '@/lib/localCrud'
+import type { LocalAccount } from '@/lib/localDb'
+
+/** Map a LocalAccount to the shape the UI expects (AccountIndex). */
+function toAccountIndex(a: LocalAccount): AccountIndex {
+  return {
+    id: a.id,
+    name: a.name,
+    balance: String(a.balance),
+    currency_code: a.currency_code,
+    icon_name: a.icon_name,
+    color: a.color ?? '',
+    include_in_total: a.include_in_total,
+    is_archived: a.is_archived,
+  }
+}
 
 export function useAccounts() {
+  const { mode } = useLocalAuth()
+  const isLocal = mode === 'local'
+
   return useQuery({
     queryKey: queryKeys.accounts.all,
-    queryFn: () => accountsApi.getMyAccountsApiV1AccountsGet().then((r) => r.data),
+    queryFn: isLocal
+      ? () => getLocalAccounts().then((list) => list.map(toAccountIndex))
+      : () => accountsApi.getMyAccountsApiV1AccountsGet().then((r) => r.data),
   })
 }
 
 export function useAccount(id: string) {
+  const { mode } = useLocalAuth()
+  const isLocal = mode === 'local'
+
   return useQuery({
     queryKey: queryKeys.accounts.detail(id),
-    queryFn: () => accountsApi.getMyAccountApiV1AccountsAccountIdGet(id).then((r) => r.data),
+    queryFn: isLocal
+      ? () => getLocalAccount(id).then((a) => (a ? toAccountIndex(a) : undefined))
+      : () => accountsApi.getMyAccountApiV1AccountsAccountIdGet(id).then((r) => r.data),
     enabled: !!id,
   })
 }
 
 export function useCreateAccount() {
   const queryClient = useQueryClient()
+  const { mode } = useLocalAuth()
+  const isLocal = mode === 'local'
+
   return useMutation({
     mutationFn: (data: CreateAccount) =>
-      accountsApi.createMyNewAccountApiV1AccountsPost(data).then((r) => r.data),
+      isLocal
+        ? createLocalAccount({
+            ...data,
+            balance: data.balance != null ? Number(data.balance) : undefined,
+          }).then(toAccountIndex)
+        : accountsApi.createMyNewAccountApiV1AccountsPost(data).then((r) => r.data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
@@ -32,11 +73,24 @@ export function useCreateAccount() {
 
 export function useUpdateAccount() {
   const queryClient = useQueryClient()
+  const { mode } = useLocalAuth()
+  const isLocal = mode === 'local'
+
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateAccount }) =>
-      accountsApi
-        .updateMyAccountApiV1AccountsAccountIdPatch(id, data)
-        .then((r) => r.data),
+      isLocal
+        ? updateLocalAccount(id, {
+            name: data.name ?? undefined,
+            balance: data.balance != null ? Number(data.balance) : undefined,
+            currency_code: data.currency_code ?? undefined,
+            icon_name: data.icon_name ?? undefined,
+            color: data.color,
+            include_in_total: data.include_in_total ?? undefined,
+            is_archived: data.is_archived ?? undefined,
+          }).then(toAccountIndex)
+        : accountsApi
+            .updateMyAccountApiV1AccountsAccountIdPatch(id, data)
+            .then((r) => r.data),
     // Optimistic update: reflect safe field changes immediately in the cached list
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.accounts.all })
@@ -71,9 +125,14 @@ export function useUpdateAccount() {
 
 export function useDeleteAccount() {
   const queryClient = useQueryClient()
+  const { mode } = useLocalAuth()
+  const isLocal = mode === 'local'
+
   return useMutation({
     mutationFn: (id: string) =>
-      accountsApi.deleteMyAccountApiV1AccountsAccountIdDelete(id).then((r) => r.data),
+      isLocal
+        ? deleteLocalAccount(id)
+        : accountsApi.deleteMyAccountApiV1AccountsAccountIdDelete(id).then((r) => r.data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })

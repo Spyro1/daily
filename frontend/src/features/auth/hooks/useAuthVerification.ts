@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { authOauthApi } from '#/api/authClient'
+import { useLocalAuth } from './useLocalAuth'
 
 export type AuthStatus = 'pending' | 'authenticated' | 'unauthenticated'
 
@@ -18,16 +19,18 @@ let lastVerifiedAt = 0
  * Skips the network call if the last successful verification is recent
  * (< VERIFY_COOLDOWN_MS), to avoid hammering the server on every navigation.
  *
- * Pass `skip: true` on public pages so no network call is made.
+ * Pass `skip: true` on public pages or local-mode pages so no network call is made.
  */
 export function useAuthVerification({ skip = false }: { skip?: boolean } = {}) {
   const navigate = useNavigate()
+  const { setOnline } = useLocalAuth()
   const [status, setStatus] = useState<AuthStatus>(skip ? 'authenticated' : 'pending')
   const ran = useRef(false)
 
   const verify = useCallback(async () => {
     // Reuse a recent successful check — avoids a network call on every navigation
     if (Date.now() - lastVerifiedAt < VERIFY_COOLDOWN_MS) {
+      setOnline()
       setStatus('authenticated')
       return
     }
@@ -36,6 +39,7 @@ export function useAuthVerification({ skip = false }: { skip?: boolean } = {}) {
       // Step 1: validate the current access token
       await authOauthApi.validateAccessTokenApiV1OauthValidatePost()
       lastVerifiedAt = Date.now()
+      setOnline()
       setStatus('authenticated')
     } catch (err: unknown) {
       const httpStatus = (err as { response?: { status?: number } }).response?.status
@@ -45,6 +49,7 @@ export function useAuthVerification({ skip = false }: { skip?: boolean } = {}) {
           // Step 2: access token expired — attempt a silent refresh
           await authOauthApi.refreshAccessTokenApiV1OauthRefreshPost()
           lastVerifiedAt = Date.now()
+          setOnline()
           setStatus('authenticated')
         } catch {
           // Step 3: refresh token also expired → force re-login
