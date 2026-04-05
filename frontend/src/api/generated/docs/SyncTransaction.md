@@ -1,32 +1,35 @@
-# UpdateTransaction
+# SyncTransaction
 
+A transaction coming from the frontend\'s local storage.
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**amount** | [**Amount2**](Amount2.md) |  | [optional] [default to undefined]
-**transaction_type** | [**TransactionType**](TransactionType.md) |  | [optional] [default to undefined]
-**occurred_at** | **string** |  | [optional] [default to undefined]
-**category_id** | **string** |  | [optional] [default to undefined]
+**id** | **string** |  | [default to undefined]
 **source_account_id** | **string** |  | [optional] [default to undefined]
 **destination_account_id** | **string** |  | [optional] [default to undefined]
+**category_id** | **string** |  | [optional] [default to undefined]
+**transaction_type** | **string** |  | [default to undefined]
+**amount** | [**Amount1**](Amount1.md) |  | [default to undefined]
 **target_amount** | [**TargetAmount**](TargetAmount.md) |  | [optional] [default to undefined]
+**occurred_at** | **string** |  | [default to undefined]
 **note** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { UpdateTransaction } from './api';
+import { SyncTransaction } from './api';
 
-const instance: UpdateTransaction = {
-    amount,
-    transaction_type,
-    occurred_at,
-    category_id,
+const instance: SyncTransaction = {
+    id,
     source_account_id,
     destination_account_id,
+    category_id,
+    transaction_type,
+    amount,
     target_amount,
+    occurred_at,
     note,
 };
 ```

@@ -25,6 +25,11 @@ def _build_url(driver: str) -> URL:
     )
 
 
+def init_url() -> str:
+    """Return the synchronous SQLAlchemy URL used by Alembic migrations."""
+    return str(_build_url("postgresql+psycopg2"))
+
+
 # ─── Database auto-creation ─────────────────────────────────────────
 
 def ensure_database_exists() -> bool:

@@ -65,6 +65,7 @@ No authorization required
 # **googleLoginApiV1GoogleLoginGet**
 > any googleLoginApiV1GoogleLoginGet()
 
+Redirect the user to Google\'s OAuth consent screen.
 
 ### Example
 
@@ -151,6 +152,7 @@ No authorization required
 # **oauthCallbackApiV1OauthCallbackGet**
 > any oauthCallbackApiV1OauthCallbackGet()
 
+OAuth callback handler. After the user authenticates with a provider (e.g. Google), the provider redirects here. We exchange the code for user info, find-or-create the backend user, and issue JWT cookies.  Local user data (if any) lives in the frontend\'s IndexedDB. After this callback the frontend can push that data via POST /sync/push.
 
 ### Example
 

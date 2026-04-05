@@ -9,6 +9,7 @@ docs/AccountIndex.md
 docs/AccountsApi.md
 docs/Amount.md
 docs/Amount1.md
+docs/Amount2.md
 docs/Balance.md
 docs/CategoriesApi.md
 docs/CategoryBrief.md
@@ -25,6 +26,12 @@ docs/LocationInner.md
 docs/OauthApi.md
 docs/ResponseMessage.md
 docs/RootApi.md
+docs/SyncAccount.md
+docs/SyncApi.md
+docs/SyncCategory.md
+docs/SyncPushRequest.md
+docs/SyncPushResponse.md
+docs/SyncTransaction.md
 docs/TargetAmount.md
 docs/TransactionBrief.md
 docs/TransactionIndex.md
@@ -34,7 +41,6 @@ docs/TransactionsApi.md
 docs/UpdateAccount.md
 docs/UpdateCategory.md
 docs/UpdateTransaction.md
-docs/V1Api.md
 docs/ValidationError.md
 git_push.sh
 index.ts
