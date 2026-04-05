@@ -72,7 +72,7 @@ export function SettingsPage() {
       const result = await syncPushToBackend()
       await clearLocalData()
       notify(
-        `Synced: ${result.accounts_created} accounts, ${result.categories_created} categories, ${result.transactions_created} transactions`,
+        `Synced: ${result.accounts_created ?? 0} accounts, ${result.categories_created ?? 0} categories, ${result.transactions_created ?? 0} transactions`,
         'success',
       )
     } catch {

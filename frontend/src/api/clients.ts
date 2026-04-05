@@ -8,6 +8,7 @@ import {
   DashboardApi,
   HealthApi,
   OauthApi,
+  SyncApi,
   TransactionsApi,
 } from '@/api/generated'
 
@@ -28,4 +29,5 @@ export const categoriesApi = new CategoriesApi(configuration, undefined, apiClie
 export const dashboardApi = new DashboardApi(configuration, undefined, apiClient)
 export const healthApi = new HealthApi(configuration, undefined, apiClient)
 export const oauthApi = new OauthApi(configuration, undefined, apiClient)
+export const syncApi = new SyncApi(configuration, undefined, apiClient)
 export const transactionsApi = new TransactionsApi(configuration, undefined, apiClient)

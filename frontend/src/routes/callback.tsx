@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, createFileRoute } from '@tanstack/react-router'
 import { Alert, CircularProgress, Stack, Typography } from '@mui/material'
 
-import { oauthApi } from '@/api/clients'
+import { authOauthApi } from '#/api/authClient'
 import { PageLayout } from '#/shared/layout/PageLayout'
 import { ErrorRounded } from '@mui/icons-material'
 import { useLocalAuth } from '#/features/auth/hooks/useLocalAuth'
@@ -22,7 +22,7 @@ function CallbackPage() {
 
     const completeLogin = async () => {
       try {
-        await oauthApi.validateAccessTokenApiV1OauthValidatePost()
+        await authOauthApi.validateAccessTokenApiV1OauthValidatePost()
         if (cancelled) return
 
         // Mark as online (Google-authenticated)
@@ -63,9 +63,11 @@ function CallbackPage() {
     <PageLayout centered>
         <Stack spacing={2.5} alignItems="center" textAlign="center">
           {errorMessage ? <ErrorRounded /> : <CircularProgress color="primary" />}
-          <Typography variant="h4">{errorMessage ? 'Signing in...' : statusText}</Typography>
+          <Typography variant="h4">{errorMessage ? 'Sign in failed' : statusText}</Typography>
           <Typography color="text.secondary">
-            Daily is validating your session and redirecting you to the dashboard.
+            {errorMessage
+              ? 'Something went wrong during authentication.'
+              : 'Validating your session and redirecting to the dashboard…'}
           </Typography>
           {errorMessage ? <Alert severity="error" sx={{ width: '100%' }}>{errorMessage}</Alert> : null}
         </Stack>
