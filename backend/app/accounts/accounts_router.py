@@ -83,7 +83,7 @@ async def create_my_new_account(
     data: CreateAccount,
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
-):
+) -> None:
     log_context = _log_context(current_user, "create_my_new_account")
     logger.info(f"{log_context}: Creating new user account")
     logger.debug(f"{log_context}: Payload={_payload_for_log(data)} user_id={current_user.id}")
@@ -169,7 +169,7 @@ async def delete_my_account(
     account_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
-):
+) -> None:
     log_context = _log_context(current_user, "delete_my_account")
     logger.info(f"{log_context}: Deleting user account id={account_id}")
 
@@ -190,3 +190,4 @@ async def delete_my_account(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error deleting user account")
 
     logger.info(f"{log_context}: Deleted account id={account_id}")
+    return
