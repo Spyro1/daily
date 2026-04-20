@@ -128,7 +128,7 @@ export function useCreateTransaction() {
             amount: data.amount as number,
             transaction_type: data.transaction_type as 'expense' | 'income' | 'transfer',
             occurred_at: data.occurred_at,
-            category_id: data.category_id,
+            category_id: data.category_id ?? null,
             source_account_id: data.source_account_id,
             destination_account_id: data.destination_account_id,
             target_amount: data.target_amount as number | undefined,

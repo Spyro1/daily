@@ -1,18 +1,10 @@
 import { Box, Skeleton, Typography } from '@mui/material'
 import type { AccountBrief } from '@/api/generated'
+import { formatCurrency } from '@/shared/utils/currency'
 
 interface Props {
   accounts: AccountBrief[]
   isLoading: boolean
-}
-
-function formatBalance(amount: number, currency: string): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount)
 }
 
 export function BalanceHeader({ accounts, isLoading }: Props) {
@@ -29,7 +21,7 @@ export function BalanceHeader({ accounts, isLoading }: Props) {
         <Skeleton variant="text" width={180} height={52} sx={{ mx: 'auto' }} />
       ) : (
         <Typography variant="h3" fontWeight={700}>
-          {formatBalance(totalBalance, currency)}
+          {formatCurrency(totalBalance, currency)}
         </Typography>
       )}
 

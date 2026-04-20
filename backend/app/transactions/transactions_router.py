@@ -120,6 +120,30 @@ async def create_my_new_transaction(
     logger.info(f"{log_context}: Creating new transaction")
     logger.debug(f"{log_context}: Payload={_payload_for_log(data)} user_id={current_user.id}")
 
+    is_transfer = data.transaction_type == TransactionType.TRANSFER
+
+    if is_transfer:
+        if not data.source_account_id or not data.destination_account_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Transfer requires both source_account_id and destination_account_id",
+            )
+        if data.source_account_id == data.destination_account_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Transfer source and destination accounts must be different",
+            )
+        category_id = None
+        target_amount = data.target_amount if data.target_amount is not None else data.amount
+    else:
+        if data.category_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Expense and income transactions require category_id",
+            )
+        category_id = data.category_id
+        target_amount = data.target_amount
+
     new_transaction = Transactions(
         user_id=current_user.id,
         transaction_type=data.transaction_type.value,
@@ -127,8 +151,8 @@ async def create_my_new_transaction(
         occurred_at=data.occurred_at,
         source_account_id=data.source_account_id,
         destination_account_id=data.destination_account_id,
-        category_id=data.category_id,
-        target_amount=data.target_amount,
+        category_id=category_id,
+        target_amount=target_amount,
         note=data.note,
     )
     logger.debug(

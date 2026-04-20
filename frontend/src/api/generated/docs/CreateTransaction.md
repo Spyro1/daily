@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **amount** | [**Amount**](Amount.md) |  | [default to undefined]
 **transaction_type** | [**TransactionType**](TransactionType.md) |  | [default to undefined]
 **occurred_at** | **string** |  | [default to undefined]
-**category_id** | **string** |  | [default to undefined]
+**category_id** | **string** |  | [optional] [default to undefined]
 **source_account_id** | **string** |  | [optional] [default to undefined]
 **destination_account_id** | **string** |  | [optional] [default to undefined]
 **target_amount** | [**TargetAmount**](TargetAmount.md) |  | [optional] [default to undefined]

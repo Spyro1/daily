@@ -6,6 +6,7 @@ import {
 import { Box, Divider, ListItem, ListItemText, Stack, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
 import type { TransactionIndex, TransactionType } from '@/api/generated'
+import { formatCurrency } from '@/shared/utils/currency'
 
 interface TransactionCardProps {
   transaction: TransactionIndex
@@ -30,7 +31,8 @@ function formatDate(dateStr: string): string {
 export function TransactionCard({ transaction: tx, showDivider = true }: TransactionCardProps) {
   const cfg = TYPE_CONFIG[tx.transaction_type as TxType] ?? TYPE_CONFIG.transfer
   const { Icon, color, sign } = cfg
-  const amountLabel = `${sign}$${parseFloat(tx.amount).toFixed(2)}`
+  const currencyCode = tx.source_account?.currency_code ?? tx.destination_account?.currency_code ?? 'USD'
+  const amountLabel = `${sign}${formatCurrency(parseFloat(tx.amount), currencyCode)}`
 
   return (
     <>
@@ -46,7 +48,7 @@ export function TransactionCard({ transaction: tx, showDivider = true }: Transac
           sx={(theme) => ({
             width: 36,
             height: 36,
-            borderRadius: 3,
+            borderRadius: 2,
             backgroundColor: alpha(color, theme.palette.mode === 'light' ? 0.12 : 0.2),
             display: 'flex',
             alignItems: 'center',

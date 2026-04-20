@@ -1,7 +1,11 @@
 import {
+  ArrowDownwardRounded,
+  ArrowUpwardRounded,
+  SwapHorizRounded,
+} from '@mui/icons-material'
+import {
   Box,
   Button,
-  Chip,
   Divider,
   List,
   ListItem,
@@ -11,37 +15,60 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import type { TransactionBrief } from '@/api/generated'
+import { alpha } from '@mui/material/styles'
+import { useNavigate } from '@tanstack/react-router'
+import type { TransactionBrief, TransactionType } from '@/api/generated'
+import { formatCurrency } from '@/shared/utils/currency'
 
 interface Props {
   transactions: TransactionBrief[]
+  currencyCode: string
   isLoading: boolean
 }
 
-const TYPE_CONFIG: Record<string, { label: string; color: 'success' | 'error' | 'info' }> = {
-  income: { label: 'Income', color: 'success' },
-  expanse: { label: 'Expense', color: 'error' },
-  transfer: { label: 'Transfer', color: 'info' },
-}
-
 const RECENT_LIMIT = 6
+
+type TxType = typeof TransactionType[keyof typeof TransactionType]
+
+const TYPE_CONFIG: Record<
+  TxType,
+  { Icon: React.ElementType; color: string; sign: string }
+> = {
+  expense: { Icon: ArrowDownwardRounded, color: '#f44336', sign: '-' },
+  income: { Icon: ArrowUpwardRounded, color: '#4caf50', sign: '+' },
+  transfer: { Icon: SwapHorizRounded, color: '#2196f3', sign: '' },
+}
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-function formatAmount(tx: TransactionBrief): string {
-  const sign = tx.transaction_type === 'expense' ? '-' : '+'
-  return `${sign}$${parseFloat(tx.amount).toFixed(2)}`
+function extractNote(tx: TransactionBrief): string {
+  const note = (tx as { note?: string | null }).note
+  return typeof note === 'string' ? note.trim() : ''
 }
 
-export function RecentTransactions({ transactions, isLoading }: Props) {
+function formatAmount(tx: TransactionBrief, currencyCode: string): string {
+  const value = parseFloat(tx.amount)
+  const cfg = TYPE_CONFIG[tx.transaction_type as TxType] ?? TYPE_CONFIG.transfer
+  return `${cfg.sign}${formatCurrency(value, currencyCode)}`
+}
+
+export function RecentTransactions({ transactions, currencyCode, isLoading }: Props) {
+  const navigate = useNavigate()
   const recent = transactions.slice(0, RECENT_LIMIT)
 
   return (
     <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
-      <Box sx={{ px: 2.5, pt: 2.5, pb: 1 }}>
+      <Box sx={{ px: 2.5, pt: 2.5, pb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
         <Typography variant="h6">Recent Transactions</Typography>
+        <Button
+          variant="text"
+          size="small"
+          onClick={() => void navigate({ to: '/transactions' })}
+        >
+          View all
+        </Button>
       </Box>
 
       {isLoading ? (
@@ -66,8 +93,9 @@ export function RecentTransactions({ transactions, isLoading }: Props) {
         <>
           <List disablePadding>
             {recent.map((tx, idx) => {
-              const cfg = TYPE_CONFIG[tx.transaction_type] ?? { label: tx.transaction_type, color: 'info' as const }
-              const isExpense = tx.transaction_type === 'expense'
+              const cfg = TYPE_CONFIG[tx.transaction_type as TxType] ?? TYPE_CONFIG.transfer
+              const { Icon, color } = cfg
+              const note = extractNote(tx)
               return (
                 <Box key={tx.id}>
                   <ListItem
@@ -76,42 +104,46 @@ export function RecentTransactions({ transactions, isLoading }: Props) {
                       <Typography
                         variant="body2"
                         fontWeight={700}
-                        color={isExpense ? 'error.main' : 'primary.main'}
+                        sx={{ color }}
                       >
-                        {formatAmount(tx)}
+                        {formatAmount(tx, currencyCode)}
                       </Typography>
                     }
                   >
+                    <Box
+                      sx={(theme) => ({
+                        width: 36,
+                        height: 36,
+                        borderRadius: 2,
+                        backgroundColor: alpha(color, theme.palette.mode === 'light' ? 0.12 : 0.2),
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        mr: 1.5,
+                        flexShrink: 0,
+                      })}
+                    >
+                      <Icon sx={{ fontSize: 18, color }} />
+                    </Box>
                     <ListItemText
                       primary={
-                        <Typography variant="body2" fontWeight={500}>
+                        <Typography variant="body2" fontWeight={600} noWrap>
                           {tx.category.name}
                         </Typography>
                       }
-                      secondary={formatDate(tx.occurred_at)}
-                      sx={{ mr: 1 }}
+                      secondary={
+                        <Typography variant="caption" color="text.secondary" noWrap>
+                          {note ? `${formatDate(tx.occurred_at)} · ${note}` : formatDate(tx.occurred_at)}
+                        </Typography>
+                      }
+                      sx={{ mr: 6 }}
                     />
-                    <Chip label={cfg.label} color={cfg.color} size="small" sx={{ mr: 1 }} />
                   </ListItem>
                   {idx < recent.length - 1 && <Divider component="li" />}
                 </Box>
               )
             })}
           </List>
-
-          {transactions.length > RECENT_LIMIT && (
-            <Box sx={{ px: 2.5, pb: 2 }}>
-              <Button
-                fullWidth
-                variant="text"
-                onClick={() => {
-                  window.location.href = '/transactions'
-                }}
-              >
-                See All {transactions.length} Transactions
-              </Button>
-            </Box>
-          )}
         </>
       )}
     </Paper>

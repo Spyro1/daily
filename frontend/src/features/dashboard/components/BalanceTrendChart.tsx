@@ -20,9 +20,11 @@ import {
 } from 'recharts'
 import type { TransactionBrief } from '@/api/generated'
 import { deriveChartData, getDateRange, type Interval } from '../utils/dateUtils'
+import { formatCurrency, formatCurrencyCompact } from '@/shared/utils/currency'
 
 interface Props {
   transactions: TransactionBrief[]
+  currencyCode: string
   interval: Interval
   onIntervalChange: (interval: Interval) => void
   customRange: [Date, Date]
@@ -37,17 +39,13 @@ const INTERVALS: { label: string; value: Interval }[] = [
   { label: 'Custom', value: 'custom' },
 ]
 
-function formatYAxis(value: number): string {
-  if (value >= 1000) return `$${(value / 1000).toFixed(1)}k`
-  return `$${value}`
-}
-
 function toInputDate(d: Date): string {
   return d.toISOString().split('T')[0]!
 }
 
 export function BalanceTrendChart({
   transactions,
+  currencyCode,
   interval,
   onIntervalChange,
   customRange,
@@ -163,7 +161,7 @@ export function BalanceTrendChart({
               interval="preserveStartEnd"
             />
             <YAxis
-              tickFormatter={formatYAxis}
+              tickFormatter={(value) => formatCurrencyCompact(Number(value), currencyCode)}
               tick={{ fontSize: 10, fill: theme.palette.text.secondary }}
               axisLine={false}
               tickLine={false}
@@ -176,7 +174,7 @@ export function BalanceTrendChart({
                 borderRadius: 12,
                 fontSize: 12,
               }}
-              formatter={(value) => [`$${Number(value).toFixed(2)}`]}
+              formatter={(value) => [formatCurrency(Number(value), currencyCode)]}
               cursor={{ stroke: theme.palette.divider }}
             />
             <Line

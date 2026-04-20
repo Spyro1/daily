@@ -91,7 +91,7 @@ export interface CreateTransaction {
     'amount': Amount;
     'transaction_type': TransactionType;
     'occurred_at': string;
-    'category_id': string;
+    'category_id'?: string | null;
     'source_account_id'?: string | null;
     'destination_account_id'?: string | null;
     'target_amount'?: TargetAmount | null;

@@ -34,7 +34,7 @@ class CreateTransaction(BaseModel):
     amount: Decimal
     transaction_type: TransactionType
     occurred_at: datetime
-    category_id: uuid.UUID
+    category_id: Optional[uuid.UUID] = None
     source_account_id: Optional[uuid.UUID] = None
     destination_account_id: Optional[uuid.UUID] = None
     target_amount: Optional[Decimal] = None
