@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { AddRounded } from '@mui/icons-material'
-import { Fab, List, Paper, Skeleton, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Fab, Paper, Skeleton, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { useNavigate } from '@tanstack/react-router'
 import type { TransactionType } from '@/api/generated'
 import { PageLayout } from '#/shared/layout/PageLayout'
@@ -49,13 +49,13 @@ export function TransactionsPage() {
       aria-label="New transaction"
       onClick={() => void navigate({ to: '/transactions/new' })}
     >
-      <AddRounded fontSize="large"/>
+      <AddRounded fontSize="large" />
     </Fab>
   )
 
   return (
     <PageLayout title="Transactions" action={fab}>
-      <Paper elevation={2} sx={{ p: 2, borderRadius: 2, mb: 2 }}>
+      <Paper elevation={2} sx={{ p: 2, borderRadius: 2 }}>
         <Stack spacing={1.5}>
           <TextField
             size="small"
@@ -65,7 +65,6 @@ export function TransactionsPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             fullWidth
           />
-
           <ToggleButtonGroup
             value={typeFilter}
             exclusive
@@ -84,20 +83,18 @@ export function TransactionsPage() {
       </Paper>
 
       {isPending ? (
-        <Paper elevation={2} sx={{ px: 2.5, py: 2, borderRadius: 2 }}>
-          <Stack spacing={1.5}>
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Stack key={i} direction="row" spacing={1.5} alignItems="center">
-                <Skeleton variant="rounded" width={36} height={36} />
-                <Stack flex={1} spacing={0.5}>
-                  <Skeleton variant="text" width="45%" />
-                  <Skeleton variant="text" width="25%" />
-                </Stack>
-                <Skeleton variant="text" width={56} />
+        <Stack spacing={1.5}>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Paper key={i} elevation={2} sx={{ px: 2, py: 1.25, borderRadius: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Skeleton variant="rounded" width={36} height={36} sx={{ borderRadius: 2, flexShrink: 0 }} />
+              <Stack flex={1} spacing={0.5}>
+                <Skeleton variant="text" width="45%" />
+                <Skeleton variant="text" width="25%" />
               </Stack>
-            ))}
-          </Stack>
-        </Paper>
+              <Skeleton variant="text" width={56} />
+            </Paper>
+          ))}
+        </Stack>
       ) : !filteredTransactions.length ? (
         <EmptyState
           message={
@@ -107,17 +104,11 @@ export function TransactionsPage() {
           }
         />
       ) : (
-        <Paper elevation={2} sx={{ px: 2.5, borderRadius: 2, overflow: 'hidden' }}>
-          <List disablePadding>
-            {filteredTransactions.map((tx, idx) => (
-              <TransactionCard
-                key={tx.id}
-                transaction={tx}
-                showDivider={idx < filteredTransactions.length - 1}
-              />
-            ))}
-          </List>
-        </Paper>
+        <Stack spacing={1.5}>
+          {filteredTransactions.map((tx) => (
+            <TransactionCard key={tx.id} transaction={tx} showDivider={false} />
+          ))}
+        </Stack>
       )}
     </PageLayout>
   )

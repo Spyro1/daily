@@ -226,5 +226,5 @@ def fill_transaction_index(transaction: Transactions) -> TransactionIndex:
         source_account=source,
         destination_account=destination,
         target_amount=transaction.target_amount,
-        note=transaction.note or "",
+        note=transaction.note,
     )

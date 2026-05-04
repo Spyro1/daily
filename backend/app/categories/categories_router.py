@@ -7,8 +7,8 @@ from db.core import get_db
 from app.auth.jwt_utils import get_current_user
 from db.models import Categories, Users
 
-from app.categories.service import create_category, delete_category, get_categories_for_user, fill_category_index, get_category_for_user_by_id, update_category
-from app.categories.schemas import CategoryIndex, UpdateCategory, CreateCategory
+from app.categories.service import create_category, delete_category, get_categories_for_user, fill_category_index, get_category_for_user_by_id, update_category, build_category_tree
+from app.categories.schemas import CategoryIndex, CategoryTree, UpdateCategory, CreateCategory
 
 router = APIRouter()
 
@@ -47,6 +47,25 @@ async def get_my_categories(
     categories = [fill_category_index(category) for category in db_categories]
     logger.info(f"{log_context}: Returning {len(categories)} categories")
     return categories    
+
+
+@router.get('/tree', response_model=list[CategoryTree])
+async def get_my_categories_tree(
+    db: AsyncSession = Depends(get_db),
+    current_user: Users = Depends(get_current_user)
+) -> list[CategoryTree]:
+    log_context = _log_context(current_user, "get_my_categories_tree")
+    logger.info(f"{log_context}: Fetching user categories as tree")
+    
+    try:
+        db_categories = await get_categories_for_user(db, current_user.id)
+    except Exception as e:
+        logger.exception(f"{log_context}: Error fetching user categories: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error fetching user categories")
+
+    tree = build_category_tree(db_categories)
+    logger.info(f"{log_context}: Returning category tree with {len(tree)} root nodes")
+    return tree
 
 
 @router.get('/{category_id}', response_model=CategoryIndex)

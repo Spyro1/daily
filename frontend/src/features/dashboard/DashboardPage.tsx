@@ -37,6 +37,18 @@ export function DashboardPage() {
     <PageLayout overline="Dashboard">
       <BalanceHeader accounts={accounts} isLoading={isPending} />
 
+      {/* <Stack direction="row" spacing={1}>
+        <Button size="small" variant="outlined" startIcon={<AddRounded />} onClick={() => void navigate({ to: '/transactions/new' })}>
+          Transaction
+        </Button>
+        <Button size="small" variant="outlined" startIcon={<AccountBalanceRounded />} onClick={() => void navigate({ to: '/accounts/new' })}>
+          Account
+        </Button>
+        <Button size="small" variant="outlined" startIcon={<CategoryRounded />} onClick={() => void navigate({ to: '/categories/new' })}>
+          Category
+        </Button>
+      </Stack> */}
+
       <BalanceTrendChart
         transactions={transactions}
         currencyCode={currencyCode}

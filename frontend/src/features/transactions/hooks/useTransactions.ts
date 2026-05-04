@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import type { CreateTransaction, TransactionListResponse, UpdateTransaction } from '@/api/generated'
+import type { CreateTransaction, TransactionIndex, TransactionListResponse, UpdateTransaction } from '@/api/generated'
 import { transactionsApi } from '@/api/clients'
 import { queryKeys } from '@/api/queryKeys'
 import { useLocalAuth } from '#/features/auth/hooks/useLocalAuth'
@@ -8,9 +8,11 @@ import {
   createLocalTransaction,
   updateLocalTransaction,
   deleteLocalTransaction,
+  getLocalAccounts,
+  getLocalCategories,
 } from '@/lib/localCrud'
 import type { LocalTransaction } from '@/lib/localDb'
-import { getLocalAccounts, getLocalCategories } from '@/lib/localCrud'
+import { isOffline, enqueueMutation } from '@/lib/offlineQueue'
 
 /** Build the list response shape the UI expects from local data. */
 async function buildLocalTransactionList(filters: {
@@ -116,27 +118,53 @@ export function useTransactions({
   })
 }
 
+export function useTransaction(id: string) {
+  const { mode } = useLocalAuth()
+  const isLocal = mode === 'local'
+
+  return useQuery({
+    queryKey: queryKeys.transactions.detail(id),
+    queryFn: isLocal
+      ? async (): Promise<TransactionIndex | undefined> => {
+          const txns = await getLocalTransactions()
+          const [accounts, categories] = await Promise.all([getLocalAccounts(), getLocalCategories()])
+          const acctMap = new Map(accounts.map((a) => [a.id, a]))
+          const catMap = new Map(categories.map((c) => [c.id, c]))
+          const t = txns.find((t) => t.id === id)
+          return t ? (mapTransaction(t, acctMap, catMap) as TransactionIndex) : undefined
+        }
+      : () => transactionsApi.getMyTransactionApiV1TransactionsTransactionIdGet(id).then((r) => r.data),
+    enabled: !!id,
+  })
+}
+
 export function useCreateTransaction() {
   const queryClient = useQueryClient()
   const { mode } = useLocalAuth()
   const isLocal = mode === 'local'
 
   return useMutation({
-    mutationFn: (data: CreateTransaction) =>
-      isLocal
-        ? createLocalTransaction({
-            amount: data.amount as number,
-            transaction_type: data.transaction_type as 'expense' | 'income' | 'transfer',
-            occurred_at: data.occurred_at,
-            category_id: data.category_id ?? null,
-            source_account_id: data.source_account_id,
-            destination_account_id: data.destination_account_id,
-            target_amount: data.target_amount as number | undefined,
-            note: data.note,
-          })
-        : transactionsApi
-            .createMyNewTransactionApiV1TransactionsPost(data)
-            .then((r) => r.data),
+    mutationFn: async (data: CreateTransaction) => {
+      if (isLocal || (mode === 'online' && isOffline())) {
+        const result = await createLocalTransaction({
+          amount: data.amount as number,
+          transaction_type: data.transaction_type as 'expense' | 'income' | 'transfer',
+          occurred_at: data.occurred_at,
+          category_id: data.category_id ?? null,
+          source_account_id: data.source_account_id,
+          destination_account_id: data.destination_account_id,
+          target_amount: data.target_amount as number | undefined,
+          note: data.note,
+        })
+        if (mode === 'online') {
+          enqueueMutation({ type: 'create-transaction', data })
+        }
+        return result
+      }
+      return transactionsApi
+        .createMyNewTransactionApiV1TransactionsPost(data)
+        .then((r) => r.data)
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
@@ -151,21 +179,27 @@ export function useUpdateTransaction() {
   const isLocal = mode === 'local'
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateTransaction }) =>
-      isLocal
-        ? updateLocalTransaction(id, {
-            amount: data.amount != null ? Number(data.amount) : undefined,
-            transaction_type: data.transaction_type as 'expense' | 'income' | 'transfer' | undefined,
-            occurred_at: data.occurred_at ?? undefined,
-            category_id: data.category_id,
-            source_account_id: data.source_account_id,
-            destination_account_id: data.destination_account_id,
-            target_amount: data.target_amount != null ? Number(data.target_amount) : undefined,
-            note: data.note,
-          }).then(() => undefined as any)
-        : transactionsApi
-            .updateMyTransactionApiV1TransactionsTransactionIdPatch(id, data)
-            .then((r) => r.data),
+    mutationFn: async ({ id, data }: { id: string; data: UpdateTransaction }) => {
+      if (isLocal || (mode === 'online' && isOffline())) {
+        await updateLocalTransaction(id, {
+          amount: data.amount != null ? Number(data.amount) : undefined,
+          transaction_type: data.transaction_type as 'expense' | 'income' | 'transfer' | undefined,
+          occurred_at: data.occurred_at ?? undefined,
+          category_id: data.category_id,
+          source_account_id: data.source_account_id,
+          destination_account_id: data.destination_account_id,
+          target_amount: data.target_amount != null ? Number(data.target_amount) : undefined,
+          note: data.note,
+        })
+        if (mode === 'online') {
+          enqueueMutation({ type: 'update-transaction', id, data })
+        }
+        return undefined as any
+      }
+      return transactionsApi
+        .updateMyTransactionApiV1TransactionsTransactionIdPatch(id, data)
+        .then((r) => r.data)
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
@@ -180,12 +214,18 @@ export function useDeleteTransaction() {
   const isLocal = mode === 'local'
 
   return useMutation({
-    mutationFn: (id: string) =>
-      isLocal
-        ? deleteLocalTransaction(id)
-        : transactionsApi
-            .deleteMyTransactionApiV1TransactionsTransactionIdDelete(id)
-            .then((r) => r.data),
+    mutationFn: async (id: string) => {
+      if (isLocal || (mode === 'online' && isOffline())) {
+        await deleteLocalTransaction(id)
+        if (mode === 'online') {
+          enqueueMutation({ type: 'delete-transaction', id })
+        }
+        return
+      }
+      return transactionsApi
+        .deleteMyTransactionApiV1TransactionsTransactionIdDelete(id)
+        .then((r) => r.data)
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })

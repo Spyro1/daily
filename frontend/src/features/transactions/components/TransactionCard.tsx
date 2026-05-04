@@ -3,8 +3,9 @@ import {
   ArrowUpwardRounded,
   SwapHorizRounded,
 } from '@mui/icons-material'
-import { Box, Divider, ListItem, ListItemText, Stack, Typography } from '@mui/material'
+import { Box, ButtonBase, Divider, Paper, Typography } from '@mui/material'
 import { alpha } from '@mui/material/styles'
+import { useNavigate } from '@tanstack/react-router'
 import type { TransactionIndex, TransactionType } from '@/api/generated'
 import { formatCurrency } from '@/shared/utils/currency'
 
@@ -29,6 +30,7 @@ function formatDate(dateStr: string): string {
 }
 
 export function TransactionCard({ transaction: tx, showDivider = true }: TransactionCardProps) {
+  const navigate = useNavigate()
   const cfg = TYPE_CONFIG[tx.transaction_type as TxType] ?? TYPE_CONFIG.transfer
   const { Icon, color, sign } = cfg
   const currencyCode = tx.source_account?.currency_code ?? tx.destination_account?.currency_code ?? 'USD'
@@ -36,47 +38,51 @@ export function TransactionCard({ transaction: tx, showDivider = true }: Transac
 
   return (
     <>
-      <ListItem
-        sx={{ px: 0, py: 1.25 }}
-        secondaryAction={
-          <Typography variant="body2" fontWeight={700} sx={{ color }}>
-            {amountLabel}
-          </Typography>
-        }
+      <ButtonBase
+        onClick={() => void navigate({ to: '/transactions/$id', params: { id: tx.id } })}
+        sx={{ width: '100%', borderRadius: 2, textAlign: 'left' }}
       >
-        <Box
-          sx={(theme) => ({
-            width: 36,
-            height: 36,
+        <Paper
+          elevation={2}
+          sx={{
+            px: 2,
+            py: 1.25,
             borderRadius: 2,
-            backgroundColor: alpha(color, theme.palette.mode === 'light' ? 0.12 : 0.2),
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            mr: 1.5,
-            flexShrink: 0,
-          })}
+            width: '100%',
+          }}
         >
-          <Icon sx={{ fontSize: 18, color }} />
-        </Box>
-        <ListItemText
-          primary={
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography variant="body2" fontWeight={600}>
-                {tx.category.name}
-              </Typography>
-            </Stack>
-          }
-          secondary={
-            <Typography variant="caption" color="text.secondary">
+          <Box
+            sx={(theme) => ({
+              width: 36,
+              height: 36,
+              borderRadius: 2,
+              backgroundColor: alpha(color, theme.palette.mode === 'light' ? 0.12 : 0.2),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: 1.5,
+              flexShrink: 0,
+            })}
+          >
+            <Icon sx={{ fontSize: 18, color }} />
+          </Box>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="body2" fontWeight={600} noWrap>
+              {tx.category.name}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" noWrap>
               {formatDate(tx.occurred_at)}
               {tx.note ? ` · ${tx.note}` : ''}
             </Typography>
-          }
-          sx={{ mr: 6 }}
-        />
-      </ListItem>
-      {showDivider && <Divider component="li" />}
+          </Box>
+          <Typography variant="body2" fontWeight={700} sx={{ color, flexShrink: 0, ml: 1 }}>
+            {amountLabel}
+          </Typography>
+        </Paper>
+      </ButtonBase>
+      {showDivider && <Divider sx={{ my: 0.5 }} />}
     </>
   )
 }

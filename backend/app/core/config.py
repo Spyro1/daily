@@ -23,7 +23,12 @@ class Database(Settings):
     password: str
     name: str
 
-    model_config = SettingsConfigDict(env_prefix='db_')
+    model_config = SettingsConfigDict(
+        env_file='../.env',
+        env_file_encoding='utf-8',
+        extra='ignore',
+        env_prefix='db_',
+    )
 
 
 class JWT(Settings):
@@ -33,7 +38,12 @@ class JWT(Settings):
     refresh_token_expire_days: int
     login_token_expire_minutes: int
 
-    model_config = SettingsConfigDict(env_prefix='jwt_')
+    model_config = SettingsConfigDict(
+        env_file='../.env',
+        env_file_encoding='utf-8',
+        extra='ignore',
+        env_prefix='jwt_',
+    )
 
 
 class Google(Settings):
@@ -43,14 +53,24 @@ class Google(Settings):
     token_url: str
     userinfo_url: str
 
-    model_config = SettingsConfigDict(env_prefix='google_')
+    model_config = SettingsConfigDict(
+        env_file='../.env',
+        env_file_encoding='utf-8',
+        extra='ignore',
+        env_prefix='google_',
+    )
 
 
 class Frontend(Settings):
     auth_callback: str
     cors_origins: str = ''
 
-    model_config = SettingsConfigDict(env_prefix='frontend_')
+    model_config = SettingsConfigDict(
+        env_file='../.env',
+        env_file_encoding='utf-8',
+        extra='ignore',
+        env_prefix='frontend_',
+    )
 
     @property
     def allowed_origins(self) -> list[str]:

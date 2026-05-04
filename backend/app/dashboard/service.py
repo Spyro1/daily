@@ -10,7 +10,7 @@ from sqlalchemy.orm import selectinload
 
 from app.dashboard.schemas import DashboardIndex
 from app.accounts.service import fill_account_brief, get_accounts_for_user
-from app.transactions.service import fill_transaction_brief, get_transactions_for_user
+from app.transactions.service import fill_transaction_brief, get_transactions_for_user_filtered
 
 async def get_dashboard_for_user(db: AsyncSession, user_id: uuid.UUID) -> DashboardIndex:
     logger.debug(f"[get_dashboard_for_user]: Fetching dashboard data for user {user_id}")
@@ -22,7 +22,7 @@ async def get_dashboard_for_user(db: AsyncSession, user_id: uuid.UUID) -> Dashbo
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch dashboard data") 
 
     try:
-        db_transactions = await get_transactions_for_user(db, user_id)
+        db_transactions, _ = await get_transactions_for_user_filtered(db, user_id, limit=50, eager=True)
     except Exception as exc:
         logger.exception(f"[get_dashboard_for_user]: Failed to fetch transactions for user {user_id}: {exc}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch dashboard data")

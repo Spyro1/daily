@@ -219,9 +219,10 @@ class Accounts(Base):
             func.coalesce(
                 func.sum(
                     case(
-                        # Bevétel vagy Bejövő utalás
-                        (Transactions.destination_account_id == id, Transactions.target_amount),
-                        # Kiadás vagy Kimenő utalás vagy Overwrite korrekció
+                        # Income: destination_account_id set, target_amount is NULL → use amount
+                        # Transfer incoming: destination_account_id set, target_amount is set → use target_amount
+                        (Transactions.destination_account_id == id, func.coalesce(Transactions.target_amount, Transactions.amount)),
+                        # Expense or outgoing transfer: subtract amount
                         (Transactions.source_account_id == id, -Transactions.amount),
                         else_=0
                     )

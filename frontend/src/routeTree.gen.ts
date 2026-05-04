@@ -18,8 +18,11 @@ import { Route as TransactionsIndexRouteImport } from './routes/transactions/ind
 import { Route as CategoriesIndexRouteImport } from './routes/categories/index'
 import { Route as AccountsIndexRouteImport } from './routes/accounts/index'
 import { Route as TransactionsNewRouteImport } from './routes/transactions/new'
+import { Route as TransactionsIdRouteImport } from './routes/transactions/$id'
 import { Route as CategoriesNewRouteImport } from './routes/categories/new'
+import { Route as CategoriesIdRouteImport } from './routes/categories/$id'
 import { Route as AccountsNewRouteImport } from './routes/accounts/new'
+import { Route as AccountsIdRouteImport } from './routes/accounts/$id'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -66,14 +69,29 @@ const TransactionsNewRoute = TransactionsNewRouteImport.update({
   path: '/transactions/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TransactionsIdRoute = TransactionsIdRouteImport.update({
+  id: '/transactions/$id',
+  path: '/transactions/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategoriesNewRoute = CategoriesNewRouteImport.update({
   id: '/categories/new',
   path: '/categories/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CategoriesIdRoute = CategoriesIdRouteImport.update({
+  id: '/categories/$id',
+  path: '/categories/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountsNewRoute = AccountsNewRouteImport.update({
   id: '/accounts/new',
   path: '/accounts/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountsIdRoute = AccountsIdRouteImport.update({
+  id: '/accounts/$id',
+  path: '/accounts/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -83,8 +101,11 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
+  '/accounts/$id': typeof AccountsIdRoute
   '/accounts/new': typeof AccountsNewRoute
+  '/categories/$id': typeof CategoriesIdRoute
   '/categories/new': typeof CategoriesNewRoute
+  '/transactions/$id': typeof TransactionsIdRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/accounts/': typeof AccountsIndexRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -96,8 +117,11 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
+  '/accounts/$id': typeof AccountsIdRoute
   '/accounts/new': typeof AccountsNewRoute
+  '/categories/$id': typeof CategoriesIdRoute
   '/categories/new': typeof CategoriesNewRoute
+  '/transactions/$id': typeof TransactionsIdRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/accounts': typeof AccountsIndexRoute
   '/categories': typeof CategoriesIndexRoute
@@ -110,8 +134,11 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
+  '/accounts/$id': typeof AccountsIdRoute
   '/accounts/new': typeof AccountsNewRoute
+  '/categories/$id': typeof CategoriesIdRoute
   '/categories/new': typeof CategoriesNewRoute
+  '/transactions/$id': typeof TransactionsIdRoute
   '/transactions/new': typeof TransactionsNewRoute
   '/accounts/': typeof AccountsIndexRoute
   '/categories/': typeof CategoriesIndexRoute
@@ -125,8 +152,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/register'
     | '/settings'
+    | '/accounts/$id'
     | '/accounts/new'
+    | '/categories/$id'
     | '/categories/new'
+    | '/transactions/$id'
     | '/transactions/new'
     | '/accounts/'
     | '/categories/'
@@ -138,8 +168,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/register'
     | '/settings'
+    | '/accounts/$id'
     | '/accounts/new'
+    | '/categories/$id'
     | '/categories/new'
+    | '/transactions/$id'
     | '/transactions/new'
     | '/accounts'
     | '/categories'
@@ -151,8 +184,11 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/register'
     | '/settings'
+    | '/accounts/$id'
     | '/accounts/new'
+    | '/categories/$id'
     | '/categories/new'
+    | '/transactions/$id'
     | '/transactions/new'
     | '/accounts/'
     | '/categories/'
@@ -165,8 +201,11 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   RegisterRoute: typeof RegisterRoute
   SettingsRoute: typeof SettingsRoute
+  AccountsIdRoute: typeof AccountsIdRoute
   AccountsNewRoute: typeof AccountsNewRoute
+  CategoriesIdRoute: typeof CategoriesIdRoute
   CategoriesNewRoute: typeof CategoriesNewRoute
+  TransactionsIdRoute: typeof TransactionsIdRoute
   TransactionsNewRoute: typeof TransactionsNewRoute
   AccountsIndexRoute: typeof AccountsIndexRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
@@ -238,6 +277,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TransactionsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/transactions/$id': {
+      id: '/transactions/$id'
+      path: '/transactions/$id'
+      fullPath: '/transactions/$id'
+      preLoaderRoute: typeof TransactionsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/categories/new': {
       id: '/categories/new'
       path: '/categories/new'
@@ -245,11 +291,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/categories/$id': {
+      id: '/categories/$id'
+      path: '/categories/$id'
+      fullPath: '/categories/$id'
+      preLoaderRoute: typeof CategoriesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/accounts/new': {
       id: '/accounts/new'
       path: '/accounts/new'
       fullPath: '/accounts/new'
       preLoaderRoute: typeof AccountsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accounts/$id': {
+      id: '/accounts/$id'
+      path: '/accounts/$id'
+      fullPath: '/accounts/$id'
+      preLoaderRoute: typeof AccountsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -261,8 +321,11 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   RegisterRoute: RegisterRoute,
   SettingsRoute: SettingsRoute,
+  AccountsIdRoute: AccountsIdRoute,
   AccountsNewRoute: AccountsNewRoute,
+  CategoriesIdRoute: CategoriesIdRoute,
   CategoriesNewRoute: CategoriesNewRoute,
+  TransactionsIdRoute: TransactionsIdRoute,
   TransactionsNewRoute: TransactionsNewRoute,
   AccountsIndexRoute: AccountsIndexRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,

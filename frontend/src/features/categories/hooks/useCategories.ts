@@ -10,6 +10,7 @@ import {
   deleteLocalCategory,
 } from '@/lib/localCrud'
 import type { LocalCategory } from '@/lib/localDb'
+import { enqueueMutation, isOffline } from '@/lib/offlineQueue'
 
 /** Map a LocalCategory to the shape the UI expects (CategoryIndex). */
 function toCategoryIndex(c: LocalCategory): CategoryIndex {
@@ -41,18 +42,25 @@ export function useCreateCategory() {
   const isLocal = mode === 'local'
 
   return useMutation({
-    mutationFn: (data: CreateCategory) =>
-      isLocal
-        ? createLocalCategory({
-            name: data.name,
-            parent_id: data.parent_id,
-            icon_name: data.icon_name,
-            color: data.color,
-            type: data.type as 'expense' | 'income',
-          }).then(toCategoryIndex)
-        : categoriesApi.createMyNewCategoryApiV1CategoriesPost(data).then((r) => r.data),
+    mutationFn: async (data: CreateCategory) => {
+      if (isLocal || (mode === 'online' && isOffline())) {
+        const result = await createLocalCategory({
+          name: data.name,
+          parent_id: data.parent_id,
+          icon_name: data.icon_name,
+          color: data.color,
+          type: data.type as 'expense' | 'income',
+        }).then(toCategoryIndex)
+        if (mode === 'online') {
+          enqueueMutation({ type: 'create-category', data })
+        }
+        return result
+      }
+      return categoriesApi.createMyNewCategoryApiV1CategoriesPost(data).then((r) => r.data)
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.categories.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
     },
   })
 }
@@ -63,20 +71,27 @@ export function useUpdateCategory() {
   const isLocal = mode === 'local'
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateCategory }) =>
-      isLocal
-        ? updateLocalCategory(id, {
-            name: data.name ?? undefined,
-            parent_id: data.parent_id,
-            icon_name: data.icon_name ?? undefined,
-            color: data.color,
-            type: data.type as 'expense' | 'income' | undefined,
-          }).then(toCategoryIndex)
-        : categoriesApi
-            .updateMyCategoryApiV1CategoriesCategoryIdPatch(id, data)
-            .then((r) => r.data),
+    mutationFn: async ({ id, data }: { id: string; data: UpdateCategory }) => {
+      if (isLocal || (mode === 'online' && isOffline())) {
+        const result = await updateLocalCategory(id, {
+          name: data.name ?? undefined,
+          parent_id: data.parent_id,
+          icon_name: data.icon_name ?? undefined,
+          color: data.color,
+          type: data.type as 'expense' | 'income' | undefined,
+        }).then(toCategoryIndex)
+        if (mode === 'online') {
+          enqueueMutation({ type: 'update-category', id, data })
+        }
+        return result
+      }
+      return categoriesApi
+        .updateMyCategoryApiV1CategoriesCategoryIdPatch(id, data)
+        .then((r) => r.data)
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.categories.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
     },
   })
 }
@@ -87,14 +102,22 @@ export function useDeleteCategory() {
   const isLocal = mode === 'local'
 
   return useMutation({
-    mutationFn: (id: string) =>
-      isLocal
-        ? deleteLocalCategory(id)
-        : categoriesApi
-            .deleteMyCategoryApiV1CategoriesCategoryIdDelete(id)
-            .then((r) => r.data),
+    mutationFn: async (id: string) => {
+      if (isLocal || (mode === 'online' && isOffline())) {
+        await deleteLocalCategory(id)
+        if (mode === 'online') {
+          enqueueMutation({ type: 'delete-category', id })
+        }
+        return
+      }
+      return categoriesApi
+        .deleteMyCategoryApiV1CategoriesCategoryIdDelete(id)
+        .then((r) => r.data)
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.categories.all })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all })
     },
   })
 }

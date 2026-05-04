@@ -11,6 +11,7 @@ import {
   deleteLocalAccount,
 } from '@/lib/localCrud'
 import type { LocalAccount } from '@/lib/localDb'
+import { enqueueMutation, isOffline } from '@/lib/offlineQueue'
 
 /** Map a LocalAccount to the shape the UI expects (AccountIndex). */
 function toAccountIndex(a: LocalAccount): AccountIndex {
@@ -57,13 +58,19 @@ export function useCreateAccount() {
   const isLocal = mode === 'local'
 
   return useMutation({
-    mutationFn: (data: CreateAccount) =>
-      isLocal
-        ? createLocalAccount({
-            ...data,
-            balance: data.balance != null ? Number(data.balance) : undefined,
-          }).then(toAccountIndex)
-        : accountsApi.createMyNewAccountApiV1AccountsPost(data).then((r) => r.data),
+    mutationFn: async (data: CreateAccount) => {
+      if (isLocal || (mode === 'online' && isOffline())) {
+        const result = await createLocalAccount({
+          ...data,
+          balance: data.balance != null ? Number(data.balance) : undefined,
+        }).then(toAccountIndex)
+        if (mode === 'online') {
+          enqueueMutation({ type: 'create-account', data })
+        }
+        return result
+      }
+      return accountsApi.createMyNewAccountApiV1AccountsPost(data).then((r) => r.data)
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })
@@ -77,20 +84,26 @@ export function useUpdateAccount() {
   const isLocal = mode === 'local'
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateAccount }) =>
-      isLocal
-        ? updateLocalAccount(id, {
-            name: data.name ?? undefined,
-            balance: data.balance != null ? Number(data.balance) : undefined,
-            currency_code: data.currency_code ?? undefined,
-            icon_name: data.icon_name ?? undefined,
-            color: data.color,
-            include_in_total: data.include_in_total ?? undefined,
-            is_archived: data.is_archived ?? undefined,
-          }).then(toAccountIndex)
-        : accountsApi
-            .updateMyAccountApiV1AccountsAccountIdPatch(id, data)
-            .then((r) => r.data),
+    mutationFn: async ({ id, data }: { id: string; data: UpdateAccount }) => {
+      if (isLocal || (mode === 'online' && isOffline())) {
+        const result = await updateLocalAccount(id, {
+          name: data.name ?? undefined,
+          balance: data.balance != null ? Number(data.balance) : undefined,
+          currency_code: data.currency_code ?? undefined,
+          icon_name: data.icon_name ?? undefined,
+          color: data.color,
+          include_in_total: data.include_in_total ?? undefined,
+          is_archived: data.is_archived ?? undefined,
+        }).then(toAccountIndex)
+        if (mode === 'online') {
+          enqueueMutation({ type: 'update-account', id, data })
+        }
+        return result
+      }
+      return accountsApi
+        .updateMyAccountApiV1AccountsAccountIdPatch(id, data)
+        .then((r) => r.data)
+    },
     // Optimistic update: reflect safe field changes immediately in the cached list
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.accounts.all })
@@ -129,10 +142,16 @@ export function useDeleteAccount() {
   const isLocal = mode === 'local'
 
   return useMutation({
-    mutationFn: (id: string) =>
-      isLocal
-        ? deleteLocalAccount(id)
-        : accountsApi.deleteMyAccountApiV1AccountsAccountIdDelete(id).then((r) => r.data),
+    mutationFn: async (id: string) => {
+      if (isLocal || (mode === 'online' && isOffline())) {
+        await deleteLocalAccount(id)
+        if (mode === 'online') {
+          enqueueMutation({ type: 'delete-account', id })
+        }
+        return
+      }
+      return accountsApi.deleteMyAccountApiV1AccountsAccountIdDelete(id).then((r) => r.data)
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all })
       void queryClient.invalidateQueries({ queryKey: queryKeys.dashboard })

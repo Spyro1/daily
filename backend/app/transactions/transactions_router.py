@@ -194,21 +194,24 @@ async def update_my_transaction(
         logger.warning(f"{log_context}: Transaction not found id={transaction_id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
 
-    if data.amount is not None:
+    # Use model_fields_set so that explicitly-sent null values (e.g. clearing
+    # source_account_id when switching from expense to income) are also applied.
+    provided = data.model_fields_set
+    if 'amount' in provided and data.amount is not None:
         db_transaction.amount = data.amount
-    if data.transaction_type is not None:
+    if 'transaction_type' in provided and data.transaction_type is not None:
         db_transaction.transaction_type = data.transaction_type.value
-    if data.occurred_at is not None:
+    if 'occurred_at' in provided and data.occurred_at is not None:
         db_transaction.occurred_at = data.occurred_at
-    if data.category_id is not None:
+    if 'category_id' in provided:
         db_transaction.category_id = data.category_id
-    if data.source_account_id is not None:
+    if 'source_account_id' in provided:
         db_transaction.source_account_id = data.source_account_id
-    if data.destination_account_id is not None:
+    if 'destination_account_id' in provided:
         db_transaction.destination_account_id = data.destination_account_id
-    if data.target_amount is not None:
+    if 'target_amount' in provided:
         db_transaction.target_amount = data.target_amount
-    if data.note is not None:
+    if 'note' in provided:
         db_transaction.note = data.note
 
     logger.debug(

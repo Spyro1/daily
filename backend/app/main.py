@@ -8,6 +8,7 @@ from alembic import command
 from alembic.config import Config
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from loguru import logger
 from sqlalchemy.exc import OperationalError
 
@@ -67,6 +68,14 @@ app.add_middleware(
 )
 
 
+# ─── Exception handler (ensures CORS headers on 500s) ───────────────
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.exception(f"Unhandled exception on {request.method} {request.url.path}: {exc}")
+    return JSONResponse(status_code=500, content={"detail": "Internal server error"})
+
+
 # ─── Middleware ──────────────────────────────────────────────────────
 
 @app.middleware("http")
@@ -74,8 +83,9 @@ async def request_logging_middleware(request: Request, call_next):
     start = perf_counter()
     response = await call_next(request)
     ms = (perf_counter() - start) * 1000
+    client = f"{request.client.host}:{request.client.port}" if request.client else "-"
     logger.info(
-        f"[http]: {request.client.host}:{request.client.port} "
+        f"[http]: {client} "
         f"{request.method} {request.url.path} -> {response.status_code} ({ms:.2f} ms)"
     )
     return response

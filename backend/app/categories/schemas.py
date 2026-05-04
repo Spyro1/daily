@@ -17,6 +17,9 @@ class CategoryIndex(CategoryBrief):
     color: Optional[str] = None
     type: CategoryType
 
+class CategoryTree(CategoryIndex):
+    children: list["CategoryTree"] = []
+
 class CreateCategory(BaseModel):
     name: str
     parent_id: Optional[uuid.UUID] = None
