@@ -57,6 +57,7 @@ async function readLocalPayload(): Promise<LocalSyncPayload> {
   try {
     db = await openDb(dbName)
   } catch {
+    console.warn(`[syncPush] Unable to open IndexedDB database "${dbName}"`)
     return { accounts: [], categories: [], transactions: [] }
   }
 
