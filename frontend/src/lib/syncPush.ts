@@ -56,8 +56,8 @@ async function readLocalPayload(): Promise<LocalSyncPayload> {
   let db: IDBDatabase
   try {
     db = await openDb(dbName)
-  } catch {
-    console.warn(`[syncPush] Unable to open IndexedDB database "${dbName}"`)
+  } catch (error) {
+    console.warn(`[syncPush] Unable to open IndexedDB database "${dbName}"`, error)
     return { accounts: [], categories: [], transactions: [] }
   }
 
