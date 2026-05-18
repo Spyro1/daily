@@ -91,6 +91,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 
+# Frontend source modules can include a `lib` directory.
+!/frontend/src/lib/
+!/frontend/src/lib/**
+
 # Testing and Coverage
 .tox/
 .nox/
