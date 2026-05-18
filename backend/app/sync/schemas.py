@@ -48,9 +48,9 @@ class SyncPushRequest(BaseModel):
     via Google.  The frontend sends everything from IndexedDB; the backend
     persists it under the authenticated user's id.
     """
-    accounts: list[SyncAccount] = []
-    categories: list[SyncCategory] = []
-    transactions: list[SyncTransaction] = []
+    accounts: list[SyncAccount] = Field(default_factory=list)
+    categories: list[SyncCategory] = Field(default_factory=list)
+    transactions: list[SyncTransaction] = Field(default_factory=list)
 
 
 class SyncPushResponse(BaseModel):
