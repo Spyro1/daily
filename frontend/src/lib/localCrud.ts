@@ -95,11 +95,11 @@ export async function updateLocalCategory(
 
   const next: LocalCategory = {
     ...existing,
-    ...(patch.name != null && { name: patch.name }),
+    ...(patch.name !== undefined && { name: patch.name }),
     ...(patch.parent_id !== undefined && { parent_id: patch.parent_id }),
-    ...(patch.icon_name != null && { icon_name: patch.icon_name }),
+    ...(patch.icon_name !== undefined && { icon_name: patch.icon_name }),
     ...(patch.color !== undefined && { color: patch.color }),
-    ...(patch.type != null && { category_type: patch.type }),
+    ...(patch.type !== undefined && { category_type: patch.type }),
   }
   await localDb.categories.put(next)
   return next
