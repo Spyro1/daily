@@ -26,13 +26,18 @@ async function resolveDbName(): Promise<string | null> {
   if (typeof indexedDB === 'undefined') return null
 
   const idb = indexedDB as IDBFactory & { databases?: () => Promise<DatabaseInfo[]> }
-  if (typeof idb.databases === 'function') {
-    const dbs = await idb.databases()
-    const match = dbs.find((db) => db.name && db.name.toLowerCase().includes('daily'))
-    if (match?.name) return match.name
-  }
+  if (typeof idb.databases !== 'function') return null
 
-  return CANDIDATE_DB_NAMES[0] ?? null
+  const dbs = await idb.databases()
+
+  // Prefer known legacy/current names first, then any DB containing "daily".
+  const known = CANDIDATE_DB_NAMES.find((candidate) => dbs.some((db) => db.name === candidate))
+  if (known) return known
+
+  const match = dbs.find((db) => db.name && db.name.toLowerCase().includes('daily'))
+  if (match?.name) return match.name
+
+  return null
 }
 
 async function readStoreRecords(db: IDBDatabase, storeName: string): Promise<Record<string, unknown>[]> {
@@ -48,7 +53,13 @@ async function readLocalPayload(): Promise<LocalSyncPayload> {
   const dbName = await resolveDbName()
   if (!dbName) return { accounts: [], categories: [], transactions: [] }
 
-  const db = await openDb(dbName)
+  let db: IDBDatabase
+  try {
+    db = await openDb(dbName)
+  } catch {
+    return { accounts: [], categories: [], transactions: [] }
+  }
+
   try {
     const [accounts, categories, transactions] = await Promise.all([
       readStoreRecords(db, 'accounts'),
