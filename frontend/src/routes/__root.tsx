@@ -49,11 +49,11 @@ function RootLayout() {
           position: 'relative',
         }}
       >
-        {import.meta.env.DEV && (
-          <Box sx={{ position: 'absolute', top: 5, right: 5, zIndex: 1 }}>
-            <HealthIcon />
-          </Box>
-        )}
+        {/* {import.meta.env.DEV && ( */}
+          {/* <Box sx={{ position: 'absolute', top: 5, right: 5, zIndex: 1 }}> */}
+            {/* <HealthIcon /> */}
+          {/* </Box> */}
+        {/* )} */}
 
         <AuthGuard>
           <Outlet />

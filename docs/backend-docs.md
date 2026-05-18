@@ -1,6 +1,6 @@
-# Backend Documentation
+﻿# Backend Documentation
 
-> Last updated: 2026-04-05
+Last updated: 2026-05-04
 
 ## Overview
 
@@ -192,169 +192,43 @@ Database-level check constraints enforce the type-to-fields rules (see `ck_trans
 
 ### Flow
 
-1. **Frontend** redirects the user to `GET /api/v1/google/login`.
-2. The backend builds a Google OAuth authorization URL with a signed **state token** (contains `provider`, `flow_type`, short expiry) and redirects the browser to Google.
-3. After the user consents, Google redirects to `GET /api/v1/oauth/callback?code=...&state=...`.
-4. The callback endpoint:
-   - Validates the state token.
-   - Exchanges the authorization code for a Google access token.
-   - Fetches user info (email, name, avatar) from Google.
-   - Finds or creates the internal User + Provider + ProvidedUser records.
-   - Issues **access** and **refresh** tokens as httponly cookies.
-   - Redirects the browser to the frontend's callback page.
-5. The frontend validates the session via `POST /api/v1/oauth/validate`.
+1. **Frontend** redirects the user to `GET /api/v1/google/login`
+- OAuth callback: `GET /api/v1/oauth/callback`
+- Access token validation: `POST /api/v1/oauth/validate`
+- Access token refresh: `POST /api/v1/oauth/refresh`
+- Logout: `POST /api/v1/oauth/logout`
+- Token as string: `GET /api/v1/oauth/token`
 
-### JWT Structure
+Session principal is `user_id` from JWT payload.
 
-Tokens carry the following payload:
+## API Surface
 
-```json
-{
-  "user_id": "uuid-string",
-  "email": "user@example.com",
-  "auth_method": "google",
-  "token_type": "access_token",
-  "iat": 1712345678,
-  "exp": 1712349278,
-  "iss": "https://github.io.spyro1/daily"
-}
-```
+- Dashboard: `GET /api/v1/dashboard`
+- Accounts: list/get/create/update/delete under `/api/v1/accounts`
+- Categories: list/tree/get/create/update/delete under `/api/v1/categories`
+- Transactions: list/get/create/update/delete under `/api/v1/transactions`
+- Sync push: `POST /api/v1/sync/push`
 
-- **`user_id`** is the primary principal (internal UUID), not the Google `sub`.
-- Access tokens expire in the configured minutes; refresh tokens in days.
-- Cookies use `secure=true` in production, `samesite=lax`, `httponly=true`.
+## Data Integrity Highlights
 
-### Key Endpoints
+- Soft delete (`deleted_at`) on core entities
+- Check constraints for transaction type integrity
+- Currency format and color format checks
+- Partial unique indexes for active records
+- Computed account balance from transactions (`column_property`)
 
-| Method | Path                    | Auth     | Description                       |
-|--------|-------------------------|----------|-----------------------------------|
-| GET    | /api/v1/google/login    | Public   | Initiates Google OAuth redirect   |
-| GET    | /api/v1/oauth/callback  | Public   | OAuth callback (code exchange)    |
-| POST   | /api/v1/oauth/validate  | Cookie   | Validates access token            |
-| POST   | /api/v1/oauth/refresh   | Cookie   | Exchanges refresh for new access  |
-| POST   | /api/v1/oauth/logout    | Public   | Clears auth cookies               |
-| GET    | /api/v1/oauth/token     | Cookie   | Returns access token as string    |
+## Tests
 
-### Dependencies
+Main test modules:
+- `app/test_main.py`
+- `app/auth/google/test_google_router.py`
+- `app/accounts/test_accounts_router.py`
+- `app/categories/test_categories_router.py`
+- `app/transactions/test_transactions_router.py`
+- `app/dashboard/test_dashboard_router.py`
+- `app/sync/test_sync_push.py`
 
-- **`get_current_user`**: FastAPI dependency that reads the `access_token` cookie, decodes it, looks up the user by `user_id`, and returns the `Users` ORM instance. Used by all protected endpoints.
-- **`get_optional_current_user`**: Same but returns `None` instead of raising 401. Available for future use.
+## Known Gaps
 
----
-
-## Sync Push
-
-The **sync push** endpoint enables the frontend to upload locally-stored data (from IndexedDB) to the backend after the user signs in with Google.
-
-### Endpoint
-
-`POST /api/v1/sync/push` — requires authentication.
-
-### Request Body
-
-```json
-{
-  "accounts": [
-    { "id": "uuid", "name": "Wallet", "currency_code": "EUR", "icon_name": "Savings", "color": "#FF5733", "include_in_total": true, "is_archived": false }
-  ],
-  "categories": [
-    { "id": "uuid", "parent_id": null, "name": "Food", "category_type": "expense", "icon_name": "Savings", "color": "#33FF57" }
-  ],
-  "transactions": [
-    { "id": "uuid", "source_account_id": "uuid", "category_id": "uuid", "transaction_type": "expense", "amount": 100.00, "occurred_at": "2026-04-01T12:00:00Z", "note": "Lunch" }
-  ]
-}
-```
-
-### Behavior
-
-- Insertion order: accounts → categories (parents first) → transactions (FK dependencies).
-- **Idempotent**: rows whose `id` already exists under this user are silently skipped.
-- All rows are assigned the authenticated user's `user_id`.
-- Returns counts of created rows.
-
-### Response
-
-```json
-{
-  "accounts_created": 2,
-  "categories_created": 5,
-  "transactions_created": 12,
-  "message": "Sync push completed"
-}
-```
-
----
-
-## API Routes Summary
-
-All routes are prefixed with `/api/v1/`.
-
-| Prefix          | Module                      | Auth Required | Description                   |
-|-----------------|-----------------------------|---------------|-------------------------------|
-| /google         | google_router               | No            | Google OAuth login redirect   |
-| /oauth          | oauth_router                | Mixed         | Token management & callback   |
-| /sync           | sync_router                 | Yes           | One-time local data push      |
-| /dashboard      | dashboard_router            | Yes           | Dashboard summary             |
-| /accounts       | accounts_router             | Yes           | Account CRUD                  |
-| /categories     | categories_router           | Yes           | Category CRUD                 |
-| /transactions   | transactions_router         | Yes           | Transaction CRUD              |
-
----
-
-## Configuration
-
-All configuration is loaded via **pydantic-settings** from environment variables (with `.env` file support).
-
-| Prefix        | Class        | Key Variables                                          |
-|---------------|--------------|--------------------------------------------------------|
-| (none)        | AppConfig    | `LOG_LEVEL`, `ENVIRONMENT` (development/production)    |
-| `DB_`         | Database     | `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME` |
-| `JWT_`        | JWT          | `JWT_SECRET_KEY`, `JWT_ALGORITHM`, `JWT_ACCESS_TOKEN_EXPIRE_MINUTES`, `JWT_REFRESH_TOKEN_EXPIRE_DAYS`, `JWT_LOGIN_TOKEN_EXPIRE_MINUTES` |
-| `GOOGLE_`     | Google       | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `GOOGLE_TOKEN_URL`, `GOOGLE_USERINFO_URL` |
-| `FRONTEND_`   | Frontend     | `FRONTEND_AUTH_CALLBACK`, `FRONTEND_CORS_ORIGINS`      |
-
----
-
-## Testing
-
-Tests use **pytest** with a dedicated test database that is created and destroyed per session.
-
-```bash
-cd backend
-pytest
-```
-
-### Test Infrastructure
-
-- `conftest.py` creates a test PostgreSQL database, applies all migrations via `Base.metadata.create_all`, and provides:
-  - `test_user` fixture — a pre-seeded user record.
-  - `client` fixture — a `TestClient` with overridden `get_db` and `get_current_user` dependencies.
-  - `seed_account`, `seed_category`, `seed_transaction` fixtures for domain data.
-
-### Test Files
-
-| File                        | Covers                                 |
-|-----------------------------|----------------------------------------|
-| test_main.py                | Health check, root endpoint            |
-| test_oauth_router.py        | Logout, validate, refresh, callback    |
-| test_local_auth.py          | JWT user_id auth, token validation     |
-| test_accounts_router.py     | Account CRUD endpoints                 |
-| test_categories_router.py   | Category CRUD endpoints                |
-| test_transactions_router.py | Transaction CRUD endpoints             |
-| test_dashboard_router.py    | Dashboard summary endpoint             |
-| test_sync_push.py           | Sync push endpoint (idempotency, etc.) |
-
----
-
-## Running
-
-```bash
-cd backend
-pip install -r requirements.txt
-
-# Set up .env with DB, JWT, Google, Frontend vars
-uvicorn app.main:app --reload --port 8000
-```
-
-Alembic migrations run automatically on startup. The app will attempt to create the database if it doesn't exist.
+- Account opening-balance transaction automation is still TODO
+- Dedicated balance-adjustment transaction flow is still TODO
