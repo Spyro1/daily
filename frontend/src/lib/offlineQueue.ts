@@ -1,20 +1,11 @@
-type OfflineMutationType =
-  | 'create-account'
-  | 'update-account'
-  | 'delete-account'
-  | 'create-category'
-  | 'update-category'
-  | 'delete-category'
-  | 'create-transaction'
-  | 'update-transaction'
-  | 'delete-transaction'
+type CreateMutationType = 'create-account' | 'create-category' | 'create-transaction'
+type UpdateMutationType = 'update-account' | 'update-category' | 'update-transaction'
+type DeleteMutationType = 'delete-account' | 'delete-category' | 'delete-transaction'
 
-type OfflineMutation = {
-  type: OfflineMutationType
-  id?: string
-  data?: unknown
-  queuedAt: string
-}
+type OfflineMutation =
+  | { type: CreateMutationType; data: unknown; queuedAt: string }
+  | { type: UpdateMutationType; id: string; data: unknown; queuedAt: string }
+  | { type: DeleteMutationType; id: string; queuedAt: string }
 
 const STORAGE_KEY = 'daily.offline.mutations'
 
@@ -59,7 +50,6 @@ export function setupOfflineSync(onSynced: (count: number) => void) {
     if (isOffline()) return
     const queue = readQueue()
     if (queue.length === 0) return
-    writeQueue([])
     onSynced(queue.length)
   }
 
