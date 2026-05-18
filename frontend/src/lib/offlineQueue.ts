@@ -2,7 +2,7 @@ type CreateMutationType = 'create-account' | 'create-category' | 'create-transac
 type UpdateMutationType = 'update-account' | 'update-category' | 'update-transaction'
 type DeleteMutationType = 'delete-account' | 'delete-category' | 'delete-transaction'
 
-type OfflineMutation =
+export type OfflineMutation =
   | { type: CreateMutationType; data: unknown; queuedAt: string }
   | { type: UpdateMutationType; id: string; data: unknown; queuedAt: string }
   | { type: DeleteMutationType; id: string; queuedAt: string }
@@ -43,20 +43,27 @@ export function enqueueMutation(mutation: Omit<OfflineMutation, 'queuedAt'>) {
   writeQueue(queue)
 }
 
-export function setupOfflineSync(onSynced: (count: number) => void) {
+export function setupOfflineSync(onSync: (queue: OfflineMutation[]) => boolean | Promise<boolean>) {
   if (typeof window === 'undefined') return () => {}
 
-  const flush = () => {
+  const flush = async () => {
     if (isOffline()) return
     const queue = readQueue()
     if (queue.length === 0) return
-    onSynced(queue.length)
+    const synced = await onSync(queue)
+    if (synced) {
+      writeQueue([])
+    }
   }
 
-  window.addEventListener('online', flush)
-  flush()
+  const handleOnline = () => {
+    void flush()
+  }
+
+  window.addEventListener('online', handleOnline)
+  void flush()
 
   return () => {
-    window.removeEventListener('online', flush)
+    window.removeEventListener('online', handleOnline)
   }
 }

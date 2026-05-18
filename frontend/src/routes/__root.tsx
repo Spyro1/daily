@@ -29,9 +29,11 @@ function RootLayout() {
 
   // Replay queued offline mutations when back online
   useEffect(() => {
-    return setupOfflineSync((count) => {
-      notificationService.notify(`Synced ${count} offline change${count > 1 ? 's' : ''}.`, 'success')
+    return setupOfflineSync((queue) => {
+      const count = queue.length
+      notificationService.notify(`${count} offline change${count > 1 ? 's' : ''} still queued.`, 'info')
       void queryClient.invalidateQueries()
+      return false
     })
   }, [])
 
