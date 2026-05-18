@@ -1,7 +1,10 @@
-# This file was originally written by Kardos Bendeguz who gave permission to use this code. Modified by Szenes Marton.
-from datetime import datetime
-from typing import Any, Dict, Optional
+"""
+OAuth router — token validation, refresh, logout, and the OAuth callback
+that exchanges provider authorization codes for JWT cookie sessions.
+"""
+
 import uuid
+from typing import Any, Optional
 
 import httpx
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
@@ -10,30 +13,64 @@ from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.jwt_utils import create_access_token, create_refresh_token, decode_token, get_current_user
-from app.auth.models import ResponseMessage, TokenData, TokenType
-from app.core.config import frontend_config, google_config, jwt_config
-from app.users.models import UserCreate, ProviderCreate, ProvidedUserCreate
-from app.users.services import get_or_create_provided_user, get_provided_user_by_sub
-from db.models import Users
+from app.auth.schema import AuthMethod, ResponseMessage, TokenData, TokenType
+from app.core.config import app_configs, frontend_config, google_config, jwt_config
+from app.users.schemas import ProviderCreate, ProvidedUserCreate, UserCreate
+from app.users.service import get_or_create_provided_user, get_user_by_id
 from db.core import get_db
+from db.models import Users
 
 router = APIRouter()
 
 ACCESS_TOKEN_EXPIRE_MINUTES = jwt_config.access_token_expire_minutes
 REFRESH_TOKEN_EXPIRE_DAYS = jwt_config.refresh_token_expire_days
 
-PROVIDER_CONFIGS: Dict[str, Any] = {
-    "google": google_config,
+PROVIDER_CONFIGS: dict[str, Any] = {
+    AuthMethod.GOOGLE.value: google_config,
 }
 
 
 def _cookie_options() -> dict[str, Any]:
+    is_production = app_configs.environment == "production"
     return {
         "httponly": True,
-        "secure": False, # Set to True if your app is served over HTTPS in production
+        "secure": is_production,
         "samesite": "lax",
         "path": "/",
     }
+
+
+def _build_token_data(user: Users, auth_method: str = AuthMethod.GOOGLE.value) -> TokenData:
+    """Build a TokenData from internal user record."""
+    return TokenData(
+        user_id=str(user.id),
+        email=user.email,
+        auth_method=auth_method,
+    )
+
+
+def _set_auth_cookies(response, token_data: TokenData) -> None:
+    """Create access + refresh tokens and set them as cookies on the response."""
+    payload = token_data.model_dump()
+    access_token = create_access_token(payload=payload)
+    refresh_token = create_refresh_token(payload=payload)
+
+    cookie_options = _cookie_options()
+    response.set_cookie(
+        key=TokenType.ACCESS_TOKEN.value,
+        value=access_token,
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        **cookie_options,
+    )
+    response.set_cookie(
+        key=TokenType.REFRESH_TOKEN.value,
+        value=refresh_token,
+        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+        **cookie_options,
+    )
+
+
+# ─── Logout ─────────────────────────────────────────────────────────
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
@@ -44,36 +81,42 @@ async def logout(response: Response):
     response.delete_cookie(key=TokenType.REFRESH_TOKEN.value, **cookie_options)
 
 
+# ─── Validate ───────────────────────────────────────────────────────
+
+
 @router.post("/validate", response_model=ResponseMessage)
 async def validate_access_token(
-    response: Response,
     access_token: Optional[str] = Cookie(None),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     request_id = str(uuid.uuid4())[:8]
-
     logger.info(f"[{request_id}][oauth/validate]: Validating access token")
 
     if not access_token:
         logger.warning(f"[{request_id}][oauth/validate]: Missing access token cookie")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token not found")
-    
+
     try:
         data = decode_token(access_token)
-        logger.debug(f"[{request_id}][oauth/validate]: Access token decoded for sub={data.get('sub')}")
-        logger.debug(f"[{request_id}][oauth/validate]: Access token payload: {data}")
+        logger.debug(f"[{request_id}][oauth/validate]: Access token decoded for user_id={data.get('user_id')}")
     except Exception:
         logger.exception(f"[{request_id}][oauth/validate]: Failed to decode access token")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired access token")
-    
-    provided_user = await get_provided_user_by_sub(db, data["sub"])
-    
-    if not provided_user:
-        logger.warning(f"[{request_id}][oauth/validate]: No provided user found for sub={data.get('sub')}")
+
+    user_id_str = data.get("user_id")
+    if not user_id_str:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+
+    user = await get_user_by_id(db, uuid.UUID(user_id_str))
+    if not user:
+        logger.warning(f"[{request_id}][oauth/validate]: No user found for user_id={user_id_str}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    
-    logger.info(f"[{request_id}][oauth/validate]: Access token is valid for user sub={data.get('sub')}")
+
+    logger.info(f"[{request_id}][oauth/validate]: Access token is valid for user_id={user_id_str}")
     return ResponseMessage(message="Access token is valid")
+
+
+# ─── Refresh ────────────────────────────────────────────────────────
 
 
 @router.post("/refresh", response_model=ResponseMessage)
@@ -83,10 +126,10 @@ async def refresh_access_token(
     db: AsyncSession = Depends(get_db),
 ):
     request_id = str(uuid.uuid4())[:8]
-    logger.info(f"[{request_id}][oauth/token]: Refresh token exchange started")
+    logger.info(f"[{request_id}][oauth/refresh]: Refresh token exchange started")
 
     if not refresh_token:
-        logger.warning(f"[{request_id}][oauth/token]: Missing refresh token cookie")
+        logger.warning(f"[{request_id}][oauth/refresh]: Missing refresh token cookie")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Refresh token not found",
@@ -95,30 +138,26 @@ async def refresh_access_token(
 
     try:
         data = decode_token(refresh_token)
-        logger.debug(f"[{request_id}][oauth/token]: Refresh token decoded for sub={data.get('sub')}")
-        logger.debug(f"[{request_id}][oauth/token]: Refresh token payload: {data}")
+        logger.debug(f"[{request_id}][oauth/refresh]: Refresh token decoded for user_id={data.get('user_id')}")
     except Exception:
-        logger.exception(f"[{request_id}][oauth/token]: Failed to decode refresh token")
+        logger.exception(f"[{request_id}][oauth/refresh]: Failed to decode refresh token")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired refresh token",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    provided_user = await get_provided_user_by_sub(db, data["sub"])
-    if not provided_user:
-        logger.warning(f"[{request_id}][oauth/token]: No provided user found for sub={data.get('sub')}")
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
+    user_id_str = data.get("user_id")
+    if not user_id_str:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
 
-    payload = TokenData(
-        sub= data["sub"], 
-        email= data["email"]
-    )
+    user = await get_user_by_id(db, uuid.UUID(user_id_str))
+    if not user:
+        logger.warning(f"[{request_id}][oauth/refresh]: No user found for user_id={user_id_str}")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    new_access = create_access_token(dict(payload))
+    token_data = _build_token_data(user, auth_method=data.get("auth_method", AuthMethod.GOOGLE.value))
+    new_access = create_access_token(token_data.model_dump())
     cookie_options = _cookie_options()
 
     response.set_cookie(
@@ -127,8 +166,11 @@ async def refresh_access_token(
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         **cookie_options,
     )
-    logger.info(f"[{request_id}][oauth/token]: Access token refreshed successfully")
+    logger.info(f"[{request_id}][oauth/refresh]: Access token refreshed successfully")
     return ResponseMessage(message="Access token refreshed successfully")
+
+
+# ─── Token as string (for API clients) ─────────────────────────────
 
 
 @router.get("/token", response_model=str)
@@ -138,17 +180,17 @@ async def get_access_token_string(
 ) -> str:
     logger.info(f"[oauth/token]: Generating access token string for user_id={current_user.id}")
     try:
-        original_payload = decode_token(access_token)  # already validated by get_current_user
-        data = TokenData(
-            email=current_user.email,
-            sub=original_payload["sub"],
-        )
-        new_access_token = create_access_token(payload=data.model_dump())
+        token_data = _build_token_data(current_user, auth_method=AuthMethod.GOOGLE.value)
+        new_access_token = create_access_token(payload=token_data.model_dump())
     except Exception as exc:
         logger.exception(f"[oauth/token]: Failed to create access token for user_id={current_user.id}: {exc}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create access token")
 
     return new_access_token
+
+
+# ─── OAuth Callback ────────────────────────────────────────────────
+
 
 @router.get("/callback")
 async def oauth_callback(
@@ -157,6 +199,15 @@ async def oauth_callback(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
+    """
+    OAuth callback handler.
+    After the user authenticates with a provider (e.g. Google), the provider
+    redirects here. We exchange the code for user info, find-or-create the
+    backend user, and issue JWT cookies.
+
+    Local user data (if any) lives in the frontend's IndexedDB. After this
+    callback the frontend can push that data via POST /sync/push.
+    """
     request_id = str(uuid.uuid4())[:8]
     logger.info(f"[{request_id}][oauth/callback]: Started callback handling")
 
@@ -166,16 +217,15 @@ async def oauth_callback(
         logger.exception(f"[{request_id}][oauth/callback]: Invalid state token")
         raise HTTPException(status_code=400, detail="Invalid or expired state token")
 
-    issued_at = state_data["iat"]
     provider = state_data["provider"]
-    logger.info(f"[{request_id}][oauth/callback]: OAuth state generated at {datetime.fromtimestamp(issued_at)}")
-    logger.info(f"[{request_id}][oauth/callback]: OAuth provider={provider}")
+    logger.info(f"[{request_id}][oauth/callback]: Provider={provider}, state issued at iat={state_data['iat']}")
 
     config = PROVIDER_CONFIGS.get(provider)
     if not config:
         logger.error(f"[{request_id}][oauth/callback]: Provider config missing for provider={provider}")
         raise HTTPException(status_code=404, detail="Provider not found")
 
+    # Exchange authorization code for tokens
     token_payload = {
         "grant_type": "authorization_code",
         "code": code,
@@ -199,19 +249,18 @@ async def oauth_callback(
 
         token_json = token_response.json()
         logger.debug(f"[{request_id}][oauth/callback]: Token response keys={list(token_json.keys())}")
-        logger.debug(f"[{request_id}][oauth/callback]: Token response payload: {token_json}")
 
         if "error" in token_json:
             logger.error(f"[{request_id}][oauth/callback]: OAuth token error payload={token_json}")
             error_msg = token_json.get("error_description", token_json.get("error", "Unknown OAuth error"))
             raise HTTPException(status_code=400, detail=f"OAuth token exchange failed: {error_msg}")
 
-        access_token = token_json[TokenType.ACCESS_TOKEN.value]
+        oauth_access_token = token_json[TokenType.ACCESS_TOKEN.value]
         logger.debug(f"[{request_id}][oauth/callback]: Access token acquired")
 
         userinfo_headers = {
             "Accept": "application/json",
-            "Authorization": f"Bearer {access_token}",
+            "Authorization": f"Bearer {oauth_access_token}",
         }
         logger.info(f"[{request_id}][oauth/callback]: Fetching userinfo from {config.userinfo_url}")
         try:
@@ -247,30 +296,30 @@ async def oauth_callback(
         logger.error(f"[{request_id}][oauth/callback]: Email missing from userinfo payload")
         raise HTTPException(status_code=400, detail="Email is required from OAuth provider")
 
-    data = TokenData(sub=provider_user_id, email=email)
-
+    # Find-or-create backend user + provider mapping
     to_db_provided_user = ProvidedUserCreate(provider_user_id=provider_user_id)
     to_db_user = UserCreate(name=display_name, email=email)
     to_db_provider = ProviderCreate(name=provider)
 
     try:
         logger.info(f"[{request_id}][oauth/callback]: Persisting oauth user sub={provider_user_id} email={email}")
-        await get_or_create_provided_user(
+        provided_user = await get_or_create_provided_user(
             db=db,
             provider=to_db_provider,
             user=to_db_user,
             provided_user=to_db_provided_user,
             avatar_url=avatar_url,
         )
-        logger.info(f"[{request_id}][oauth/callback]: OAuth user persisted successfully")
+        db_user = provided_user.user
+        if not db_user:
+            db_user = await get_user_by_id(db, provided_user.user_id)
+
+        logger.info(f"[{request_id}][oauth/callback]: OAuth user persisted successfully user_id={provided_user.user_id}")
     except Exception as exc:
         logger.exception(f"[{request_id}][oauth/callback]: Failed to persist oauth user: {exc}")
         raise HTTPException(status_code=500, detail="Failed to save oauth user to the database")
 
-    access_token = create_access_token(payload=dict(data))
-    refresh_token = create_refresh_token(payload=dict(data))
-
-    logger.info(f"[{request_id}][oauth/callback]: Tokens created successfully: access_token: {access_token}, refresh_token: {refresh_token}")
+    token_data = _build_token_data(db_user, auth_method=provider)
 
     redirect_route = frontend_config.auth_callback
     if not redirect_route:
@@ -278,19 +327,7 @@ async def oauth_callback(
         raise HTTPException(status_code=500, detail="Redirect route incorrect! Contact the site administrator.")
 
     redirect_response = RedirectResponse(url=redirect_route, status_code=302)
-    cookie_options = _cookie_options()
-    redirect_response.set_cookie(
-        key=TokenType.ACCESS_TOKEN.value,
-        value=access_token,
-        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        **cookie_options,
-    )
-    redirect_response.set_cookie(
-        key=TokenType.REFRESH_TOKEN.value,
-        value=refresh_token,
-        max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
-        **cookie_options,
-    )
+    _set_auth_cookies(redirect_response, token_data)
 
     logger.debug(f"[{request_id}][oauth/callback]: Redirecting to frontend callback: {redirect_route}")
     return redirect_response

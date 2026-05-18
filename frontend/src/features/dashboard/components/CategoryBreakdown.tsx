@@ -1,8 +1,10 @@
 import { Box, LinearProgress, Paper, Skeleton, Stack, Typography } from '@mui/material'
 import type { TransactionBrief } from '@/api/generated'
+import { formatCurrency } from '@/shared/utils/currency'
 
 interface Props {
   transactions: TransactionBrief[]
+  currencyCode: string
   isLoading: boolean
 }
 
@@ -44,13 +46,13 @@ function deriveCategories(
   return { items, total }
 }
 
-export function CategoryBreakdown({ transactions, isLoading }: Props) {
+export function CategoryBreakdown({ transactions, currencyCode, isLoading }: Props) {
   const { items } = deriveCategories(transactions)
 
   return (
     <Paper elevation={2} sx={{ p: 2.5, borderRadius: 2 }}>
       <Typography variant="h6" gutterBottom>
-        Top Spending Categories
+        Categories
       </Typography>
 
       {isLoading ? (
@@ -75,7 +77,7 @@ export function CategoryBreakdown({ transactions, isLoading }: Props) {
                   {cat.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  ${cat.total.toFixed(0)} &middot; {cat.percentage.toFixed(1)}%
+                  {formatCurrency(cat.total, currencyCode, { maximumFractionDigits: 0 })} &middot; {cat.percentage.toFixed(1)}%
                 </Typography>
               </Stack>
               <LinearProgress

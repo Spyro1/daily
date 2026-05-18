@@ -1,4 +1,5 @@
 import type { InternalAxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { apiClient } from './clients'
 import { authOauthApi } from './authClient'
 import { notificationService } from './notificationService'
@@ -61,7 +62,12 @@ export function initResponseHandler(onUnauthenticated: () => void) {
 
   apiClient.interceptors.response.use(
     (response) => response,
-    async (error: { config: RetryConfig; response?: { status: number } }) => {
+    async (error: { config: RetryConfig; response?: { status: number }; code?: string; message?: string }) => {
+      // Ignore intentionally canceled requests (route changes / query invalidations).
+      if (axios.isAxiosError(error) && (error.code === 'ERR_CANCELED' || error.message === 'canceled')) {
+        return Promise.reject(error)
+      }
+
       const status = error.response?.status ?? 0
       const config = error.config
 

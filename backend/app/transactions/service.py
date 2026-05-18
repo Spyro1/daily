@@ -1,16 +1,18 @@
 import uuid
 from datetime import datetime, timezone
+from decimal import Decimal
+from typing import Optional
 from loguru import logger
 
-from sqlalchemy import select
+from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 
 from db.models import Transactions
-from app.transactions.models import TransactionBrief, TransactionIndex
-from app.categories.services import fill_category_brief
-from app.accounts.services import fill_account_brief
+from app.transactions.schemas import TransactionBrief, TransactionIndex, TransactionType
+from app.categories.service import fill_category_brief
+from app.accounts.service import fill_account_brief
 
 
 def _get_transaction_eager_options():
@@ -40,6 +42,79 @@ async def get_transactions_for_user(db: AsyncSession, user_id: uuid.UUID, eager:
 
     logger.debug(f"[get_transactions_for_user]: Returning {len(transactions)} transactions for user {user_id}")
     return transactions
+
+
+async def get_transactions_for_user_filtered(
+    db: AsyncSession,
+    user_id: uuid.UUID,
+    date_from: Optional[datetime] = None,
+    date_to: Optional[datetime] = None,
+    category_id: Optional[uuid.UUID] = None,
+    account_id: Optional[uuid.UUID] = None,
+    transaction_type: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 100,
+    eager: bool = True,
+) -> tuple[list[Transactions], int]:
+    """
+    Fetch transactions with optional filters and pagination.
+    Returns a tuple of (transactions, total_count) for pagination support.
+    """
+    filters = [
+        Transactions.user_id == user_id,
+        Transactions.deleted_at.is_(None),
+    ]
+
+    if date_from:
+        filters.append(Transactions.occurred_at >= date_from)
+    if date_to:
+        filters.append(Transactions.occurred_at <= date_to)
+    if category_id:
+        filters.append(Transactions.category_id == category_id)
+    if transaction_type:
+        filters.append(Transactions.transaction_type == transaction_type)
+    if account_id:
+        # Match either source or destination account
+        filters.append(
+            or_(
+                Transactions.source_account_id == account_id,
+                Transactions.destination_account_id == account_id,
+            )
+        )
+
+    # Get total count before pagination
+    count_statement = select(Transactions).where(and_(*filters))
+    try:
+        count_result = await db.scalars(count_statement)
+        total_count = len(count_result.all())
+    except Exception as exc:
+        logger.exception(f"[get_transactions_for_user_filtered]: Error counting transactions for user {user_id}: {exc}")
+        raise
+
+    # Get paginated results
+    statement = (
+        select(Transactions)
+        .where(and_(*filters))
+        .order_by(Transactions.occurred_at.desc())
+        .offset(skip)
+        .limit(limit)
+    )
+
+    if eager:
+        statement = statement.options(*_get_transaction_eager_options())
+
+    try:
+        result = await db.scalars(statement)
+        transactions = result.all()
+    except Exception as exc:
+        logger.exception(f"[get_transactions_for_user_filtered]: Error fetching filtered transactions for user {user_id}: {exc}")
+        raise
+
+    logger.debug(
+        f"[get_transactions_for_user_filtered]: Returning {len(transactions)} of {total_count} transactions "
+        f"(skip={skip}, limit={limit}) for user {user_id}"
+    )
+    return transactions, total_count
 
 
 async def get_transaction_for_user_by_id(db: AsyncSession, user_id: uuid.UUID, transaction_id: uuid.UUID, eager: bool = False) -> Transactions | None:
@@ -132,14 +207,24 @@ def fill_transaction_brief(transaction: Transactions) -> TransactionBrief:
 
 
 def fill_transaction_index(transaction: Transactions) -> TransactionIndex:
+    # Normalize source and destination accounts to avoid nulls in the response. If both are null, use a fallback "Unknown account". If one is null, use the other as both source and destination (this can happen for expenses and incomes where only one account is involved).
+    source = fill_account_brief(transaction.source_account) if transaction.source_account else None
+    destination = fill_account_brief(transaction.destination_account) if transaction.destination_account else None
+
+    if source is None and destination is None:
+        logger.exception(
+            f"Transaction id={transaction.id} has no source or destination account. Using fallback account for both. This should not happen for transfer transactions. user_id={transaction.user_id}"
+        )
+        raise RuntimeError(f"Transaction id={transaction.id} has no source or destination account")
+
     return TransactionIndex(
         id=transaction.id,
         amount=transaction.amount,
         transaction_type=transaction.transaction_type,
         category=fill_category_brief(transaction.category),
         occurred_at=transaction.occurred_at,
-        source_account=fill_account_brief(transaction.source_account) if transaction.source_account else None,
-        destination_account=fill_account_brief(transaction.destination_account) if transaction.destination_account else None,
+        source_account=source,
+        destination_account=destination,
         target_amount=transaction.target_amount,
         note=transaction.note,
     )

@@ -1,11 +1,18 @@
 import {
+    BusinessCenterRounded,
+    CardGiftcardRounded,
     CategoryRounded,
+    DirectionsCarRounded,
     FastfoodRounded,
     HomeRounded,
+    LaptopRounded,
     LocalAtmRounded,
+    LocalHospitalRounded,
+    MovieRounded,
     ReceiptLongRounded,
     SellRounded,
     ShoppingBagRounded,
+    TrendingUpRounded,
     WorkRounded,
 } from '@mui/icons-material'
 import { alpha } from '@mui/material/styles'
@@ -35,16 +42,32 @@ import { useNotify } from '#/shared/providers/SnackbarProvider'
 import { buildCategoryTreeOptions } from './categoryTree'
 import { useCategories, useCreateCategory } from './hooks/useCategories'
 
-const CATEGORY_ICONS = [
+const EXPENSE_ICONS = [
     { value: 'general', label: 'General', Icon: CategoryRounded },
     { value: 'food', label: 'Food', Icon: FastfoodRounded },
     { value: 'shopping', label: 'Shopping', Icon: ShoppingBagRounded },
     { value: 'home', label: 'Home', Icon: HomeRounded },
-    { value: 'salary', label: 'Salary', Icon: WorkRounded },
     { value: 'bills', label: 'Bills', Icon: ReceiptLongRounded },
+    { value: 'transport', label: 'Transport', Icon: DirectionsCarRounded },
+    { value: 'health', label: 'Health', Icon: LocalHospitalRounded },
+    { value: 'fun', label: 'Fun', Icon: MovieRounded },
+] as const
+
+const INCOME_ICONS = [
+    { value: 'salary', label: 'Salary', Icon: WorkRounded },
+    { value: 'freelance', label: 'Freelance', Icon: LaptopRounded },
+    { value: 'business', label: 'Business', Icon: BusinessCenterRounded },
+    { value: 'investment', label: 'Invest', Icon: TrendingUpRounded },
+    { value: 'gift', label: 'Gift', Icon: CardGiftcardRounded },
     { value: 'cash', label: 'Cash', Icon: LocalAtmRounded },
     { value: 'sale', label: 'Sale', Icon: SellRounded },
+    { value: 'other', label: 'Other', Icon: CategoryRounded },
 ] as const
+
+const ICONS_BY_TYPE = {
+    [CategoryType.Expense]: EXPENSE_ICONS,
+    [CategoryType.Income]: INCOME_ICONS,
+} as const
 
 function toParentId(value: string): CreateCategory['parent_id'] {
     return value ? value : null
@@ -56,12 +79,13 @@ export function CreateCategoryPage() {
     const [name, setName] = useState('')
     const [type, setType] = useState<CategoryType>(CategoryType.Expense)
     const [parentId, setParentId] = useState('')
-    const [icon, setIcon] = useState<(typeof CATEGORY_ICONS)[number]['value']>('general')
+    const [icon, setIcon] = useState<string>('general')
     const [color, setColor] = useState('#ef5350')
     const { data: categories } = useCategories()
     const { mutate: createCategory, isPending } = useCreateCategory()
     const parentOptions = buildCategoryTreeOptions(categories, type)
     const selectedParent = parentOptions.find((option) => option.id === parentId)
+    const activeIcons = ICONS_BY_TYPE[type]
 
     useEffect(() => {
         if (!parentId) {
@@ -77,6 +101,14 @@ export function CreateCategoryPage() {
 
     useEffect(() => {
         setColor(type === CategoryType.Expense ? '#ef5350' : '#66bb6a')
+    }, [type])
+
+    useEffect(() => {
+        const validValues = ICONS_BY_TYPE[type].map((i) => i.value) as string[]
+        if (!validValues.includes(icon)) {
+            setIcon(ICONS_BY_TYPE[type][0].value)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [type])
 
     const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -184,7 +216,7 @@ export function CreateCategoryPage() {
                                     gap: 1.25,
                                 }}
                             >
-                                {CATEGORY_ICONS.map(({ value, label, Icon }) => {
+                                {activeIcons.map(({ value, label, Icon }) => {
                                     const selected = icon === value
 
                                     return (

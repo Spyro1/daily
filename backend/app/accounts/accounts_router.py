@@ -7,7 +7,7 @@ from db.core import get_db
 from app.auth.jwt_utils import get_current_user
 from db.models import Accounts, Users
 
-from app.accounts.services import (
+from app.accounts.service import (
     create_account,
     update_account,
     delete_account,
@@ -15,7 +15,7 @@ from app.accounts.services import (
     get_account_for_user_by_id,
     get_accounts_for_user,
 )
-from app.accounts.models import AccountIndex, CreateAccount, UpdateAccount
+from app.accounts.schemas import AccountIndex, CreateAccount, UpdateAccount
 
 router = APIRouter()
 
@@ -83,7 +83,7 @@ async def create_my_new_account(
     data: CreateAccount,
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
-)-> AccountIndex:
+) -> None:
     log_context = _log_context(current_user, "create_my_new_account")
     logger.info(f"{log_context}: Creating new user account")
     logger.debug(f"{log_context}: Payload={_payload_for_log(data)} user_id={current_user.id}")
@@ -169,7 +169,7 @@ async def delete_my_account(
     account_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
-):
+) -> None:
     log_context = _log_context(current_user, "delete_my_account")
     logger.info(f"{log_context}: Deleting user account id={account_id}")
 
@@ -190,3 +190,4 @@ async def delete_my_account(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error deleting user account")
 
     logger.info(f"{log_context}: Deleted account id={account_id}")
+    return

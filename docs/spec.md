@@ -1,84 +1,87 @@
-# Daily Költségvetéskezelő – Részletes Funkcionális Specifikáció v1.1
+﻿# Daily Budget Manager - Detailed Functional Specification v1.1
 
-**Készítette:** Szenes Márton (KTZRDZ)
+Author: Marton Szenes (KTZRDZ)
 
-**Dátum:** 2026. február 22.
-
----
-
-## 1. Adatmodell és Alapelvek
-
-A rendszer **offline-first** működésű. Minden rekord rendelkezik egy kliens oldalon generált `UUID`-val, egy `updated_at`  időbélyeggel és egy `deleted_at` időbélyeggel a szinkronizációhoz. Az összegek tárolása fixpontos formátumban történik (4 tizedesjegyig a kerekítési hibák elkerülése végett).
+Date: 2026-02-22
 
 ---
 
-## 2. Profil és Hitelesítés Use Cases (PC)
+## 1. Data Model and Core Principles
 
-| Azonosító | Megnevezés                 | Leírás / Üzleti logika                                                                                                        |
-| --------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| **PC-01** | Lokális profil létrehozása | Első indításkor létrejön egy titkosított helyi adatbázis. Nem igényel internetet.                                             |
-| **PC-02** | Google Auth társítás       | OIDC token lekérése. Sikeres válasz után a helyi felhasználó (`user_id`) összekapcsolódik a Google (`sub`) azonosítóval.      |
-| **PC-03** | Adszinkronizáció           | Társításkor a felhőben nem létező helyi rekordok feltöltésre kerülnek. Ütközéskor (azonos UUID) a frissebb `updated_at` nyer. |
-| **PC-04** | Kijelentkezés              | -                                                                                                                             |
+The system follows an offline-first architecture. Every record has a client-generated UUID, an updated_at timestamp, and a deleted_at timestamp for synchronization. Monetary amounts are stored in fixed-point format (up to 4 decimal places) to avoid rounding errors.
 
 ---
 
-## 3. Számlakezelés Use Cases (AC)
+## 2. Profile and Authentication Use Cases (PC)
 
-| Azonosító | Megnevezés          | Leírás / Üzleti logika                                                                                                                                                  |
-| --------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **AC-01** | Számla létrehozása  | Kötelező: név, devizanem (ISO 4217), kezdőegyenleg. (A kezdőegyenleg egy automatikus tranzakciót generál.)  Opcionális: Ikon, szín, Beleszámítódjon-e a teljes összegbe |
-| **AC-02** | Számla szerkesztése | Név, ikon, beleszámítódjon-e a teljes öszegbe kapcsoló módosítható. A devizanem csak akkor módosítható, ha még nincs hozzárendelt tranzakció.                           |
-| **AC-03** | Számla archiválása  | Törlés helyett archiválás: nem jelenik meg a választólistákban, de az előzményekben és statisztikákban megmarad.                                                        |
-| **AC-04** | Egyenleg kalkuláció | Dinamikus érték. Nem tárolt érték, minden lekéréskor számítódik a hozzá kapcsolódó tranzakciókból.                                                                      |
-
----
-
-## 4. Kategóriakezelés Use Cases (CC)
-
-| Azonosító | Megnevezés            | Leírás / Üzleti logika                                                                                                      |
-| --------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **CC-01** | Kategória létrehozása | Új kategória rögzítése a hierarchiában. Opcionálisan megadható egy `parent_id`.                                             |
-| **CC-02** | Kategória áthelyezése | Szülő kategória módosítása. A fa struktúra épségét ellenőrizni kell (nem lehet önmaga vagy saját leszármazottja a szülője). |
-| **CC-03** | Kategória törlése     | Ha vannak hozzárendelt tranzakciók, a rendszer kényszeríti az átmozgatást az "Egyéb" (rendszerkategória) alá.               |
+| ID | Name | Description / Business Logic |
+| --- | --- | --- |
+| PC-01 | Local profile creation | On first launch, an encrypted local database is created. No internet is required. |
+| PC-02 | Google Auth linking | The app retrieves an OIDC token. After a successful response, the local user (user_id) is linked to the Google subject identifier (sub). |
+| PC-03 | Data synchronization | During linking, local records missing from cloud storage are uploaded. If a conflict occurs (same UUID), the record with the newer updated_at wins. |
+| PC-04 | Logout | User session is terminated. |
 
 ---
 
-## 5. Tranzakciókezelés Use Cases (TR)
+## 3. Account Management Use Cases (AC)
 
-| Azonosító | Megnevezés              | Leírás / Üzleti logika                                                                                                                                                                          |
-| --------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **TR-01** | Kiadás/Bevétel rögzítés | Kötelező: összeg, kiadás/bevétel, dátum (automatikusan az adott dátum ha nincs megadva), forrásszámla, kategória. Opcionális: Megjegyzés. Mentéskor a számla egyenlege azonnal frissül a UI-on. |
-| **TR-02** | Belső átutalás          | Kötelező: forrásszámla, célszámla. Ha a devizanem eltér, meg kell adni a forrás deviza mennyiségét, és hogy ez mennyi cél deviza összegre váltandó.                                             |
-| **TR-03** | Tranzakció módosítása   | Bármely mező szerkeszthető. Számla vagy összeg módosításakor a rendszer újraszámolja az érintett számlák egyenlegét.                                                                            |
-| **TR-04** | Tranzakció törlése      | A tranzakció törlése nem törli az adatbázisból, hanem csak "archiválja", azaz a `deleted_at` mezőt beállítja. Nem számít a számla egyenlegébe.                                                  |
+| ID | Name | Description / Business Logic |
+| --- | --- | --- |
+| AC-01 | Create account | Required: name, currency (ISO 4217), opening balance. The opening balance generates an automatic transaction. Optional: icon, color, include-in-total flag. |
+| AC-02 | Edit account | Name, icon, and include-in-total flag are editable. Currency can only be changed if no transactions are assigned to the account yet. |
+| AC-03 | Archive account | Instead of physical deletion, account is archived. It is hidden from selectors, but remains in history and statistics. |
+| AC-04 | Balance calculation | Balance is dynamic. It is not stored as a static value and is calculated from linked transactions on each read. |
 
 ---
 
-## 6. Automatikus feldolgozás (Notification Parser)
+## 4. Category Management Use Cases (CC)
 
-### 6.1. Értesítés feldolgozási folyamat
+| ID | Name | Description / Business Logic |
+| --- | --- | --- |
+| CC-01 | Create category | Creates a new category in the hierarchy. Optional parent_id can be provided. |
+| CC-02 | Move category | Parent category can be changed. Tree integrity must be validated (a category cannot be its own parent or a descendant of itself). |
+| CC-03 | Delete category | If transactions are assigned, the system enforces reassignment under the Other system category before delete/archive flow is completed. |
 
-1. **Trigger:** A rendszer figyeli a beállított banki appok értesítéseit.
-2. **Parsing:** AI alapú szövegelemzés, amely megpróbálja kinyerni a tranzakció összegét, dátumát, és ha lehetséges, a számlákat és kategóriákat.
-3. **Matching:** Ha a parser képes azonosítani a számlákat és kategóriákat, akkor létrehozza a tranzakciót. Ha nem, akkor egy "feldolgozatlan értesítés" rekord jön létre, amely később manuálisan feldolgozható, ezáltal tanítva a parser-t. Valamint a tévesen feldolgozott értesítések is javíthatóak, és ezekből is tanul a parser.
-4. **Queueing:** Ha nincs internet, az értesítés nyers szövege egy lokális sorba (Local Queue) kerül, és később kerül feldolgozásra amikor lesz internet.
+---
+
+## 5. Transaction Management Use Cases (TR)
+
+| ID | Name | Description / Business Logic |
+| --- | --- | --- |
+| TR-01 | Record expense/income | Required: amount, expense or income type, date (defaults to current date if omitted), source account, category. Optional: note. After save, account balance updates immediately in UI. |
+| TR-02 | Internal transfer | Required: source account and destination account. If currencies differ, source amount and converted destination amount must both be provided. |
+| TR-03 | Edit transaction | Any field can be edited. If account or amount changes, affected account balances are recalculated. |
+| TR-04 | Delete transaction | Delete is logical (archive): data remains in database, deleted_at is set, and transaction is excluded from active balance calculations. |
+
+---
+
+## 6. Automatic Processing (Notification Parser)
+
+### 6.1 Notification Processing Flow
+
+1. Trigger: The system listens to notifications from configured banking apps.
+2. Parsing: AI-based text parsing attempts to extract amount, date, and if possible, related accounts and categories.
+3. Matching: If accounts/categories are identified, the transaction is created automatically. Otherwise an unprocessed notification record is created for manual processing. Corrected records are used to improve parser behavior.
+4. Queueing: If there is no internet, raw notification text is saved into a local queue and processed later when connectivity is restored.
 
 ---
 
 ## 7. Import / Export (IE)
 
-| Azonosító | Megnevezés | Leírás / Üzleti logika                                                                                        |
-| --------- | ---------- | ------------------------------------------------------------------------------------------------------------- |
-| **IE-01** | Export     | A teljes adatbázis (számlák, kategóriák, tranzakciók) exportálása JSON formátumba, vagy síkstruktúrás CSV-be. |
-| **IE-02** | Import     | CSV/JSON fájl beolvasása.                                                                                     |
-* *Séma ellenőrzés:* Hiányzó kötelező mezők esetén a rekord elvetése.
-* *Deduplikáció:* Ha az rekord azonosító egyezik, a rekordot duplikáltnak minősíti és kihagyja.
+| ID | Name | Description / Business Logic |
+| --- | --- | --- |
+| IE-01 | Export | Export full database content (accounts, categories, transactions) to JSON or flat CSV format. |
+| IE-02 | Import | Import from CSV or JSON files. |
 
+Schema validation:
+- Records with missing required fields are rejected.
+
+Deduplication:
+- If record identifiers match existing records, records are treated as duplicates and skipped.
 
 ---
 
-## 8. Hibaágak és Kivételkezelés
+## 8. Error Paths and Exception Handling
 
-* **Konfliktuskezelés:** Ha ugyanazt a rekordot két eszközön módosították, az a verzió marad meg, amelyiknek nagyobb az `updated_at` értéke (Amelyik később lett frissítve).
-* **Hibás parsing:** Ha az értesítésből az összeg nem olvasható ki, a parser létrehoz egy "feldolgozatlan értesítés" rekordot, amely manuálisan javítható.
+- Conflict handling: If the same record is edited on two devices, the version with the higher updated_at value is kept.
+- Parsing failure: If amount cannot be extracted from a notification, the parser creates an unprocessed notification record that can be fixed manually.

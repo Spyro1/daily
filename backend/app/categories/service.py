@@ -6,11 +6,11 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 
-from app.categories.models import CategoryBrief, CategoryIndex
+from app.categories.schemas import CategoryBrief, CategoryIndex, CategoryTree
 from db.models import Categories
 
 
-async def get_categories_for_user(db: AsyncSession, user_id: uuid.UUID) -> list[CategoryIndex]:
+async def get_categories_for_user(db: AsyncSession, user_id: uuid.UUID) -> list[Categories]:
     logger.debug(f"[get_categories_for_user]: Fetching categories for user {user_id}")
     statement = select(Categories).where(
         Categories.user_id == user_id,
@@ -106,9 +106,15 @@ async def delete_category(db: AsyncSession, category: Categories) -> None:
 
 
 def fill_category_brief(category: Categories) -> CategoryBrief:
-    return CategoryBrief(
-        id=category.id,
-        name=category.name,
+    if category is not None:
+        return CategoryBrief(
+            id=category.id,
+            name=category.name,
+        )
+    else:
+        return CategoryBrief(
+            id=uuid.UUID(int=0),
+            name="Transfer",
     )
 
 def fill_category_index(category: Categories) -> CategoryIndex:
@@ -120,3 +126,27 @@ def fill_category_index(category: Categories) -> CategoryIndex:
         icon_name=category.icon_name,
         type=category.category_type
     )
+
+
+def build_category_tree(categories: list[Categories]) -> list[CategoryTree]:
+    """Build a tree structure from a flat list of categories."""
+    nodes: dict[uuid.UUID, CategoryTree] = {}
+    for cat in categories:
+        nodes[cat.id] = CategoryTree(
+            id=cat.id,
+            name=cat.name,
+            color=cat.color,
+            parent_id=cat.parent_id,
+            icon_name=cat.icon_name,
+            type=cat.category_type,
+            children=[],
+        )
+
+    roots: list[CategoryTree] = []
+    for node in nodes.values():
+        if node.parent_id and node.parent_id in nodes:
+            nodes[node.parent_id].children.append(node)
+        else:
+            roots.append(node)
+
+    return roots

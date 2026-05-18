@@ -20,6 +20,7 @@ export function DashboardPage() {
 
   const accounts: AccountBrief[] = data?.accounts ?? []
   const transactions: TransactionBrief[] = data?.transactions ?? []
+  const currencyCode = accounts[0]?.currency_code ?? 'USD'
 
   if (isError) {
     const status = (error as { response?: { status?: number } }).response?.status
@@ -36,8 +37,21 @@ export function DashboardPage() {
     <PageLayout overline="Dashboard">
       <BalanceHeader accounts={accounts} isLoading={isPending} />
 
+      {/* <Stack direction="row" spacing={1}>
+        <Button size="small" variant="outlined" startIcon={<AddRounded />} onClick={() => void navigate({ to: '/transactions/new' })}>
+          Transaction
+        </Button>
+        <Button size="small" variant="outlined" startIcon={<AccountBalanceRounded />} onClick={() => void navigate({ to: '/accounts/new' })}>
+          Account
+        </Button>
+        <Button size="small" variant="outlined" startIcon={<CategoryRounded />} onClick={() => void navigate({ to: '/categories/new' })}>
+          Category
+        </Button>
+      </Stack> */}
+
       <BalanceTrendChart
         transactions={transactions}
+        currencyCode={currencyCode}
         interval={interval}
         onIntervalChange={setInterval}
         customRange={customRange}
@@ -46,14 +60,15 @@ export function DashboardPage() {
 
       <SummaryTiles
         transactions={transactions}
+        currencyCode={currencyCode}
         interval={interval}
         customRange={customRange}
         isLoading={isPending}
       />
 
-      <CategoryBreakdown transactions={transactions} isLoading={isPending} />
+      <CategoryBreakdown transactions={transactions} currencyCode={currencyCode} isLoading={isPending} />
 
-      <RecentTransactions transactions={transactions} isLoading={isPending} />
+      <RecentTransactions transactions={transactions} currencyCode={currencyCode} isLoading={isPending} />
     </PageLayout>
   )
 }

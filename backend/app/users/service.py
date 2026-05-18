@@ -1,10 +1,11 @@
 import uuid
+from datetime import datetime, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
-from db.models import ProvidedUsers, Users, Providers
-from app.users.models import ProvidedUserCreate, UserCreate, ProviderCreate
+from db.models import ProvidedUsers, Transactions, Users, Providers
+from app.users.schemas import ProvidedUserCreate, UserCreate, ProviderCreate
 from loguru import logger
 
 
@@ -49,7 +50,11 @@ async def get_user_by_email(db: AsyncSession, email: str) -> Users | None:
     return db_user
 
 
-async def get_or_create_user(db: AsyncSession, user: UserCreate, avatar_url: str | None = None) -> Users:
+async def get_or_create_user(
+    db: AsyncSession,
+    user: UserCreate,
+    avatar_url: str | None = None,
+) -> Users:
     logger.debug(f"[users/get_or_create_user]: start email={user.email}")
     db_user = await get_user_by_email(db, str(user.email))
 
@@ -148,6 +153,8 @@ async def get_or_create_provided_user(
 
     if db_provided_user:
         logger.debug(f"[users/get_or_create_provided_user]: existing mapping id={db_provided_user.id} user_id={db_user.id} provider_id={db_provider.id}")
+        # Eagerly load the user relationship
+        await db.refresh(db_provided_user, ["user"])
         return db_provided_user
 
     db_provided_user = ProvidedUsers(
@@ -159,7 +166,7 @@ async def get_or_create_provided_user(
     db.add(db_provided_user)
 
     await db.commit()
-    await db.refresh(db_provided_user)
+    await db.refresh(db_provided_user, ["user"])
     logger.info(f"[users/get_or_create_provided_user]: created mapping id={db_provided_user.id} user_id={db_user.id} provider_id={db_provider.id}")
     return db_provided_user
 

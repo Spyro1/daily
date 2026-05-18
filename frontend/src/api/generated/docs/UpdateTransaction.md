@@ -5,7 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**amount** | [**Amount1**](Amount1.md) |  | [optional] [default to undefined]
+**amount** | [**Amount2**](Amount2.md) |  | [optional] [default to undefined]
 **transaction_type** | [**TransactionType**](TransactionType.md) |  | [optional] [default to undefined]
 **occurred_at** | **string** |  | [optional] [default to undefined]
 **category_id** | **string** |  | [optional] [default to undefined]

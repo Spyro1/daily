@@ -10,10 +10,10 @@ Name | Type | Description | Notes
 **transaction_type** | [**TransactionType**](TransactionType.md) |  | [default to undefined]
 **category** | [**CategoryBrief**](CategoryBrief.md) |  | [default to undefined]
 **occurred_at** | **string** |  | [default to undefined]
-**source_account** | [**AccountBrief**](AccountBrief.md) |  | [default to undefined]
-**destination_account** | [**AccountBrief**](AccountBrief.md) |  | [default to undefined]
-**target_amount** | **string** |  | [default to undefined]
-**note** | **string** |  | [default to undefined]
+**source_account** | [**AccountBrief**](AccountBrief.md) |  | [optional] [default to undefined]
+**destination_account** | [**AccountBrief**](AccountBrief.md) |  | [optional] [default to undefined]
+**target_amount** | **string** |  | [optional] [default to undefined]
+**note** | **string** |  | [optional] [default to undefined]
 
 ## Example
 

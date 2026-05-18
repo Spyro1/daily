@@ -1,5 +1,7 @@
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, status
+from datetime import datetime
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
@@ -7,15 +9,16 @@ from db.core import get_db
 from app.auth.jwt_utils import get_current_user
 from db.models import Transactions, Users
 
-from app.transactions.services import (
+from app.transactions.service import (
     create_transaction,
     update_transaction,
     delete_transaction,
     fill_transaction_index,
     get_transaction_for_user_by_id,
     get_transactions_for_user,
+    get_transactions_for_user_filtered,
 )
-from app.transactions.models import CreateTransaction, TransactionIndex, UpdateTransaction
+from app.transactions.schemas import CreateTransaction, TransactionIndex, UpdateTransaction, TransactionListResponse, TransactionType
 
 router = APIRouter()
 
@@ -37,23 +40,50 @@ def _log_context(current_user: Users, action: str) -> str:
 # Endpoints
 # ================================
 
-@router.get('', response_model=list[TransactionIndex])
+@router.get('', response_model=TransactionListResponse)
 async def get_my_transactions(
     db: AsyncSession = Depends(get_db),
-    current_user: Users = Depends(get_current_user)
-) -> list[TransactionIndex]:
+    current_user: Users = Depends(get_current_user),
+    date_from: Optional[datetime] = Query(None, description="Start date for transaction filtering (ISO 8601 format)"),
+    date_to: Optional[datetime] = Query(None, description="End date for transaction filtering (ISO 8601 format)"),
+    category_id: Optional[uuid.UUID] = Query(None, description="Filter by category ID"),
+    account_id: Optional[uuid.UUID] = Query(None, description="Filter by source or destination account ID"),
+    transaction_type: Optional[TransactionType] = Query(None, description="Filter by transaction type (income, expense, transfer)"),
+    skip: int = Query(0, ge=0, description="Number of records to skip (pagination)"),
+    limit: int = Query(100, ge=1, le=1000, description="Number of records to return (pagination)"),
+) -> TransactionListResponse:
     log_context = _log_context(current_user, "get_my_transactions")
-    logger.info(f"{log_context}: Fetching user transactions")
+    logger.info(f"{log_context}: Fetching user transactions with filters")
+    logger.debug(
+        f"{log_context}: Filters - date_from={date_from}, date_to={date_to}, "
+        f"category_id={category_id}, account_id={account_id}, type={transaction_type}, skip={skip}, limit={limit}"
+    )
 
     try:
-        db_transactions = await get_transactions_for_user(db, current_user.id, eager=True)
+        db_transactions, total_count = await get_transactions_for_user_filtered(
+            db,
+            current_user.id,
+            date_from=date_from,
+            date_to=date_to,
+            category_id=category_id,
+            account_id=account_id,
+            transaction_type=transaction_type.value if transaction_type else None,
+            skip=skip,
+            limit=limit,
+            eager=True,
+        )
     except Exception as e:
         logger.exception(f"{log_context}: Error fetching user transactions: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error fetching user transactions")
 
     transactions = [fill_transaction_index(t) for t in db_transactions]
-    logger.info(f"{log_context}: Returning {len(transactions)} transactions")
-    return transactions
+    logger.info(f"{log_context}: Returning {len(transactions)} of {total_count} transactions")
+    return TransactionListResponse(
+        data=transactions,
+        total=total_count,
+        skip=skip,
+        limit=limit,
+    )
 
 
 @router.get('/{transaction_id}', response_model=TransactionIndex)
@@ -85,10 +115,34 @@ async def create_my_new_transaction(
     data: CreateTransaction,
     db: AsyncSession = Depends(get_db),
     current_user: Users = Depends(get_current_user)
-) -> TransactionIndex:
+) -> None:
     log_context = _log_context(current_user, "create_my_new_transaction")
     logger.info(f"{log_context}: Creating new transaction")
     logger.debug(f"{log_context}: Payload={_payload_for_log(data)} user_id={current_user.id}")
+
+    is_transfer = data.transaction_type == TransactionType.TRANSFER
+
+    if is_transfer:
+        if not data.source_account_id or not data.destination_account_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Transfer requires both source_account_id and destination_account_id",
+            )
+        if data.source_account_id == data.destination_account_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Transfer source and destination accounts must be different",
+            )
+        category_id = None
+        target_amount = data.target_amount if data.target_amount is not None else data.amount
+    else:
+        if data.category_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Expense and income transactions require category_id",
+            )
+        category_id = data.category_id
+        target_amount = data.target_amount
 
     new_transaction = Transactions(
         user_id=current_user.id,
@@ -97,8 +151,8 @@ async def create_my_new_transaction(
         occurred_at=data.occurred_at,
         source_account_id=data.source_account_id,
         destination_account_id=data.destination_account_id,
-        category_id=data.category_id,
-        target_amount=data.target_amount,
+        category_id=category_id,
+        target_amount=target_amount,
         note=data.note,
     )
     logger.debug(
@@ -140,21 +194,24 @@ async def update_my_transaction(
         logger.warning(f"{log_context}: Transaction not found id={transaction_id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
 
-    if data.amount is not None:
+    # Use model_fields_set so that explicitly-sent null values (e.g. clearing
+    # source_account_id when switching from expense to income) are also applied.
+    provided = data.model_fields_set
+    if 'amount' in provided and data.amount is not None:
         db_transaction.amount = data.amount
-    if data.transaction_type is not None:
+    if 'transaction_type' in provided and data.transaction_type is not None:
         db_transaction.transaction_type = data.transaction_type.value
-    if data.occurred_at is not None:
+    if 'occurred_at' in provided and data.occurred_at is not None:
         db_transaction.occurred_at = data.occurred_at
-    if data.category_id is not None:
+    if 'category_id' in provided:
         db_transaction.category_id = data.category_id
-    if data.source_account_id is not None:
+    if 'source_account_id' in provided:
         db_transaction.source_account_id = data.source_account_id
-    if data.destination_account_id is not None:
+    if 'destination_account_id' in provided:
         db_transaction.destination_account_id = data.destination_account_id
-    if data.target_amount is not None:
+    if 'target_amount' in provided:
         db_transaction.target_amount = data.target_amount
-    if data.note is not None:
+    if 'note' in provided:
         db_transaction.note = data.note
 
     logger.debug(

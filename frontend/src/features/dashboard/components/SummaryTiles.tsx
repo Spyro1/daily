@@ -3,23 +3,17 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown'
 import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 import type { TransactionBrief } from '@/api/generated'
 import { deriveSummary, type Interval } from '../utils/dateUtils'
+import { formatCurrency } from '@/shared/utils/currency'
 
 interface Props {
   transactions: TransactionBrief[]
+  currencyCode: string
   interval: Interval
   customRange: [Date, Date]
   isLoading: boolean
 }
 
-function formatAmount(value: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(value)
-}
-
-export function SummaryTiles({ transactions, interval, customRange, isLoading }: Props) {
+export function SummaryTiles({ transactions, currencyCode, interval, customRange, isLoading }: Props) {
   const { totalIncome, totalExpense } = deriveSummary(transactions, interval, customRange)
 
   return (
@@ -50,7 +44,7 @@ export function SummaryTiles({ transactions, interval, customRange, isLoading }:
             />
           ) : (
             <Typography variant="h6" fontWeight={700}>
-              {formatAmount(totalIncome)}
+              {formatCurrency(totalIncome, currencyCode, { maximumFractionDigits: 0 })}
             </Typography>
           )}
         </Paper>
@@ -82,7 +76,7 @@ export function SummaryTiles({ transactions, interval, customRange, isLoading }:
             />
           ) : (
             <Typography variant="h6" fontWeight={700}>
-              {formatAmount(totalExpense)}
+              {formatCurrency(totalExpense, currencyCode, { maximumFractionDigits: 0 })}
             </Typography>
           )}
         </Paper>

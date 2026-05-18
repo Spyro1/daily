@@ -7,8 +7,9 @@ import {
   WorkspacesRounded,
 } from '@mui/icons-material'
 import { alpha } from '@mui/material/styles'
-import { Box, Chip, Paper, Stack, Typography } from '@mui/material'
+import { Box, ButtonBase, Chip, Paper, Stack, Typography } from '@mui/material'
 import type { SvgIconProps } from '@mui/material'
+import { useNavigate } from '@tanstack/react-router'
 import type { AccountIndex } from '@/api/generated'
 
 const ICON_MAP: Record<string, React.ComponentType<SvgIconProps>> = {
@@ -25,6 +26,7 @@ interface AccountCardProps {
 }
 
 export function AccountCard({ account }: AccountCardProps) {
+  const navigate = useNavigate()
   const Icon = ICON_MAP[account.icon_name] ?? WalletRounded
   const balance = parseFloat(account.balance)
   const formatted = new Intl.NumberFormat('en-US', {
@@ -34,17 +36,22 @@ export function AccountCard({ account }: AccountCardProps) {
   }).format(balance)
 
   return (
-    <Paper
-      elevation={2}
-      sx={{
-        p: 2,
-        borderRadius: 3,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        opacity: account.is_archived ? 0.55 : 1,
-      }}
+    <ButtonBase
+      onClick={() => void navigate({ to: '/accounts/$id', params: { id: account.id } })}
+      sx={{ width: '100%', borderRadius: 3, textAlign: 'left' }}
     >
+      <Paper
+        elevation={2}
+        sx={{
+          p: 2,
+          borderRadius: 3,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          opacity: account.is_archived ? 0.55 : 1,
+          width: '100%',
+        }}
+      >
       <Box
         sx={(theme) => ({
           width: 44,
@@ -80,5 +87,6 @@ export function AccountCard({ account }: AccountCardProps) {
         {formatted}
       </Typography>
     </Paper>
+    </ButtonBase>
   )
 }

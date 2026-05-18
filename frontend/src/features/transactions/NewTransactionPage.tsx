@@ -76,25 +76,29 @@ export function NewTransactionPage() {
     (!sourceAccountRequired || !!sourceAccountId) &&
     (!destinationAccountRequired || !!destinationAccountId)
   const hasValidTransferAccounts = !isTransfer || sourceAccountId !== destinationAccountId
-  const canSubmit = !!amount.trim() && !!categoryId && hasRequiredAccounts && hasValidTransferAccounts
+  const hasRequiredCategory = isTransfer || !!categoryId
+  const canSubmit = !!amount.trim() && hasRequiredCategory && hasRequiredAccounts && hasValidTransferAccounts
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const trimmedAmount = amount.trim()
 
-    if (!trimmedAmount || !categoryId || !hasRequiredAccounts || !hasValidTransferAccounts) {
+    if (!trimmedAmount || !hasRequiredCategory || !hasRequiredAccounts || !hasValidTransferAccounts) {
       return
     }
+
+    const transferTargetAmount = isTransfer ? toApiAmount(trimmedAmount) : null
 
     createTransaction(
       {
         amount: toApiAmount(trimmedAmount),
         transaction_type: txType,
-        category_id: categoryId,
-        occurred_at: date,
+        category_id: isTransfer ? null : categoryId,
+        occurred_at: new Date(date).toISOString(),
         source_account_id: sourceAccountRequired ? sourceAccountId : null,
         destination_account_id: destinationAccountRequired ? destinationAccountId : null,
+        target_amount: transferTargetAmount,
         note: note.trim() || null,
       },
       {
@@ -150,25 +154,27 @@ export function NewTransactionPage() {
               autoComplete="off"
             />
 
-            <FormControl fullWidth required>
-              <InputLabel id="tx-category-label">Category</InputLabel>
-              <Select
-                labelId="tx-category-label"
-                value={categoryId}
-                label="Category"
-                disabled={isPending}
-                onChange={(e) => setCategoryId(e.target.value)}
-              >
-                {categoryOptions.map((option) => (
-                  <MenuItem key={option.id} value={option.id}>{option.pathLabel}</MenuItem>
-                ))}
-              </Select>
-              <FormHelperText>
-                {categoryOptions.length === 0
-                  ? 'Create a category first before saving this transaction.'
-                  : 'Nested categories are shown with their full path.'}
-              </FormHelperText>
-            </FormControl>
+            {!isTransfer && (
+              <FormControl fullWidth required>
+                <InputLabel id="tx-category-label">Category</InputLabel>
+                <Select
+                  labelId="tx-category-label"
+                  value={categoryId}
+                  label="Category"
+                  disabled={isPending}
+                  onChange={(e) => setCategoryId(e.target.value)}
+                >
+                  {categoryOptions.map((option) => (
+                    <MenuItem key={option.id} value={option.id}>{option.pathLabel}</MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText>
+                  {categoryOptions.length === 0
+                    ? 'Create a category first before saving this transaction.'
+                    : 'Nested categories are shown with their full path.'}
+                </FormHelperText>
+              </FormControl>
+            )}
 
             {!isIncome && (
               <FormControl fullWidth required={sourceAccountRequired}>

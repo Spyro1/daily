@@ -28,7 +28,7 @@ All URIs are relative to *http://localhost*
 |[**validateAccessTokenApiV1OauthValidatePost**](#validateaccesstokenapiv1oauthvalidatepost) | **POST** /api/v1/oauth/validate | Validate Access Token|
 
 # **createMyNewAccountApiV1AccountsPost**
-> AccountIndex createMyNewAccountApiV1AccountsPost(createAccount)
+> any createMyNewAccountApiV1AccountsPost(createAccount)
 
 
 ### Example
@@ -62,7 +62,7 @@ const { status, data } = await apiInstance.createMyNewAccountApiV1AccountsPost(
 
 ### Return type
 
-**AccountIndex**
+**any**
 
 ### Authorization
 
@@ -138,7 +138,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **createMyNewTransactionApiV1TransactionsPost**
-> TransactionIndex createMyNewTransactionApiV1TransactionsPost(createTransaction)
+> any createMyNewTransactionApiV1TransactionsPost(createTransaction)
 
 
 ### Example
@@ -172,7 +172,7 @@ const { status, data } = await apiInstance.createMyNewTransactionApiV1Transactio
 
 ### Return type
 
-**TransactionIndex**
+**any**
 
 ### Authorization
 
@@ -721,7 +721,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getMyTransactionsApiV1TransactionsGet**
-> Array<TransactionIndex> getMyTransactionsApiV1TransactionsGet()
+> TransactionListResponse getMyTransactionsApiV1TransactionsGet()
 
 
 ### Example
@@ -735,9 +735,23 @@ import {
 const configuration = new Configuration();
 const apiInstance = new V1Api(configuration);
 
+let dateFrom: string; //Start date for transaction filtering (ISO 8601 format) (optional) (default to undefined)
+let dateTo: string; //End date for transaction filtering (ISO 8601 format) (optional) (default to undefined)
+let categoryId: string; //Filter by category ID (optional) (default to undefined)
+let accountId: string; //Filter by source or destination account ID (optional) (default to undefined)
+let transactionType: TransactionType; //Filter by transaction type (income, expense, transfer) (optional) (default to undefined)
+let skip: number; //Number of records to skip (pagination) (optional) (default to 0)
+let limit: number; //Number of records to return (pagination) (optional) (default to 100)
 let accessToken: string; // (optional) (default to undefined)
 
 const { status, data } = await apiInstance.getMyTransactionsApiV1TransactionsGet(
+    dateFrom,
+    dateTo,
+    categoryId,
+    accountId,
+    transactionType,
+    skip,
+    limit,
     accessToken
 );
 ```
@@ -746,12 +760,19 @@ const { status, data } = await apiInstance.getMyTransactionsApiV1TransactionsGet
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
+| **dateFrom** | [**string**] | Start date for transaction filtering (ISO 8601 format) | (optional) defaults to undefined|
+| **dateTo** | [**string**] | End date for transaction filtering (ISO 8601 format) | (optional) defaults to undefined|
+| **categoryId** | [**string**] | Filter by category ID | (optional) defaults to undefined|
+| **accountId** | [**string**] | Filter by source or destination account ID | (optional) defaults to undefined|
+| **transactionType** | **TransactionType** | Filter by transaction type (income, expense, transfer) | (optional) defaults to undefined|
+| **skip** | [**number**] | Number of records to skip (pagination) | (optional) defaults to 0|
+| **limit** | [**number**] | Number of records to return (pagination) | (optional) defaults to 100|
 | **accessToken** | [**string**] |  | (optional) defaults to undefined|
 
 
 ### Return type
 
-**Array<TransactionIndex>**
+**TransactionListResponse**
 
 ### Authorization
 

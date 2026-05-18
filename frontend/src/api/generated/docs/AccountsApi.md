@@ -11,7 +11,7 @@ All URIs are relative to *http://localhost*
 |[**updateMyAccountApiV1AccountsAccountIdPatch**](#updatemyaccountapiv1accountsaccountidpatch) | **PATCH** /api/v1/accounts/{account_id} | Update My Account|
 
 # **createMyNewAccountApiV1AccountsPost**
-> AccountIndex createMyNewAccountApiV1AccountsPost(createAccount)
+> any createMyNewAccountApiV1AccountsPost(createAccount)
 
 
 ### Example
@@ -45,7 +45,7 @@ const { status, data } = await apiInstance.createMyNewAccountApiV1AccountsPost(
 
 ### Return type
 
-**AccountIndex**
+**any**
 
 ### Authorization
 

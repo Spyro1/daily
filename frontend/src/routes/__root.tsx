@@ -5,11 +5,14 @@ import { Box, CssBaseline, ThemeProvider } from '@mui/material'
 import { NotFoundPage } from '#/shared/layout/NotFoundPage'
 import { getThemeByName } from '@/theme/theme'
 import { ThemeModeProvider, useThemeMode } from '@/theme/themeMode'
-import { HealthIcon } from '#/shared/ui/HealthIcon'
 import { BottomNav } from '#/shared/layout/BottomNav'
 import { SnackbarProvider } from '#/shared/providers/SnackbarProvider'
 import { AuthGuard } from '#/features/auth/components/AuthGuard'
+import { LocalAuthProvider } from '#/features/auth/hooks/useLocalAuth'
 import { initResponseHandler } from '#/api/responseHandler'
+import { setupOfflineSync } from '@/lib/offlineQueue'
+import { notificationService } from '@/api/notificationService'
+import { queryClient } from '@/api/queryClient'
 
 const MOBILE_MAX_WIDTH = 480
 
@@ -22,6 +25,14 @@ function RootLayout() {
   useEffect(() => {
     initResponseHandler(() => void navigate({ to: '/', replace: true }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Replay queued offline mutations when back online
+  useEffect(() => {
+    return setupOfflineSync((count) => {
+      notificationService.notify(`Synced ${count} offline change${count > 1 ? 's' : ''}.`, 'success')
+      void queryClient.invalidateQueries()
+    })
   }, [])
 
   return (
@@ -37,11 +48,11 @@ function RootLayout() {
           position: 'relative',
         }}
       >
-        {/* Development only */}
-        <Box sx={{ position: 'absolute', top: 5, right: 5, zIndex: 1 }}>
-          <HealthIcon />
-        </Box>
-        {/* Development only END */}
+        {/* {import.meta.env.DEV && ( */}
+          {/* <Box sx={{ position: 'absolute', top: 5, right: 5, zIndex: 1 }}> */}
+            {/* <HealthIcon /> */}
+          {/* </Box> */}
+        {/* )} */}
 
         <AuthGuard>
           <Outlet />
@@ -58,7 +69,9 @@ function RootComponent() {
   return (
     <ThemeModeProvider>
       <SnackbarProvider>
-        <RootLayout />
+        <LocalAuthProvider>
+          <RootLayout />
+        </LocalAuthProvider>
       </SnackbarProvider>
     </ThemeModeProvider>
   )

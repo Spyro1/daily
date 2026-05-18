@@ -10,6 +10,7 @@
 - I input the given access token copyed from the cookies of the frontend site then paste it to swagger and it does not validate it. Why?
 - create verbose logging for every endpoint for better debugging
 - Create basic test cases for each router with a centralized test client fixture. Create a github action which runs the tests on every push.
+- Finish transaction router (create, update, delete, list with filters)
 
 ## Building the frontend
 
