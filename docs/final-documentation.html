@@ -1,0 +1,1623 @@
+<!DOCTYPE html><html><head>
+      <title>final-documentation</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:///c:\Users\marci\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.8.27\crossnote\dependencies\katex\katex.min.css">
+      
+      
+      
+      <script type="text/javascript" src="file:///c:\Users\marci\.vscode\extensions\shd101wyy.markdown-preview-enhanced-0.8.27\crossnote\dependencies\mermaid\mermaid.min.js" charset="UTF-8"></script>
+      
+      
+      
+      <style>
+      code[class*=language-],pre[class*=language-]{color:#333;background:0 0;font-family:Consolas,"Liberation Mono",Menlo,Courier,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.4;-moz-tab-size:8;-o-tab-size:8;tab-size:8;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:.8em;overflow:auto;border-radius:3px;background:#f5f5f5}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal;background:#f5f5f5}.token.blockquote,.token.comment{color:#969896}.token.cdata{color:#183691}.token.doctype,.token.macro.property,.token.punctuation,.token.variable{color:#333}.token.builtin,.token.important,.token.keyword,.token.operator,.token.rule{color:#a71d5d}.token.attr-value,.token.regex,.token.string,.token.url{color:#183691}.token.atrule,.token.boolean,.token.code,.token.command,.token.constant,.token.entity,.token.number,.token.property,.token.symbol{color:#0086b3}.token.prolog,.token.selector,.token.tag{color:#63a35c}.token.attr-name,.token.class,.token.class-name,.token.function,.token.id,.token.namespace,.token.pseudo-class,.token.pseudo-element,.token.url-reference .token.variable{color:#795da3}.token.entity{cursor:help}.token.title,.token.title .token.punctuation{font-weight:700;color:#1d3e81}.token.list{color:#ed6a43}.token.inserted{background-color:#eaffea;color:#55a532}.token.deleted{background-color:#ffecec;color:#bd2c00}.token.bold{font-weight:700}.token.italic{font-style:italic}.language-json .token.property{color:#183691}.language-markup .token.tag .token.punctuation{color:#333}.language-css .token.function,code.language-css{color:#0086b3}.language-yaml .token.atrule{color:#63a35c}code.language-yaml{color:#183691}.language-ruby .token.function{color:#333}.language-markdown .token.url{color:#795da3}.language-makefile .token.symbol{color:#795da3}.language-makefile .token.variable{color:#183691}.language-makefile .token.builtin{color:#0086b3}.language-bash .token.keyword{color:#0086b3}pre[data-line]{position:relative;padding:1em 0 1em 3em}pre[data-line] .line-highlight-wrapper{position:absolute;top:0;left:0;background-color:transparent;display:block;width:100%}pre[data-line] .line-highlight{position:absolute;left:0;right:0;padding:inherit 0;margin-top:1em;background:hsla(24,20%,50%,.08);background:linear-gradient(to right,hsla(24,20%,50%,.1) 70%,hsla(24,20%,50%,0));pointer-events:none;line-height:inherit;white-space:pre}pre[data-line] .line-highlight:before,pre[data-line] .line-highlight[data-end]:after{content:attr(data-start);position:absolute;top:.4em;left:.6em;min-width:1em;padding:0 .5em;background-color:hsla(24,20%,50%,.4);color:#f4f1ef;font:bold 65%/1.5 sans-serif;text-align:center;vertical-align:.3em;border-radius:999px;text-shadow:none;box-shadow:0 1px #fff}pre[data-line] .line-highlight[data-end]:after{content:attr(data-end);top:auto;bottom:.4em}html body{font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ol,html body>ul{margin-bottom:16px}html body ol,html body ul{padding-left:2em}html body ol.no-list,html body ul.no-list{padding:0;list-style-type:none}html body ol ol,html body ol ul,html body ul ol,html body ul ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:700;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:700}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::after,html body code::before{letter-spacing:-.2em;content:'\00a0'}html body pre>code{padding:0;margin:0;word-break:normal;white-space:pre;background:0 0;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:after,html body pre code:before,html body pre tt:after,html body pre tt:before{content:normal}html body blockquote,html body dl,html body ol,html body p,html body pre,html body ul{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body code,html body pre{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview ul{list-style:disc}.markdown-preview ul ul{list-style:circle}.markdown-preview ul ul ul{list-style:square}.markdown-preview ol{list-style:decimal}.markdown-preview ol ol,.markdown-preview ul ol{list-style-type:lower-roman}.markdown-preview ol ol ol,.markdown-preview ol ul ol,.markdown-preview ul ol ol,.markdown-preview ul ul ol{list-style-type:lower-alpha}.markdown-preview .newpage,.markdown-preview .pagebreak{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center!important}.markdown-preview:not([data-for=preview]) .code-chunk .code-chunk-btn-group{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .status{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .output-div{margin-bottom:16px}.markdown-preview .md-toc{padding:0}.markdown-preview .md-toc .md-toc-details{margin:0;padding:0;border:none}.markdown-preview .md-toc summary.md-toc-link-wrapper{cursor:pointer;list-style-position:outside}.markdown-preview .md-toc summary.md-toc-link-wrapper::marker{font-size:.85em}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div,.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}.markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='0']{margin-left:12px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='1']{margin-left:28px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='2']{margin-left:44px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='3']{margin-left:60px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='4']{margin-left:76px}.markdown-preview .md-toc .md-toc-link-wrapper[data-level='5']{margin-left:80px}.markdown-preview a.tag,.markdown-preview a.tag:active,.markdown-preview a.tag:link,.markdown-preview a.tag:visited,.markdown-preview span.tag:not(.token){display:inline-block;background-color:var(--vscode-badge-background,rgba(127,127,127,.18));color:var(--vscode-badge-foreground,currentColor);border-radius:2em;font-size:.85em;font-weight:500;padding:.05em .55em;line-height:1.5;white-space:nowrap;text-decoration:none;text-shadow:none;box-shadow:none;transition:background-color .12s ease,opacity .12s ease}.markdown-preview a.tag{cursor:pointer}.markdown-preview a.tag:focus,.markdown-preview a.tag:hover{background-color:var(--vscode-badge-background,rgba(127,127,127,.32));color:var(--vscode-badge-foreground,currentColor);opacity:.85;text-decoration:none;outline:0}.markdown-preview .wikilink-embed-content{border-left:3px solid var(--vscode-textBlockQuote-border,rgba(128,128,128,.3));background:var(--vscode-textBlockQuote-background,rgba(128,128,128,.05));margin:.5em 0;padding:.5em .75em;border-radius:0 3px 3px 0}.markdown-preview .wikilink-embed-content.wikilink-embed-error{border-left-color:var(--vscode-errorForeground,#cf222e);color:var(--vscode-errorForeground,#cf222e);font-style:italic;opacity:.8}.markdown-preview .wikilink-embed-content h1:first-child,.markdown-preview .wikilink-embed-content h2:first-child,.markdown-preview .wikilink-embed-content h3:first-child,.markdown-preview .wikilink-embed-content h4:first-child,.markdown-preview .wikilink-embed-content h5:first-child,.markdown-preview .wikilink-embed-content h6:first-child{margin-top:.25em}.markdown-preview .wikilink-embed-content .wikilink-embed-content{margin:.25em 0;padding:.25em .5em}.markdown-preview .block-id{display:none}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0;min-height:100vh}@media screen and (min-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{font-size:14px!important;padding:1em}}@media print{html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc{padding:0 16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-details{margin:0;padding:0;border:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div,html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='0']{padding-left:0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='1']{padding-left:16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='2']{padding-left:32px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='3']{padding-left:48px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='4']{padding-left:64px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper[data-level='5']{padding-left:80px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% - 300px);padding:2em calc(50% - 457px - 300px / 2);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+      <script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    // your code here
+  });
+</script>
+    </head>
+    <body for="html-export">
+      <div class="crossnote markdown-preview  ">
+      
+<h1 id="daily--comprehensive-project-documentation">Daily — Comprehensive Project Documentation </h1>
+<blockquote>
+<p><strong>Version:</strong> 1.0.0<br>
+<strong>Last updated:</strong> 2026-05-18<br>
+<strong>Author:</strong> Marton Szenes</p>
+</blockquote>
+<hr>
+<h2 id="table-of-contents">Table of Contents </h2>
+<ol>
+<li><a href="#1-executive-project-overview">Executive Project Overview</a>
+<ul>
+<li><a href="#11-high-level-purpose">1.1 High-Level Purpose</a></li>
+<li><a href="#12-system-architecture">1.2 System Architecture</a></li>
+<li><a href="#13-core-technology-stack">1.3 Core Technology Stack</a></li>
+</ul>
+</li>
+<li><a href="#2-user-manual">User Manual</a>
+<ul>
+<li><a href="#21-getting-started">2.1 Getting Started</a></li>
+<li><a href="#22-authentication--access">2.2 Authentication &amp; Access</a></li>
+<li><a href="#23-dashboard">2.3 Dashboard</a></li>
+<li><a href="#24-accounts">2.4 Accounts</a></li>
+<li><a href="#25-categories">2.5 Categories</a></li>
+<li><a href="#26-transactions">2.6 Transactions</a></li>
+<li><a href="#27-settings">2.7 Settings</a></li>
+<li><a href="#28-troubleshooting-faq">2.8 Troubleshooting FAQ</a></li>
+</ul>
+</li>
+<li><a href="#3-developer--maintainer-manual">Developer &amp; Maintainer Manual</a>
+<ul>
+<li><a href="#31-local-development-setup">3.1 Local Development Setup</a></li>
+<li><a href="#32-backend-architecture-deep-dive">3.2 Backend Architecture Deep-Dive</a></li>
+<li><a href="#33-frontend-architecture-deep-dive">3.3 Frontend Architecture Deep-Dive</a></li>
+<li><a href="#34-deployment--devops-infrastructure">3.4 Deployment &amp; DevOps Infrastructure</a></li>
+</ul>
+</li>
+<li><a href="#4-system-edge-cases--known-technical-debt">System Edge Cases &amp; Known Technical Debt</a></li>
+</ol>
+<hr>
+<h2 id="1-executive-project-overview">1. Executive Project Overview </h2>
+<h3 id="11-high-level-purpose">1.1 High-Level Purpose </h3>
+<p><strong>Daily</strong> is a personal finance management application designed for individuals who want to track their income, expenses, and account balances across time. The central design philosophy is <strong>offline-first</strong>: the application is fully functional without any internet connection. Users can create a local profile, record transactions, and manage accounts entirely within their browser using IndexedDB (via Dexie). When the user later signs in with a Google account, all locally-stored data is transparently pushed to the backend for cloud persistence and multi-device continuity.</p>
+<p><strong>Who it serves:</strong></p>
+<ul>
+<li>Individual users who want a lightweight, private personal budget tracker.</li>
+<li>Users in low-connectivity environments who require an app that does not depend on a server.</li>
+<li>Users who want cloud-backed sync across devices without giving up offline usability.</li>
+</ul>
+<p><strong>Core capabilities:</strong></p>
+<ul>
+<li>Account management with multi-currency support</li>
+<li>Hierarchical category management (expense / income)</li>
+<li>Full transaction lifecycle (expense, income, internal transfer)</li>
+<li>Dashboard with balance trend chart, category breakdown, and summary tiles</li>
+<li>Offline queue that replays mutations when connectivity resumes</li>
+<li>One-time sync push from local browser storage to the authenticated backend</li>
+</ul>
+<hr>
+<h3 id="12-system-architecture">1.2 System Architecture </h3>
+<div class="mermaid">flowchart TD
+    subgraph Browser
+        UI[React SPA]
+        IDB[(IndexedDB\nDexie — local data)]
+        OQ[localStorage\nOffline Queue]
+        UI -- local mode CRUD --&gt; IDB
+        UI -- enqueue offline mutations --&gt; OQ
+    end
+
+    subgraph Backend ["Backend (FastAPI)"]
+        MW[CORS + Request Logging\nMiddleware]
+        AUTH[Auth Routers\n/api/v1/google\n/api/v1/oauth]
+        DATA[Data Routers\naccounts · categories\ntransactions · dashboard]
+        SYNC[Sync Router\n/api/v1/sync/push]
+        SVC[Service Layer]
+        MW --&gt; AUTH
+        MW --&gt; DATA
+        MW --&gt; SYNC
+        AUTH --&gt; SVC
+        DATA --&gt; SVC
+        SYNC --&gt; SVC
+    end
+
+    subgraph Database ["PostgreSQL 16"]
+        PG[(users · providers\nprovided_users\naccounts · categories\ntransactions)]
+    end
+
+    subgraph Google ["Google OAuth 2.0"]
+        GAUTH[Authorization Server\naccounts.google.com]
+        UINFO[UserInfo Endpoint]
+    end
+
+    UI -- HTTP + httpOnly JWT cookies --&gt; MW
+    SVC -- SQLAlchemy async --&gt; PG
+    AUTH -- httpx token exchange --&gt; GAUTH
+    AUTH -- httpx userinfo --&gt; UINFO
+
+    OQ -- replay on reconnect --&gt; DATA
+    IDB -- one-time push on sign-in --&gt; SYNC
+</div><p><strong>Request flow summary:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Local (offline)</strong></td>
+<td>The browser reads/writes directly to IndexedDB. No network required. All mutations are applied instantly in the browser.</td>
+</tr>
+<tr>
+<td><strong>Online (authenticated)</strong></td>
+<td>After Google sign-in, the frontend calls backend REST endpoints authenticated by httpOnly JWT cookies.</td>
+</tr>
+<tr>
+<td><strong>Online but offline</strong></td>
+<td>If the browser loses connectivity while the user is authenticated, mutations are serialised to localStorage. When the browser comes back online, the queue is replayed against the backend API automatically.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="13-core-technology-stack">1.3 Core Technology Stack </h3>
+<h4 id="backend">Backend </h4>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Library / Version</th>
+<th>Role in Project</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Language</td>
+<td>Python 3.13</td>
+<td>Application runtime</td>
+</tr>
+<tr>
+<td>Web framework</td>
+<td>FastAPI 0.135</td>
+<td>REST API, routing, dependency injection</td>
+</tr>
+<tr>
+<td>ORM</td>
+<td>SQLAlchemy 2.0 (async)</td>
+<td>Database access, model definitions, column properties</td>
+</tr>
+<tr>
+<td>Async driver</td>
+<td>asyncpg</td>
+<td>Non-blocking PostgreSQL I/O</td>
+</tr>
+<tr>
+<td>Sync driver</td>
+<td>psycopg2</td>
+<td>Alembic migration runner + seed scripts</td>
+</tr>
+<tr>
+<td>Database</td>
+<td>PostgreSQL 16</td>
+<td>Persistent relational data store</td>
+</tr>
+<tr>
+<td>Migrations</td>
+<td>Alembic</td>
+<td>Schema versioning and auto-upgrade on startup</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>PyJWT</td>
+<td>JWT creation / verification for access and refresh tokens</td>
+</tr>
+<tr>
+<td>OAuth client</td>
+<td>httpx</td>
+<td>Token exchange and userinfo fetching from Google</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Pydantic v2 + pydantic-settings</td>
+<td>Request/response schemas, typed env config</td>
+</tr>
+<tr>
+<td>Logging</td>
+<td>Loguru</td>
+<td>Structured application logging, uvicorn interception</td>
+</tr>
+</tbody>
+</table>
+<h4 id="frontend">Frontend </h4>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Library / Version</th>
+<th>Role in Project</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Language</td>
+<td>TypeScript</td>
+<td>Strongly-typed application code</td>
+</tr>
+<tr>
+<td>UI framework</td>
+<td>React 19</td>
+<td>Component rendering</td>
+</tr>
+<tr>
+<td>Build tool</td>
+<td>Vite</td>
+<td>Dev server, production bundling</td>
+</tr>
+<tr>
+<td>Routing</td>
+<td>TanStack Router</td>
+<td>File-based routing, type-safe navigation</td>
+</tr>
+<tr>
+<td>Server state</td>
+<td>TanStack Query</td>
+<td>Data fetching, caching, invalidation</td>
+</tr>
+<tr>
+<td>HTTP client</td>
+<td>Axios</td>
+<td>REST calls to backend, interceptor-based 401 refresh</td>
+</tr>
+<tr>
+<td>UI library</td>
+<td>MUI 7 (Material UI)</td>
+<td>Component system, theming, icons</td>
+</tr>
+<tr>
+<td>Local database</td>
+<td>Dexie 4 (IndexedDB)</td>
+<td>Offline-first local storage</td>
+</tr>
+<tr>
+<td>Charts</td>
+<td>Recharts 3</td>
+<td>Balance trend chart, category breakdown</td>
+</tr>
+<tr>
+<td>API client</td>
+<td>openapi-generator (typescript-axios)</td>
+<td>Generated, typed API bindings from backend OpenAPI spec</td>
+</tr>
+<tr>
+<td>Test runner</td>
+<td>Vitest + Testing Library</td>
+<td>Unit and component tests</td>
+</tr>
+<tr>
+<td>Linter / Formatter</td>
+<td>ESLint + Prettier</td>
+<td>Code quality enforcement</td>
+</tr>
+</tbody>
+</table>
+<h4 id="infrastructure">Infrastructure </h4>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Technology</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Containerisation</td>
+<td>Docker + Docker Compose</td>
+<td>Local full-stack orchestration</td>
+</tr>
+<tr>
+<td>Database container</td>
+<td>postgres:16-alpine</td>
+<td>Isolated PostgreSQL instance</td>
+</tr>
+<tr>
+<td>Frontend container</td>
+<td>node:22-alpine</td>
+<td>Serves Vite dev server</td>
+</tr>
+<tr>
+<td>Backend container</td>
+<td>python:3.13-slim</td>
+<td>Serves uvicorn with hot-reload</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="2-user-manual">2. User Manual </h2>
+<h3 id="21-getting-started">2.1 Getting Started </h3>
+<p>Daily works in two modes, and you choose which on first visit.</p>
+<p><strong>Local mode — no account required</strong></p>
+<ol>
+<li>Open the app in your browser.</li>
+<li>Click <strong>Get started locally</strong>.</li>
+<li>Enter a display name and an email address. The email is your local identifier only — it is never sent to a server.</li>
+<li>You are taken directly to the Dashboard. All your data is stored in your browser's IndexedDB database.</li>
+</ol>
+<blockquote>
+<p><strong>Important:</strong> Local data lives in the browser you used to create it. Clearing browser storage, using a different browser, or switching devices will not carry your data over — unless you link a Google account first.</p>
+</blockquote>
+<p><strong>Online mode — Google account</strong></p>
+<ol>
+<li>Open the app.</li>
+<li>Click <strong>Login via Google</strong>.</li>
+<li>Complete the Google sign-in flow on Google's page.</li>
+<li>You are redirected back to Daily's callback page, which verifies your session and then takes you to the Dashboard.</li>
+</ol>
+<p>If you had local data before signing in with Google, Daily will automatically sync it to your account during the callback step.</p>
+<hr>
+<h3 id="22-authentication--access">2.2 Authentication &amp; Access </h3>
+<h4 id="local-profile-creation">Local Profile Creation </h4>
+<p>When you choose local mode, a profile record with <code>key: "local"</code> is written to the browser's IndexedDB. This profile persists across browser sessions until you explicitly log out. On every subsequent visit, Daily detects this record and automatically places you in local mode.</p>
+<h4 id="google-oauth-sign-in-flow">Google OAuth Sign-In Flow </h4>
+<ol>
+<li>The app redirects your browser to <code>GET /api/v1/google/login</code>.</li>
+<li>The backend constructs a short-lived signed JWT as the OAuth <strong>state</strong> token (expires after the configured <code>jwt_login_token_expire_minutes</code> window) and redirects to Google's authorization endpoint.</li>
+<li>Google presents its consent screen. The requested scopes are <code>openid profile email</code> with <code>access_type=offline</code>.</li>
+<li>After you approve, Google redirects to the configured <code>redirect_uri</code> with an authorization <code>code</code> and the <code>state</code> token.</li>
+<li>The backend's <code>GET /api/v1/oauth/callback</code> validates the <code>state</code> token, exchanges the <code>code</code> for an access token at Google's token endpoint, then calls Google's userinfo endpoint to retrieve your <code>sub</code>, email, display name, and avatar URL.</li>
+<li>The backend performs a <strong>find-or-create</strong> on the <code>provided_users</code> table using the Google <code>sub</code>. If this is your first sign-in, a new <code>users</code> record and a <code>provided_users</code> record are created.</li>
+<li>The backend issues two httpOnly cookies: <code>access_token</code> (short-lived, configured by <code>JWT_ACCESS_TOKEN_EXPIRE_MINUTES</code>) and <code>refresh_token</code> (long-lived, configured by <code>JWT_REFRESH_TOKEN_EXPIRE_DAYS</code>).</li>
+<li>The browser is redirected to the frontend's <code>/callback</code> route, which calls <code>POST /api/v1/oauth/validate</code> to confirm the session.</li>
+</ol>
+<h4 id="token-refresh">Token Refresh </h4>
+<p>When any API call returns <code>401 Unauthorized</code>, the frontend's Axios response interceptor silently calls <code>POST /api/v1/oauth/refresh</code>. If the refresh token is still valid, the backend issues a new access token cookie and the original request is transparently retried. If the refresh also fails, the user is redirected to the login page (<code>/</code>).</p>
+<h4 id="logout">Logout </h4>
+<ul>
+<li><strong>Local mode:</strong> Clicking logout in Settings calls <code>logoutLocal()</code>, which deletes the local profile from IndexedDB, clears the auth mode, and navigates to <code>/</code>.</li>
+<li><strong>Online mode:</strong> Clicking logout calls <code>POST /api/v1/oauth/logout</code>, which deletes both the <code>access_token</code> and <code>refresh_token</code> cookies server-side, and then navigates to <code>/</code>.</li>
+</ul>
+<hr>
+<h3 id="23-dashboard">2.3 Dashboard </h3>
+<p>The Dashboard is the first page you see after logging in. It gives you a financial snapshot at a glance.</p>
+<p><strong>What you see:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Balance Header</strong></td>
+<td>Total net balance across all accounts that have <code>include_in_total</code> enabled.</td>
+</tr>
+<tr>
+<td><strong>Balance Trend Chart</strong></td>
+<td>A line chart of your net balance over time. You can switch between <strong>Daily</strong>, <strong>Weekly</strong>, <strong>Monthly</strong>, <strong>Yearly</strong>, or a <strong>Custom date range</strong>.</td>
+</tr>
+<tr>
+<td><strong>Summary Tiles</strong></td>
+<td>Total income and total expenses for the selected interval.</td>
+</tr>
+<tr>
+<td><strong>Category Breakdown</strong></td>
+<td>A breakdown of spending (or income) grouped by category for the selected interval.</td>
+</tr>
+<tr>
+<td><strong>Recent Transactions</strong></td>
+<td>The 10 most recent transactions across all accounts.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>In local mode, the Dashboard is built from your IndexedDB data in the browser. In online mode, it is fetched from <code>GET /api/v1/dashboard</code>.</p>
+</blockquote>
+<hr>
+<h3 id="24-accounts">2.4 Accounts </h3>
+<p>Accounts represent your real-world money containers — bank accounts, wallets, savings pots, or credit cards.</p>
+<h4 id="viewing-accounts">Viewing Accounts </h4>
+<p>Navigate to <strong>Accounts</strong> via the bottom navigation bar. You see a list of all your active (non-archived) accounts. Each card shows the account name, currency, current balance, and icon.</p>
+<blockquote>
+<p>The balance shown is always <strong>computed live</strong> from all non-deleted transactions linked to that account. It is never stored as a static value.</p>
+</blockquote>
+<h4 id="creating-an-account">Creating an Account </h4>
+<ol>
+<li>Tap the <strong>+</strong> button or navigate to <code>/accounts/new</code>.</li>
+<li>Fill in the required fields:
+<ul>
+<li><strong>Name</strong> — must be unique across your accounts (case-sensitive at the database level).</li>
+<li><strong>Currency</strong> — a 3-letter ISO 4217 currency code (e.g. <code>USD</code>, <code>HUF</code>, <code>EUR</code>).</li>
+<li><strong>Icon</strong> — choose a MUI icon name.</li>
+<li><strong>Color</strong> — a hex colour code (e.g. <code>#1976d2</code>).</li>
+<li><strong>Include in total</strong> — whether this account's balance is included in the Dashboard's net total.</li>
+</ul>
+</li>
+<li>Submit. The account is created immediately (locally in offline mode, or via <code>POST /api/v1/accounts</code> in online mode).</li>
+</ol>
+<blockquote>
+<p><strong>Opening balance:</strong> To set an opening balance, create an income transaction dated to the account's start date after creating the account.</p>
+</blockquote>
+<h4 id="editing-an-account">Editing an Account </h4>
+<p>Navigate to the account's detail page (<code>/accounts/:id</code>) and use the edit form. You can change the name, icon, colour, include-in-total flag, and archived status. Currency cannot be changed while transactions exist on the account (this is validated at the application layer).</p>
+<h4 id="archiving-an-account">Archiving an Account </h4>
+<p>Setting <code>is_archived = true</code> via the edit form hides the account from pickers and selectors throughout the app but preserves its full transaction history and keeps its balance contribution to statistics. Archived accounts are never physically deleted.</p>
+<hr>
+<h3 id="25-categories">2.5 Categories </h3>
+<p>Categories organise your transactions. They form a two-level tree (parent → children) and are typed as either <strong>expense</strong> or <strong>income</strong>.</p>
+<h4 id="viewing-categories">Viewing Categories </h4>
+<p>Navigate to <strong>Categories</strong> via the bottom navigation bar. You see a flat list of all your active categories.</p>
+<p>The tree view is also available at <code>GET /api/v1/categories/tree</code> (API) or via the <code>useCategories</code> hook which the UI consumes as a flat list and assembles into a tree on the client with <code>categoryTree.ts</code>.</p>
+<h4 id="creating-a-category">Creating a Category </h4>
+<ol>
+<li>Tap the <strong>+</strong> button or navigate to <code>/categories/new</code>.</li>
+<li>Fill in:
+<ul>
+<li><strong>Name</strong> — must be non-empty; unique within the same parent / type / user combination.</li>
+<li><strong>Type</strong> — <code>expense</code> or <code>income</code>.</li>
+<li><strong>Parent</strong> — optionally select an existing category of the same type as the parent.</li>
+<li><strong>Icon</strong> and <strong>Color</strong> — display customisation.</li>
+</ul>
+</li>
+<li>Submit.</li>
+</ol>
+<blockquote>
+<p>A category cannot be its own parent. This is enforced by a database <code>CHECK</code> constraint (<code>ck_categories_parent_not_self</code>).</p>
+</blockquote>
+<h4 id="editing-a-category">Editing a Category </h4>
+<p>Navigate to <code>/categories/:id</code>. You can change the name, parent, icon, colour, and type. Moving a category to a different parent is permitted as long as it does not create a cycle (the database constraint prevents self-reference; the app enforces no deeper cycle check beyond that at this time).</p>
+<h4 id="deleting-a-category">Deleting a Category </h4>
+<p>Deleting a category is a <strong>soft delete</strong> — <code>deleted_at</code> is set on the record. Transactions linked to a deleted category retain their <code>category_id</code> FK (set to <code>NULL</code> via <code>ON DELETE SET NULL</code>), so historical data is preserved.</p>
+<blockquote>
+<p>Before deleting a category that has active transactions, consider reassigning those transactions to another category to avoid <code>null</code> category references.</p>
+</blockquote>
+<hr>
+<h3 id="26-transactions">2.6 Transactions </h3>
+<p>Transactions are the core records of your financial activity.</p>
+<h4 id="transaction-types">Transaction Types </h4>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Required fields</th>
+<th>Account fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Expense</strong></td>
+<td><code>amount</code>, <code>category_id</code>, <code>source_account_id</code>, <code>occurred_at</code></td>
+<td>Money flows <strong>out of</strong> the source account.</td>
+</tr>
+<tr>
+<td><strong>Income</strong></td>
+<td><code>amount</code>, <code>category_id</code>, <code>destination_account_id</code>, <code>occurred_at</code></td>
+<td>Money flows <strong>into</strong> the destination account.</td>
+</tr>
+<tr>
+<td><strong>Transfer</strong></td>
+<td><code>amount</code>, <code>source_account_id</code>, <code>destination_account_id</code>, <code>occurred_at</code></td>
+<td>No category. If the accounts have different currencies, <code>target_amount</code> must be provided (the credited amount in the destination account's currency).</td>
+</tr>
+</tbody>
+</table>
+<h4 id="viewing-transactions">Viewing Transactions </h4>
+<p>Navigate to <strong>Transactions</strong> (the <code>+</code> FAB in the middle of the bottom navigation opens the New Transaction page; the Transactions list is accessible from the nav item). The list supports filtering by:</p>
+<ul>
+<li>Date range (<code>date_from</code>, <code>date_to</code>)</li>
+<li>Category</li>
+<li>Account</li>
+<li>Transaction type</li>
+</ul>
+<p>Pagination is controlled by <code>skip</code> and <code>limit</code> query parameters (default: skip=0, limit=100, max limit=1000). The total record count is returned in the <code>total</code> field of the response.</p>
+<h4 id="creating-a-transaction">Creating a Transaction </h4>
+<ol>
+<li>Navigate to <code>/transactions/new</code> or tap the <strong>+</strong> FAB.</li>
+<li>Select the transaction type.</li>
+<li>For <strong>expense</strong>: choose a source account, a category, enter the amount, and optionally a date and note.</li>
+<li>For <strong>income</strong>: choose a destination account, a category, enter the amount, and optionally a date and note.</li>
+<li>For <strong>transfer</strong>: choose a source and a destination account (they must be different), enter the debit amount, and if the currencies differ, also enter the credited target amount.</li>
+<li>Submit.</li>
+</ol>
+<h4 id="editing-a-transaction">Editing a Transaction </h4>
+<p>Navigate to <code>/transactions/:id</code>. Any field can be changed. After save, the relevant account balances are recalculated automatically on the next read (because balance is a computed column, not a stored value).</p>
+<h4 id="deleting-a-transaction">Deleting a Transaction </h4>
+<p>Deletion is always a <strong>soft delete</strong>: <code>deleted_at</code> is set and the transaction is excluded from all balance and dashboard calculations. The record itself remains in the database for audit/history purposes.</p>
+<hr>
+<h3 id="27-settings">2.7 Settings </h3>
+<p>The Settings page (<code>/settings</code>) provides account and application controls.</p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Profile</strong></td>
+<td>Displays your current auth mode (local or online) and your name.</td>
+</tr>
+<tr>
+<td><strong>Link Google Account</strong></td>
+<td>Visible in local mode. Tapping this redirects to Google OAuth, exactly as the main login flow. On return, your local IndexedDB data is pushed to the backend and local storage is cleared.</td>
+</tr>
+<tr>
+<td><strong>Manual Sync</strong></td>
+<td>Visible in online mode when local data still exists. Initiates <code>POST /api/v1/sync/push</code> manually and clears local storage on success.</td>
+</tr>
+<tr>
+<td><strong>Theme</strong></td>
+<td>Toggle between Light and Dark mode. Preference is persisted to <code>localStorage</code> under the key <code>daily-theme-mode</code>. The app also respects the OS <code>prefers-color-scheme</code> media query if no preference is stored.</td>
+</tr>
+<tr>
+<td><strong>Logout</strong></td>
+<td>Ends the session (local or online) and returns to the login page.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="28-troubleshooting-faq">2.8 Troubleshooting FAQ </h3>
+<p><strong>Q: My data disappeared after I cleared browser storage.</strong><br>
+A: In local mode, all data lives in your browser's IndexedDB. If you clear site data or use a private browsing window, that data is not available. To prevent this, link your Google account via Settings before clearing data.</p>
+<p><strong>Q: I get "Login could not be completed" on the callback page.</strong><br>
+A: The most common cause is an expired or invalid OAuth state token. The state token is a short-lived JWT that expires within the configured <code>jwt_login_token_expire_minutes</code> window. Start the login flow again from the home page.</p>
+<p><strong>Q: My session expired while I was using the app.</strong><br>
+A: The app automatically attempts a silent token refresh when a request returns <code>401</code>. If the refresh token has also expired, you will be redirected to the login page. Simply sign in again — your cloud data is preserved.</p>
+<p><strong>Q: I made changes while offline but they did not appear after I reconnected.</strong><br>
+A: Changes made while offline in authenticated mode are queued in <code>localStorage</code> under the key <code>daily_offline_queue</code>. They are replayed automatically when the browser detects the <code>online</code> event. A success notification is shown after replay. If some mutations failed, they remain in the queue for the next reconnect attempt.</p>
+<p><strong>Q: Why is my account balance different from what I expect?</strong><br>
+A: Balance is always computed from transaction rows — it is not stored as a static field. If a transaction was soft-deleted (<code>deleted_at</code> set), it is excluded. If you have a transfer with <code>target_amount</code>, that value (not <code>amount</code>) is credited to the destination account.</p>
+<p><strong>Q: Can I use the app on multiple browsers or devices without a Google account?</strong><br>
+A: No. Local mode is scoped to a single browser's IndexedDB. For multi-device use, sign in with Google so your data is persisted in the cloud backend.</p>
+<hr>
+<h2 id="3-developer--maintainer-manual">3. Developer &amp; Maintainer Manual </h2>
+<h3 id="31-local-development-setup">3.1 Local Development Setup </h3>
+<h4 id="prerequisites">Prerequisites </h4>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>Minimum Version</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python</td>
+<td>3.13</td>
+<td>Backend runtime</td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td>22</td>
+<td>Frontend dev server and build</td>
+</tr>
+<tr>
+<td>npm</td>
+<td>10+</td>
+<td>Frontend package manager</td>
+</tr>
+<tr>
+<td>Docker Desktop</td>
+<td>Any recent</td>
+<td>Recommended for full-stack local run</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td>16</td>
+<td>Only needed for manual (non-Docker) setup</td>
+</tr>
+</tbody>
+</table>
+<h4 id="environment-variables">Environment Variables </h4>
+<p>Create a <code>.env</code> file in the repository root (next to <code>docker-compose.yml</code>). The backend reads it via <code>pydantic-settings</code> with a <code>../.env</code> path relative to the <code>backend/</code> directory.</p>
+<pre data-role="codeBlock" data-info="dotenv" class="language-dotenv dotenv"><code># ─── Application ──────────────────────────────────────────────────
+log_level=INFO
+environment=development     # 'development' or 'production'
+
+# ─── Database (db_ prefix) ────────────────────────────────────────
+db_host=localhost           # Use 'db' when running in Docker Compose
+db_port=5432
+db_username=postgres
+db_password=your_password
+db_name=daily
+
+# ─── JWT (jwt_ prefix) ────────────────────────────────────────────
+jwt_secret_key=your_very_long_random_secret_key
+jwt_algorithm=HS256
+jwt_access_token_expire_minutes=30
+jwt_refresh_token_expire_days=30
+jwt_login_token_expire_minutes=10
+
+# ─── Google OAuth (google_ prefix) ────────────────────────────────
+google_client_id=your_google_client_id.apps.googleusercontent.com
+google_client_secret=your_google_client_secret
+google_redirect_uri=http://localhost:8000/api/v1/oauth/callback
+google_token_url=https://oauth2.googleapis.com/token
+google_userinfo_url=https://www.googleapis.com/oauth2/v3/userinfo
+
+# ─── Frontend (frontend_ prefix) ──────────────────────────────────
+frontend_auth_callback=http://localhost:3000/callback
+frontend_cors_origins=http://localhost:3000
+
+# ─── Docker port mapping (optional overrides) ────────────────────
+db_port_exposed=5432
+backend_port=8000
+</code></pre><blockquote>
+<p><strong>Security:</strong> Never commit real secrets to version control. Use environment variable injection at the runtime boundary (Docker secrets, CI secret stores, or a secrets manager).</p>
+</blockquote>
+<h4 id="option-a--full-stack-with-docker-compose-recommended">Option A — Full Stack with Docker Compose (recommended) </h4>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose up <span class="token parameter variable">--build</span>
+</code></pre><p>This starts three services:</p>
+<ul>
+<li><code>daily-db</code> — PostgreSQL 16, health-checked before the backend starts.</li>
+<li><code>daily-backend</code> — FastAPI with <code>--reload</code>, hot-reloading from <code>./backend/app</code> and <code>./backend/db</code>.</li>
+<li><code>daily-frontend</code> — Vite dev server on port 3000.</li>
+</ul>
+<p>The backend service overrides <code>db_host=db</code> via the <code>environment</code> block in <code>docker-compose.yml</code> so that it resolves to the <code>db</code> container, not <code>localhost</code>.</p>
+<h4 id="option-b--backend-only-manual-python">Option B — Backend Only (manual Python) </h4>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> backend
+pip <span class="token function">install</span> <span class="token parameter variable">-r</span> requirements.txt
+alembic upgrade <span class="token function">head</span>
+uvicorn app.main:app <span class="token parameter variable">--host</span> <span class="token number">0.0</span>.0.0 <span class="token parameter variable">--port</span> <span class="token number">8000</span> <span class="token parameter variable">--reload</span>
+</code></pre><p>Alembic automatically creates the configured database if it does not exist (via <code>ensure_database_exists()</code> in <code>db/core.py</code>), then runs all pending migrations.</p>
+<h4 id="option-c--frontend-only-manual-node">Option C — Frontend Only (manual Node) </h4>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> frontend
+<span class="token function">npm</span> <span class="token function">install</span>
+<span class="token function">npm</span> run start        <span class="token comment"># Vite dev server on port 3000</span>
+</code></pre><p>The frontend reads the API base URL from the runtime-injected <code>window.__ENV__.VITE_API_BASE_URL</code>, falling back to <code>import.meta.env.VITE_API_BASE_URL</code> (build-time) and then <code>window.location.origin</code> as a last resort.</p>
+<h4 id="running-tests">Running Tests </h4>
+<p><strong>Backend:</strong></p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> backend
+pytest
+</code></pre><p>Tests use <code>conftest.py</code> at the root of the backend directory, which sets up an in-process test database and a <code>TestClient</code> with dependency overrides.</p>
+<p><strong>Frontend:</strong></p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> frontend
+<span class="token function">npm</span> run <span class="token builtin class-name">test</span>       <span class="token comment"># vitest run (single pass)</span>
+</code></pre><h4 id="regenerating-the-api-client">Regenerating the API Client </h4>
+<p>When backend endpoints change, regenerate the TypeScript API client:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> frontend
+<span class="token function">npm</span> run gen-api
+</code></pre><p>This calls <code>openapi-generator-cli</code> against <code>http://localhost:8000/openapi.json</code> and writes the generated client to <code>src/api/generated/</code>. Commit the regenerated files.</p>
+<hr>
+<h3 id="32-backend-architecture-deep-dive">3.2 Backend Architecture Deep-Dive </h3>
+<h4 id="directory-structure">Directory Structure </h4>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>backend/
+├── alembic.ini                   # Alembic config — points to db/migrations/
+├── conftest.py                   # Shared pytest fixtures
+├── requirements.txt
+├── Dockerfile
+│
+├── app/
+│   ├── main.py                   # FastAPI app, lifespan, CORS, request logging middleware
+│   ├── routers.py                # Central router — all /api/v1/* prefixes registered here
+│   │
+│   ├── core/
+│   │   ├── config.py             # pydantic-settings: AppConfig, Database, JWT, Google, Frontend
+│   │   └── logging.py            # Loguru config + uvicorn log interception
+│   │
+│   ├── auth/
+│   │   ├── schema.py             # TokenData, TokenType, FlowType, AuthMethod, ResponseMessage
+│   │   ├── jwt_utils.py          # Token creation/decoding, get_current_user dependency
+│   │   ├── oauth_router.py       # /oauth/logout, /validate, /refresh, /token, /callback
+│   │   └── google/
+│   │       └── google_router.py  # GET /google/login — builds redirect URL
+│   │
+│   ├── accounts/                 # Accounts CRUD
+│   ├── categories/               # Categories CRUD + tree builder
+│   ├── transactions/             # Transactions CRUD + filtered list
+│   ├── dashboard/                # Dashboard aggregation
+│   ├── sync/                     # One-time sync push
+│   └── users/                    # User and provider CRUD (internal)
+│
+└── db/
+    ├── core.py                   # Async engine, session factory, DB auto-create
+    ├── models.py                 # All SQLAlchemy ORM models + balance column_property
+    └── migrations/
+        ├── env.py                # Alembic environment — uses sync engine from core.py
+        └── versions/             # Migration scripts
+</code></pre><h4 id="application-startup">Application Startup </h4>
+<p>On startup, the FastAPI <code>lifespan</code> context manager:</p>
+<ol>
+<li>Calls <code>configure_logging()</code> — sets up Loguru and intercepts uvicorn's standard logging.</li>
+<li>Calls <code>_run_migrations()</code> — runs <code>alembic upgrade head</code> via Python API. If the database does not exist yet (<code>OperationalError</code> matching the missing DB pattern), it calls <code>ensure_database_exists()</code> which connects to the <code>postgres</code> administrative database and issues <code>CREATE DATABASE</code>. The migration is then re-run.</li>
+<li>Logs <code>"Application startup complete."</code> and yields control.</li>
+</ol>
+<h4 id="middleware-stack">Middleware Stack </h4>
+<p>Applied in order (outermost first):</p>
+<table>
+<thead>
+<tr>
+<th>Middleware</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CORSMiddleware</code></td>
+<td>Allows requests from <code>frontend_cors_origins</code>. <code>allow_credentials=True</code> is required for cookie-based auth.</td>
+</tr>
+<tr>
+<td><code>request_logging_middleware</code></td>
+<td>Logs every HTTP request with method, path, status code, and elapsed milliseconds to Loguru.</td>
+</tr>
+<tr>
+<td><code>unhandled_exception_handler</code></td>
+<td>Catches any unhandled exceptions and returns a <code>500 {"detail": "Internal server error"}</code> JSON response, ensuring CORS headers are present even on crashes.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="api-specifications">API Specifications </h4>
+<p>All endpoints are prefixed with <code>/api/v1/</code>. Authentication is via httpOnly cookie (<code>access_token</code>). Protected routes use the <code>get_current_user</code> FastAPI dependency.</p>
+<hr>
+<h5 id="auth--google-login">Auth — Google Login </h5>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/google/login</code></td>
+<td>None</td>
+<td>Builds a signed state JWT and redirects to <code>https://accounts.google.com/o/oauth2/v2/auth</code> with <code>scope=openid profile email</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h5 id="auth--oauth">Auth — OAuth </h5>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/oauth/callback</code></td>
+<td>None (cookies are set here)</td>
+<td>Exchanges authorization code for Google tokens, fetches userinfo, find-or-creates the backend user, sets <code>access_token</code> and <code>refresh_token</code> cookies, and redirects to <code>frontend_auth_callback</code>.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/oauth/validate</code></td>
+<td><code>access_token</code> cookie</td>
+<td>Decodes the access token, verifies the user exists in DB. Returns <code>{"message": "Access token is valid"}</code> or <code>401</code>.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/oauth/refresh</code></td>
+<td><code>refresh_token</code> cookie</td>
+<td>Issues a new <code>access_token</code> cookie from a valid refresh token.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/oauth/logout</code></td>
+<td>None</td>
+<td>Deletes <code>access_token</code> and <code>refresh_token</code> cookies.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/oauth/token</code></td>
+<td><code>access_token</code> cookie</td>
+<td>Returns the raw access token string (for API clients that cannot read cookies).</td>
+</tr>
+</tbody>
+</table>
+<p>Cookie security policy:</p>
+<pre data-role="codeBlock" data-info="python" class="language-python python"><code><span class="token punctuation">{</span>
+    <span class="token string">"httponly"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span>
+    <span class="token string">"secure"</span><span class="token punctuation">:</span> <span class="token boolean">True</span><span class="token punctuation">,</span>        <span class="token comment"># only in production (environment == 'production')</span>
+    <span class="token string">"samesite"</span><span class="token punctuation">:</span> <span class="token string">"lax"</span><span class="token punctuation">,</span>
+    <span class="token string">"path"</span><span class="token punctuation">:</span> <span class="token string">"/"</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+</code></pre><hr>
+<h5 id="accounts">Accounts </h5>
+<p>All endpoints require <code>access_token</code> cookie.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Request Body</th>
+<th>Response</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/accounts</code></td>
+<td>—</td>
+<td><code>list[AccountIndex]</code></td>
+<td>All non-deleted accounts for the current user.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/accounts/{account_id}</code></td>
+<td>—</td>
+<td><code>AccountIndex</code></td>
+<td>Single account. Returns <code>404</code> if not found or not owned by the user.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/accounts</code></td>
+<td><code>CreateAccount</code></td>
+<td><code>201 No Content</code></td>
+<td>Creates a new account. Returns <code>400</code> on duplicate name (<code>IntegrityError</code>).</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/api/v1/accounts/{account_id}</code></td>
+<td><code>UpdateAccount</code></td>
+<td><code>AccountIndex</code></td>
+<td>Partial update — only provided fields are changed.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/accounts/{account_id}</code></td>
+<td>—</td>
+<td><code>204 No Content</code></td>
+<td>Soft-deletes the account (sets <code>deleted_at</code>).</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>CreateAccount</code> schema:</strong></p>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"string (required)"</span><span class="token punctuation">,</span>
+  <span class="token property">"currency_code"</span><span class="token operator">:</span> <span class="token string">"string, 3-letter ISO 4217 (required)"</span><span class="token punctuation">,</span>
+  <span class="token property">"icon_name"</span><span class="token operator">:</span> <span class="token string">"string (required)"</span><span class="token punctuation">,</span>
+  <span class="token property">"color"</span><span class="token operator">:</span> <span class="token string">"string, hex #RRGGBB (required)"</span><span class="token punctuation">,</span>
+  <span class="token property">"include_in_total"</span><span class="token operator">:</span> <span class="token string">"boolean (required)"</span><span class="token punctuation">,</span>
+  <span class="token property">"balance"</span><span class="token operator">:</span> <span class="token string">"decimal (optional, not yet persisted as a transaction)"</span>
+<span class="token punctuation">}</span>
+</code></pre><p><strong><code>AccountIndex</code> response schema:</strong></p>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"id"</span><span class="token operator">:</span> <span class="token string">"uuid"</span><span class="token punctuation">,</span>
+  <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"balance"</span><span class="token operator">:</span> <span class="token string">"decimal (computed from transactions)"</span><span class="token punctuation">,</span>
+  <span class="token property">"currency_code"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"icon_name"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"color"</span><span class="token operator">:</span> <span class="token string">"string"</span><span class="token punctuation">,</span>
+  <span class="token property">"include_in_total"</span><span class="token operator">:</span> <span class="token string">"boolean"</span><span class="token punctuation">,</span>
+  <span class="token property">"is_archived"</span><span class="token operator">:</span> <span class="token string">"boolean"</span>
+<span class="token punctuation">}</span>
+</code></pre><hr>
+<h5 id="categories">Categories </h5>
+<p>All endpoints require <code>access_token</code> cookie.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Request Body</th>
+<th>Response</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/categories</code></td>
+<td>—</td>
+<td><code>list[CategoryIndex]</code></td>
+<td>All non-deleted categories for the user.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/categories/tree</code></td>
+<td>—</td>
+<td><code>list[CategoryTree]</code></td>
+<td>Categories assembled as a recursive tree (root nodes with nested <code>children</code>).</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/categories/{category_id}</code></td>
+<td>—</td>
+<td><code>CategoryIndex</code></td>
+<td>Single category. Returns <code>404</code> if not found.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/categories</code></td>
+<td><code>CreateCategory</code></td>
+<td><code>201 No Content</code></td>
+<td>Creates a new category.</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/api/v1/categories/{category_id}</code></td>
+<td><code>UpdateCategory</code></td>
+<td><code>CategoryIndex</code></td>
+<td>Partial update.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/categories/{category_id}</code></td>
+<td>—</td>
+<td><code>204 No Content</code></td>
+<td>Soft-deletes the category.</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>CreateCategory</code> schema:</strong></p>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"name"</span><span class="token operator">:</span> <span class="token string">"string (required)"</span><span class="token punctuation">,</span>
+  <span class="token property">"type"</span><span class="token operator">:</span> <span class="token string">"expense | income (required)"</span><span class="token punctuation">,</span>
+  <span class="token property">"parent_id"</span><span class="token operator">:</span> <span class="token string">"uuid (optional)"</span><span class="token punctuation">,</span>
+  <span class="token property">"icon_name"</span><span class="token operator">:</span> <span class="token string">"string (required)"</span><span class="token punctuation">,</span>
+  <span class="token property">"color"</span><span class="token operator">:</span> <span class="token string">"string, hex #RRGGBB (optional)"</span>
+<span class="token punctuation">}</span>
+</code></pre><hr>
+<h5 id="transactions">Transactions </h5>
+<p>All endpoints require <code>access_token</code> cookie.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Query Params</th>
+<th>Request Body</th>
+<th>Response</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/transactions</code></td>
+<td><code>date_from</code>, <code>date_to</code>, <code>category_id</code>, <code>account_id</code>, <code>transaction_type</code>, <code>skip</code>, <code>limit</code></td>
+<td>—</td>
+<td><code>TransactionListResponse</code></td>
+<td>Filtered, paginated list.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/transactions/{transaction_id}</code></td>
+<td>—</td>
+<td>—</td>
+<td><code>TransactionIndex</code></td>
+<td>Single transaction.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/transactions</code></td>
+<td>—</td>
+<td><code>CreateTransaction</code></td>
+<td><code>201 No Content</code></td>
+<td>Creates a new transaction. Validates type-specific field requirements at the router layer before persisting.</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/api/v1/transactions/{transaction_id}</code></td>
+<td>—</td>
+<td><code>UpdateTransaction</code></td>
+<td><code>TransactionIndex</code></td>
+<td>Partial update.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/transactions/{transaction_id}</code></td>
+<td>—</td>
+<td>—</td>
+<td><code>204 No Content</code></td>
+<td>Soft-deletes the transaction.</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>TransactionListResponse</code> schema:</strong></p>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"data"</span><span class="token operator">:</span> <span class="token string">"list[TransactionIndex]"</span><span class="token punctuation">,</span>
+  <span class="token property">"total"</span><span class="token operator">:</span> <span class="token string">"integer (total matching rows before pagination)"</span><span class="token punctuation">,</span>
+  <span class="token property">"skip"</span><span class="token operator">:</span> <span class="token string">"integer"</span><span class="token punctuation">,</span>
+  <span class="token property">"limit"</span><span class="token operator">:</span> <span class="token string">"integer"</span>
+<span class="token punctuation">}</span>
+</code></pre><p><strong><code>CreateTransaction</code> schema:</strong></p>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"amount"</span><span class="token operator">:</span> <span class="token string">"decimal &gt; 0 (required)"</span><span class="token punctuation">,</span>
+  <span class="token property">"transaction_type"</span><span class="token operator">:</span> <span class="token string">"expense | income | transfer (required)"</span><span class="token punctuation">,</span>
+  <span class="token property">"occurred_at"</span><span class="token operator">:</span> <span class="token string">"datetime ISO 8601 (required)"</span><span class="token punctuation">,</span>
+  <span class="token property">"category_id"</span><span class="token operator">:</span> <span class="token string">"uuid (required for expense/income, null for transfer)"</span><span class="token punctuation">,</span>
+  <span class="token property">"source_account_id"</span><span class="token operator">:</span> <span class="token string">"uuid (required for expense/transfer, null for income)"</span><span class="token punctuation">,</span>
+  <span class="token property">"destination_account_id"</span><span class="token operator">:</span> <span class="token string">"uuid (required for income/transfer, null for expense)"</span><span class="token punctuation">,</span>
+  <span class="token property">"target_amount"</span><span class="token operator">:</span> <span class="token string">"decimal (required for cross-currency transfer)"</span><span class="token punctuation">,</span>
+  <span class="token property">"note"</span><span class="token operator">:</span> <span class="token string">"string (optional)"</span>
+<span class="token punctuation">}</span>
+</code></pre><hr>
+<h5 id="dashboard">Dashboard </h5>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Response</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/dashboard</code></td>
+<td><code>access_token</code> cookie</td>
+<td><code>DashboardIndex</code></td>
+<td>Returns all account briefs and the 10 most recent transactions for the user.</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>DashboardIndex</code> schema:</strong></p>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"accounts"</span><span class="token operator">:</span> <span class="token string">"list[AccountBrief]"</span><span class="token punctuation">,</span>
+  <span class="token property">"transactions"</span><span class="token operator">:</span> <span class="token string">"list[TransactionBrief]"</span>
+<span class="token punctuation">}</span>
+</code></pre><hr>
+<h5 id="sync">Sync </h5>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Request Body</th>
+<th>Response</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/sync/push</code></td>
+<td><code>access_token</code> cookie</td>
+<td><code>SyncPushRequest</code></td>
+<td><code>SyncPushResponse</code></td>
+<td>One-time bulk upload. Idempotent — rows whose <code>id</code> already exists are silently skipped.</td>
+</tr>
+</tbody>
+</table>
+<p><strong><code>SyncPushRequest</code> schema:</strong></p>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"accounts"</span><span class="token operator">:</span> <span class="token string">"list[SyncAccount]"</span><span class="token punctuation">,</span>
+  <span class="token property">"categories"</span><span class="token operator">:</span> <span class="token string">"list[SyncCategory]"</span><span class="token punctuation">,</span>
+  <span class="token property">"transactions"</span><span class="token operator">:</span> <span class="token string">"list[SyncTransaction]"</span>
+<span class="token punctuation">}</span>
+</code></pre><p><strong><code>SyncPushResponse</code> schema:</strong></p>
+<pre data-role="codeBlock" data-info="json" class="language-json json"><code><span class="token punctuation">{</span>
+  <span class="token property">"accounts_created"</span><span class="token operator">:</span> <span class="token string">"integer"</span><span class="token punctuation">,</span>
+  <span class="token property">"categories_created"</span><span class="token operator">:</span> <span class="token string">"integer"</span><span class="token punctuation">,</span>
+  <span class="token property">"transactions_created"</span><span class="token operator">:</span> <span class="token string">"integer"</span><span class="token punctuation">,</span>
+  <span class="token property">"message"</span><span class="token operator">:</span> <span class="token string">"string"</span>
+<span class="token punctuation">}</span>
+</code></pre><p>Insertion order within the transaction: accounts → categories → transactions (respects FK dependencies).</p>
+<hr>
+<h5 id="health">Health </h5>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/</code></td>
+<td>None</td>
+<td><code>{"msg": "Hello World"}</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/health</code></td>
+<td>None</td>
+<td><code>{"status": "ok"}</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="database-schema--constraints">Database Schema &amp; Constraints </h4>
+<p>All tables inherit <code>created_at</code>, <code>updated_at</code> (auto-maintained via <code>server_default</code> and <code>onupdate</code>), and <code>deleted_at</code> (nullable, used for soft deletes) from the <code>Base</code> declarative class.</p>
+<h5 id="users"><code>users</code> </h5>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID PK</td>
+<td><code>default=uuid4</code></td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td>VARCHAR(255)</td>
+<td>Nullable; unique partial index where <code>email IS NOT NULL AND deleted_at IS NULL</code></td>
+</tr>
+<tr>
+<td><code>display_name</code></td>
+<td>VARCHAR(255)</td>
+<td><code>CHECK length(trim(display_name)) &gt; 0</code></td>
+</tr>
+<tr>
+<td><code>avatar_url</code></td>
+<td>TEXT</td>
+<td>Nullable</td>
+</tr>
+</tbody>
+</table>
+<h5 id="providers"><code>providers</code> </h5>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID PK</td>
+<td></td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>VARCHAR(255)</td>
+<td>Unique partial index where <code>deleted_at IS NULL</code>; <code>CHECK length(trim(name)) &gt; 0</code></td>
+</tr>
+<tr>
+<td><code>is_enabled</code></td>
+<td>BOOLEAN</td>
+<td><code>server_default=true</code></td>
+</tr>
+</tbody>
+</table>
+<h5 id="provided_users"><code>provided_users</code> </h5>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID PK</td>
+<td></td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td>UUID FK → <code>users.id</code></td>
+<td><code>ON DELETE CASCADE</code></td>
+</tr>
+<tr>
+<td><code>provider_id</code></td>
+<td>UUID FK → <code>providers.id</code></td>
+<td><code>ON DELETE RESTRICT</code></td>
+</tr>
+<tr>
+<td><code>provider_user_id</code></td>
+<td>VARCHAR(255)</td>
+<td>Composite unique partial index on <code>(provider_id, provider_user_id)</code> where <code>deleted_at IS NULL</code></td>
+</tr>
+</tbody>
+</table>
+<h5 id="accounts-1"><code>accounts</code> </h5>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID PK</td>
+<td></td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td>UUID FK → <code>users.id</code></td>
+<td><code>ON DELETE CASCADE</code></td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>VARCHAR(255)</td>
+<td>Unique partial index on <code>(user_id, name)</code> where <code>deleted_at IS NULL</code>; <code>CHECK length(trim(name)) &gt; 0</code></td>
+</tr>
+<tr>
+<td><code>currency_code</code></td>
+<td>VARCHAR(3)</td>
+<td><code>CHECK currency_code ~ '^[A-Z]{3}$'</code></td>
+</tr>
+<tr>
+<td><code>icon_name</code></td>
+<td>VARCHAR(100)</td>
+<td><code>server_default='Savings'</code></td>
+</tr>
+<tr>
+<td><code>color</code></td>
+<td>VARCHAR(7)</td>
+<td><code>CHECK color ~ '^#[0-9A-Fa-f]{6}$'</code> or NULL</td>
+</tr>
+<tr>
+<td><code>include_in_total</code></td>
+<td>BOOLEAN</td>
+<td><code>server_default=true</code></td>
+</tr>
+<tr>
+<td><code>is_archived</code></td>
+<td>BOOLEAN</td>
+<td><code>server_default=false</code></td>
+</tr>
+<tr>
+<td><code>balance</code></td>
+<td>DECIMAL (computed)</td>
+<td><code>column_property</code> — a correlated scalar subquery that sums transaction credits minus debits for this account, excluding soft-deleted rows</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>balance</code> column property is computed at the SQL level using:</p>
+<ul>
+<li><code>coalesce(target_amount, amount)</code> for incoming transfers (credits the <code>target_amount</code> if present, otherwise <code>amount</code>)</li>
+<li><code>-amount</code> for outgoing transfers and expenses</li>
+<li><code>amount</code> for income</li>
+</ul>
+<h5 id="categories-1"><code>categories</code> </h5>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID PK</td>
+<td></td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td>UUID FK → <code>users.id</code></td>
+<td><code>ON DELETE CASCADE</code></td>
+</tr>
+<tr>
+<td><code>parent_id</code></td>
+<td>UUID FK → <code>categories.id</code></td>
+<td><code>ON DELETE SET NULL</code>; <code>CHECK parent_id &lt;&gt; id</code> (no self-reference)</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>VARCHAR(255)</td>
+<td>Unique on <code>(user_id, parent_id, name, category_type)</code> where active; <code>CHECK length(trim(name)) &gt; 0</code></td>
+</tr>
+<tr>
+<td><code>category_type</code></td>
+<td>VARCHAR(20)</td>
+<td><code>CHECK category_type IN ('expense', 'income')</code></td>
+</tr>
+<tr>
+<td><code>is_system_category</code></td>
+<td>BOOLEAN</td>
+<td><code>server_default=false</code></td>
+</tr>
+<tr>
+<td><code>icon_name</code></td>
+<td>VARCHAR(100)</td>
+<td><code>server_default='Savings'</code></td>
+</tr>
+<tr>
+<td><code>color</code></td>
+<td>VARCHAR(7)</td>
+<td><code>CHECK color ~ '^#[0-9A-Fa-f]{6}$'</code> or NULL</td>
+</tr>
+</tbody>
+</table>
+<h5 id="transactions-1"><code>transactions</code> </h5>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraints</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>UUID PK</td>
+<td></td>
+</tr>
+<tr>
+<td><code>user_id</code></td>
+<td>UUID FK → <code>users.id</code></td>
+<td><code>ON DELETE CASCADE</code></td>
+</tr>
+<tr>
+<td><code>source_account_id</code></td>
+<td>UUID FK → <code>accounts.id</code></td>
+<td>Nullable; <code>ON DELETE RESTRICT</code></td>
+</tr>
+<tr>
+<td><code>destination_account_id</code></td>
+<td>UUID FK → <code>accounts.id</code></td>
+<td>Nullable; <code>ON DELETE SET NULL</code></td>
+</tr>
+<tr>
+<td><code>category_id</code></td>
+<td>UUID FK → <code>categories.id</code></td>
+<td>Nullable; <code>ON DELETE SET NULL</code></td>
+</tr>
+<tr>
+<td><code>transaction_type</code></td>
+<td>VARCHAR(20)</td>
+<td><code>CHECK transaction_type IN ('income', 'expense', 'transfer', 'overwrite')</code></td>
+</tr>
+<tr>
+<td><code>amount</code></td>
+<td>NUMERIC(18,4)</td>
+<td><code>CHECK amount &gt; 0</code></td>
+</tr>
+<tr>
+<td><code>target_amount</code></td>
+<td>NUMERIC(18,4)</td>
+<td>Nullable; used for cross-currency transfers</td>
+</tr>
+<tr>
+<td><code>occurred_at</code></td>
+<td>DATETIME(tz)</td>
+<td>Not null</td>
+</tr>
+<tr>
+<td><code>note</code></td>
+<td>TEXT</td>
+<td>Nullable</td>
+</tr>
+</tbody>
+</table>
+<p>The most complex constraint is <code>ck_transactions_type_integrity</code>, a composite <code>CHECK</code> that enforces:</p>
+<ul>
+<li><strong>income</strong>: <code>destination_account_id NOT NULL</code>, <code>source_account_id IS NULL</code>, <code>category_id NOT NULL</code></li>
+<li><strong>expense</strong>: <code>source_account_id NOT NULL</code>, <code>destination_account_id IS NULL</code>, <code>category_id NOT NULL</code></li>
+<li><strong>transfer</strong>: <code>source_account_id NOT NULL</code>, <code>destination_account_id NOT NULL</code>, <code>source_account_id &lt;&gt; destination_account_id</code>, <code>category_id IS NULL</code>, <code>target_amount NOT NULL</code></li>
+</ul>
+<p>Indexes are defined on the most common query patterns:</p>
+<ul>
+<li><code>(user_id, occurred_at, deleted_at)</code> — main timeline queries</li>
+<li><code>(source_account_id, occurred_at)</code> and <code>(destination_account_id, occurred_at)</code> — per-account balance queries</li>
+<li><code>(user_id, transaction_type, occurred_at, deleted_at)</code> — type-filtered timeline</li>
+</ul>
+<h4 id="connection-pool-configuration">Connection Pool Configuration </h4>
+<p>The async SQLAlchemy engine is configured with:</p>
+<pre data-role="codeBlock" data-info="python" class="language-python python"><code>pool_size<span class="token operator">=</span><span class="token number">20</span>
+max_overflow<span class="token operator">=</span><span class="token number">30</span>
+pool_pre_ping<span class="token operator">=</span><span class="token boolean">True</span>
+</code></pre><p>This supports up to 50 simultaneous database connections (<code>pool_size + max_overflow</code>). <code>pool_pre_ping=True</code> discards stale connections before use.</p>
+<hr>
+<h3 id="33-frontend-architecture-deep-dive">3.3 Frontend Architecture Deep-Dive </h3>
+<h4 id="directory-structure-1">Directory Structure </h4>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>frontend/src/
+├── constants.ts                  # APP_NAME, API_BASE URL resolution
+├── main.tsx                      # Root render: QueryClientProvider + RouterProvider
+├── router.tsx                    # TanStack Router creation from generated route tree
+├── routeTree.gen.ts              # Auto-generated by TanStack Router plugin
+│
+├── api/
+│   ├── authClient.ts             # Separate axios instance (no interceptor) for auth calls
+│   ├── clients.ts                # Shared axios instance + generated API class instances
+│   ├── notificationService.ts    # Singleton notification bus (toast dispatcher)
+│   ├── queryClient.ts            # TanStack Query client (staleTime, retry config)
+│   ├── queryKeys.ts              # Canonical query key factory
+│   ├── responseHandler.ts        # Axios interceptor: 401 refresh, error toasts
+│   └── generated/                # Auto-generated TypeScript-Axios client
+│
+├── features/
+│   ├── accounts/                 # AccountsPage, CreateAccountPage, EditAccountPage
+│   │   ├── hooks/useAccounts.ts  # Dual-mode queries + mutations
+│   │   └── components/           # AccountCard, AccountForm, etc.
+│   ├── auth/
+│   │   ├── hooks/useLocalAuth.tsx # LocalAuthProvider + useLocalAuth hook
+│   │   ├── hooks/useAuthVerification.ts
+│   │   └── components/AuthGuard.tsx
+│   ├── categories/               # CategoriesPage, tree building, Create/EditCategoryPage
+│   ├── dashboard/                # DashboardPage + BalanceTrendChart, SummaryTiles, etc.
+│   ├── settings/                 # SettingsPage (logout, theme, sync)
+│   └── transactions/             # TransactionsPage, NewTransactionPage, EditTransactionPage
+│
+├── lib/
+│   ├── localDb.ts                # Dexie database class + table interface types
+│   ├── localCrud.ts              # CRUD functions for all local tables + balance helpers
+│   ├── offlineQueue.ts           # Mutation queue (localStorage) + replay logic
+│   └── syncPush.ts               # hasLocalData() + syncPushToBackend()
+│
+├── routes/                       # TanStack Router file-based route definitions
+│   ├── __root.tsx                # Root layout, providers, interceptor init, offline sync
+│   ├── index.tsx                 # Login page (/)
+│   ├── register.tsx              # Local registration (/register)
+│   ├── callback.tsx              # OAuth callback handler (/callback)
+│   ├── dashboard.tsx
+│   ├── settings.tsx
+│   ├── accounts/[index|new|$id].tsx
+│   ├── categories/[index|new|$id].tsx
+│   └── transactions/[index|new|$id].tsx
+│
+├── shared/
+│   ├── layout/                   # PageLayout, BottomNav, NotFoundPage, DemoPage
+│   ├── providers/SnackbarProvider.tsx
+│   ├── ThemeModeToggle.tsx
+│   └── ui/                       # EmptyState, NavButton, PageHeader, HealthIcon
+│
+└── theme/
+    ├── theme.ts                  # MUI theme definitions (light + dark)
+    └── themeMode.tsx             # ThemeModeProvider + useThemeMode hook
+</code></pre><h4 id="state-and-api-client-architecture">State and API Client Architecture </h4>
+<p><strong>Dual-mode hook pattern:</strong></p>
+<p>Every domain hook (<code>useAccounts</code>, <code>useCategories</code>, <code>useTransactions</code>, <code>useDashboard</code>) reads the current auth mode from <code>useLocalAuth()</code> and branches its <code>queryFn</code> accordingly:</p>
+<pre data-role="codeBlock" data-info="typescript" class="language-typescript typescript"><code><span class="token comment">// Online mode → backend API</span>
+<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> accountsApi<span class="token punctuation">.</span><span class="token function">getMyAccountsApiV1AccountsGet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span>r <span class="token operator">=&gt;</span> r<span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+
+<span class="token comment">// Local mode → IndexedDB</span>
+<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token function">getLocalAccounts</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span>list <span class="token operator">=&gt;</span> list<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span>toAccountIndex<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre><p>Mutations follow the same pattern and additionally handle the third state (online mode + offline):</p>
+<pre data-role="codeBlock" data-info="typescript" class="language-typescript typescript"><code><span class="token keyword keyword-if">if</span> <span class="token punctuation">(</span>isLocal <span class="token operator">||</span> <span class="token punctuation">(</span>mode <span class="token operator">===</span> <span class="token string">'online'</span> <span class="token operator">&amp;&amp;</span> <span class="token function">isOffline</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment">// Write to IndexedDB</span>
+  <span class="token comment">// If online, also enqueue for replay</span>
+<span class="token punctuation">}</span> <span class="token keyword keyword-else">else</span> <span class="token punctuation">{</span>
+  <span class="token comment">// Call backend API</span>
+<span class="token punctuation">}</span>
+</code></pre><p><strong>Query key structure</strong> (<code>queryKeys.ts</code>):</p>
+<pre data-role="codeBlock" data-info="typescript" class="language-typescript typescript"><code><span class="token punctuation">{</span>
+  dashboard<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'dashboard'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  accounts<span class="token operator">:</span> <span class="token punctuation">{</span>
+    all<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'accounts'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token function-variable function">detail</span><span class="token operator">:</span> <span class="token punctuation">(</span>id<span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">[</span><span class="token string">'accounts'</span><span class="token punctuation">,</span> id<span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  categories<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token operator">...</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  transactions<span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token operator">...</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span>
+</code></pre><p>All mutations call <code>queryClient.invalidateQueries</code> after success to trigger refetches of the relevant queries.</p>
+<p><strong>Axios interceptor</strong> (<code>responseHandler.ts</code>):</p>
+<p>Attached once in the root route's <code>useEffect</code>. It intercepts all responses from <code>apiClient</code> (the shared Axios instance):</p>
+<ol>
+<li>On <code>401</code>: marks the request <code>_retry=true</code> and calls <code>POST /api/v1/oauth/refresh</code> on a <strong>separate</strong> Axios instance (<code>authClient.ts</code> — without the interceptor, to avoid infinite loops). If successful, replays the original request. If the refresh also fails, calls <code>onUnauthenticated()</code> (a navigate-to-<code>/</code> callback) and shows an error toast.</li>
+<li>On <code>403</code>: shows "access denied" toast.</li>
+<li>On other <code>4xx</code> / <code>5xx</code>: extracts the <code>detail</code> field (string) or the first <code>msg</code> from a FastAPI <code>422</code> validation array, and shows an error toast.</li>
+<li>Cancelled requests (route changes / query stale) are silently ignored via <code>axios.isAxiosError &amp;&amp; error.code === 'ERR_CANCELED'</code>.</li>
+</ol>
+<h4 id="auth-guard">Auth Guard </h4>
+<p><code>AuthGuard</code> wraps all routed content. Its logic:</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>pathname in PUBLIC_PATHS (/,  /callback, /register)?
+  → render children immediately
+
+mode === 'local'?
+  → render children (no server check)
+
+mode === 'undetermined'?
+  → show spinner (waiting for IndexedDB profile check)
+
+mode === 'online' and status === 'pending'?
+  → show spinner (waiting for /validate call)
+
+status === 'unauthenticated'?
+  → render null (redirect already initiated by useAuthVerification)
+
+else → render children
+</code></pre><h4 id="offline-queue">Offline Queue </h4>
+<p><code>offlineQueue.ts</code> serialises mutations as JSON to <code>localStorage['daily_offline_queue']</code>. Each entry is a <code>QueueEntry</code> with a UUID, an ISO timestamp, and the mutation payload.</p>
+<p>The <code>setupOfflineSync()</code> function (called once from the root route) attaches a <code>window.addEventListener('online', ...)</code> listener. When the browser comes online, it calls <code>replayQueue()</code>, which iterates the queue and dispatches each mutation to the appropriate API endpoint. Successfully replayed entries are removed; failed entries remain in the queue for the next reconnect. The on-success callback invalidates all TanStack Query caches and shows a toast.</p>
+<h4 id="theme">Theme </h4>
+<p><code>ThemeModeProvider</code> persists the selected theme to <code>localStorage['daily-theme-mode']</code> and reads <code>prefers-color-scheme</code> as the fallback when no preference is stored. Programmatic dark mode is applied by toggling the <code>dark</code> class on <code>document.documentElement</code> and setting <code>document.documentElement.style.colorScheme</code>.</p>
+<hr>
+<h3 id="34-deployment--devops-infrastructure">3.4 Deployment &amp; DevOps Infrastructure </h3>
+<h4 id="docker-compose-development">Docker Compose (Development) </h4>
+<pre data-role="codeBlock" data-info="yaml" class="language-yaml yaml"><code><span class="token key atrule">services</span><span class="token punctuation">:</span>
+  <span class="token key atrule">db</span><span class="token punctuation">:</span>        <span class="token comment"># postgres:16-alpine with health check</span>
+  <span class="token key atrule">backend</span><span class="token punctuation">:</span>   <span class="token comment"># python:3.13-slim, uvicorn --reload, hot-reload via 'develop.watch'</span>
+  <span class="token key atrule">frontend</span><span class="token punctuation">:</span>  <span class="token comment"># node:22-alpine, 'npm run start' (Vite dev server)</span>
+</code></pre><p>The <code>develop.watch</code> block in the backend service uses Docker Compose Watch to sync <code>./backend/app</code> and <code>./backend/db</code> into the container without a full rebuild.</p>
+<h4 id="production-build">Production Build </h4>
+<p><strong>Frontend:</strong></p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token builtin class-name">cd</span> frontend
+<span class="token function">npm</span> run build      <span class="token comment"># Outputs to dist/</span>
+</code></pre><p>Vite produces a tree-shaken, code-split bundle. For production, set <code>VITE_API_BASE_URL</code> as a build-time env variable or inject it at runtime via <code>public/env.js</code> (which populates <code>window.__ENV__</code>).</p>
+<p><strong>Backend:</strong></p>
+<p>The backend Dockerfile is single-stage (<code>python:3.13-slim</code>). For production, run:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code>uvicorn app.main:app <span class="token parameter variable">--host</span> <span class="token number">0.0</span>.0.0 <span class="token parameter variable">--port</span> <span class="token number">8000</span> <span class="token parameter variable">--workers</span> <span class="token number">4</span>
+</code></pre><p>Remove <code>--reload</code> and set <code>environment=production</code> in the env file to enable <code>secure=True</code> on cookies.</p>
+<h4 id="database-migrations">Database Migrations </h4>
+<p>Migrations are managed by Alembic. The migration history lives in <code>backend/db/migrations/versions/</code>.</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># Apply all pending migrations</span>
+alembic upgrade <span class="token function">head</span>
+
+<span class="token comment"># Create a new migration (auto-generate from model diff)</span>
+alembic revision <span class="token parameter variable">--autogenerate</span> <span class="token parameter variable">-m</span> <span class="token string">"description"</span>
+
+<span class="token comment"># Roll back one migration</span>
+alembic downgrade <span class="token parameter variable">-1</span>
+</code></pre><p>The backend applies migrations automatically on every startup via <code>_run_migrations()</code>. In production, you may prefer to run <code>alembic upgrade head</code> as a pre-deploy step rather than on every process start.</p>
+<h4 id="seed-data">Seed Data </h4>
+<p><code>backend/db/seed/default_seed.py</code> can be run standalone to populate the database with default provider records (<code>google</code>) and system categories. Run it with the sync session factory from <code>db/core.py</code>.</p>
+<hr>
+<h2 id="4-system-edge-cases--known-technical-debt">4. System Edge Cases &amp; Known Technical Debt </h2>
+<h3 id="sync-conflict-resolution">Sync Conflict Resolution </h3>
+<p>The current sync push (<code>POST /api/v1/sync/push</code>) is append-only and idempotent: records whose <code>id</code> already exists are silently skipped. There is no conflict resolution for records that may have been modified both locally and on the server since the last sync. The winning record is always the server-side version, as the local record is not pushed if its <code>id</code> is already present.</p>
+<p><strong>Impact:</strong> If a user edits a transaction locally after previously having synced it, the local edit will not be propagated by a second push.</p>
+<p><strong>Mitigation planned:</strong> A pull-sync endpoint and <code>updated_at</code>-based conflict resolution (the spec's "last write wins" rule) are listed as future improvements in <code>local-user-plan.md</code>.</p>
+<h3 id="offline-queue-replay-failures">Offline Queue Replay Failures </h3>
+<p>Failed mutations remain in the queue after a replay pass but there is no back-off policy, retry limit, or conflict telemetry. If a mutation permanently fails (e.g., the referenced account was deleted server-side), it will block the queue indefinitely.</p>
+<p><strong>Impact:</strong> Stale or invalid mutations accumulate in <code>localStorage</code> and are retried on every reconnect event.</p>
+<p><strong>Mitigation planned:</strong> A retry count and maximum-attempts limit with user-facing conflict reporting are identified as pending work in <code>plan.md</code>.</p>
+<h3 id="opening-balance-transactions">Opening Balance Transactions </h3>
+<p>The <code>CreateAccount</code> schema includes an optional <code>balance</code> field, but the router currently does not create a corresponding income transaction when a non-zero opening balance is provided. The field is accepted and silently ignored.</p>
+<p><strong>Impact:</strong> Users who expect to set an opening balance at account creation will not have it reflected in the computed balance.</p>
+<p><strong>Workaround:</strong> Create a manual income transaction dated to the account's opening date.</p>
+<h3 id="overwrite-transaction-type"><code>overwrite</code> Transaction Type </h3>
+<p>The database <code>CHECK</code> constraint permits <code>transaction_type = 'overwrite'</code>, but no API endpoint, schema, or service layer code uses this type. It is reserved for a future balance-correction feature.</p>
+<h3 id="cookie-security-in-development">Cookie Security in Development </h3>
+<p>Cookies are set with <code>secure=False</code> when <code>environment != 'production'</code>. This is intentional for local HTTP development but must not be deployed as-is. Set <code>environment=production</code> in all production deployments to enforce <code>Secure</code> on cookies.</p>
+<h3 id="no-rate-limiting">No Rate Limiting </h3>
+<p>There are no rate limits on any API endpoint, including the OAuth callback and token refresh endpoints. A production deployment should place a reverse proxy (e.g., nginx, Caddy, or a cloud API gateway) in front of the backend with per-IP rate limiting on auth endpoints.</p>
+<h3 id="category-cycle-detection">Category Cycle Detection </h3>
+<p>The database enforces <code>parent_id &lt;&gt; id</code> (no direct self-reference), but does not detect multi-level cycles (e.g., A → B → A). The service layer does not perform cycle detection before updating a category's <code>parent_id</code>. Moving a category to a descendant of itself would create an inconsistent tree.</p>
+<h3 id="balance-computed-column-performance">Balance Computed Column Performance </h3>
+<p>The <code>balance</code> field on <code>Accounts</code> is a SQLAlchemy <code>column_property</code> backed by a correlated scalar subquery. This subquery executes once per account row returned in a query. For users with many transactions, this can be slow at scale. A future optimisation would be to cache balances in a materialized view or a separate table updated by triggers.</p>
+<h3 id="frontend-bundle-splitting">Frontend Bundle Splitting </h3>
+<p>The frontend is not configured with manual chunk splitting. On large datasets or as the codebase grows, the initial bundle size may increase. The <code>vite.config.ts</code> does not currently define <code>rollupOptions.output.manualChunks</code>.</p>
+<h3 id="missing-backend-side-pagination-for-accounts-and-categories">Missing Backend-Side Pagination for Accounts and Categories </h3>
+<p>The <code>GET /api/v1/accounts</code> and <code>GET /api/v1/categories</code> endpoints return all records for the user in a single response with no pagination. A <code>TODO</code> comment in the accounts router acknowledges this and notes it as future work for users with large numbers of accounts.</p>
+
+      </div>
+      
+      
+    
+    
+    <script type="module">
+// TODO: If ZenUML gets integrated into mermaid in the future,
+//      we can remove the following lines.
+
+
+var MERMAID_CONFIG = ({"startOnLoad":false});
+if (typeof MERMAID_CONFIG !== 'undefined') {
+  MERMAID_CONFIG.startOnLoad = false
+  MERMAID_CONFIG.cloneCssStyles = false
+  MERMAID_CONFIG.theme = "default"
+}
+
+mermaid.initialize(MERMAID_CONFIG || {})
+if (typeof(window['Reveal']) !== 'undefined') {
+  function mermaidRevealHelper(event) {
+    var currentSlide = event.currentSlide
+    var diagrams = currentSlide.querySelectorAll('div.mermaid')
+    for (var i = 0; i < diagrams.length; i++) {
+      var diagram = diagrams[i]
+      if (!diagram.hasAttribute('data-processed')) {
+        mermaid.init(null, diagram, ()=> {
+          Reveal.slide(event.indexh, event.indexv)
+        })
+      }
+    }
+  }
+  Reveal.addEventListener('slidetransitionend', mermaidRevealHelper)
+  Reveal.addEventListener('ready', mermaidRevealHelper)
+  await mermaid.run({
+    nodes: document.querySelectorAll('div.mermaid')
+  })
+} else {
+  await mermaid.run({
+    nodes: document.querySelectorAll('div.mermaid')
+  })
+}
+</script>
+    
+    
+    
+  
+    </body></html>
